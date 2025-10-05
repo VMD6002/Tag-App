@@ -29,7 +29,7 @@ const TagGroup = ({
   const Children = useMemo(
     () =>
       Object.keys(tags)
-        .filter((k: any) => k.Tag.startsWith(parent))
+        .filter((k) => k.startsWith(parent))
         .sort(),
     [tags, parent]
   );
