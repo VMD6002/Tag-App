@@ -5,13 +5,17 @@ import { rename } from "node:fs/promises";
 import type { ContentJsonType } from "../schemas/contentData.js";
 import { contentDataDB } from "../db/contentData.js";
 import { DecrementTagCount, IncrementTagCount, tagDB } from "../db/tags.js";
+import { ORPCError } from "@orpc/server";
 
 export async function setDoc(input: ContentJsonType) {
   const NewData = input;
 
   const OldData = contentDataDB.data[NewData.id];
 
-  if (!OldData) return `Sorry can't update that which doesn't exist`;
+  if (!OldData)
+    throw new ORPCError("NOT_FOUND", {
+      message: `Doc with id ${NewData.id} doesn't exist`,
+    });
 
   // To chnage file Name when content Title is changed
   if (NewData.Title !== OldData?.Title) {
