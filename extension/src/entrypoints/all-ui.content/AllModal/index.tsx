@@ -10,6 +10,8 @@ import FloatingButtons from "./FloatingButtons";
 import PresetsMenu from "./PresetsMenu";
 import SeeMore from "../../../components/craft/SeeMore";
 import log from "@/lib/log";
+import useData from "./useData";
+import { Redo2 } from "lucide-react";
 
 function sanitizeTextForFileName(value: string) {
   // Remove invalid characters
@@ -28,21 +30,16 @@ function ToBeLoaded() {
 
   const count = useRef(0);
   const [exists, setExists] = useState<boolean>(false);
-
   const [presets, setPresets] = useState<MultiSelectOption[]>([]);
-  const [selectedPreset, setSelectedPreset] = useState<string>("");
 
-  const [videoTitle, setVideoTitle] = useState("");
+  const Data = useData();
+
   const handleNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setVideoTitle(e.target.value);
+      Data.setTitle(e.target.value);
     },
     [] // dependency on sanitizeFilename
   );
-  const [selectedTags, setSelectedTags] = useState<MultiSelectOption[]>([]);
-
-  const [videoCoverUrl, setVideoCoverUrl] = useState("");
-  const [videoExtraData, setVideoExtraData] = useState("");
 
   const { contentData, setContentData, removeContents } = useContentData();
   const { tags, setTags } = useTagData();
@@ -68,30 +65,30 @@ function ToBeLoaded() {
     const { Download } = GetTagAppSiteData();
     if (contentData.hasOwnProperty(Identifier)) {
       log("Already Exists returning");
-      const Data = contentData[Identifier];
-      setVideoTitle(Data.Title);
+      const mediaData = contentData[Identifier];
+      Data.setTitle(mediaData.Title);
       const SiteTag = `Site:${Site}`;
-      setSelectedTags([
-        ...Data.Tags.map((o) =>
+      Data.setTags([
+        ...mediaData.Tags.map((o) =>
           o !== SiteTag
             ? { label: o, value: o }
             : { label: o, value: o, fixed: true }
         ),
       ]);
-      setVideoCoverUrl(Data.CoverUrl!);
-      setVideoExtraData(Data.extraData || "");
-      setSelectedPreset(JSON.stringify(Data.Download?.flags));
+      Data.setCoverUrl(mediaData.CoverUrl!);
+      Data.setExtraData(mediaData.extraData || "");
+      Data.setPreset(JSON.stringify(mediaData.Download?.flags));
       setExists(true);
     } else {
-      setVideoTitle(sanitizeTextForFileName(Title));
+      Data.setTitle(sanitizeTextForFileName(Title));
       const SiteTag = `Site:${Site}`;
-      setSelectedTags([
+      Data.setTags([
         ...defaultTags.map((o) => ({ label: o, value: o })),
         { label: SiteTag, value: SiteTag, fixed: true },
       ]);
-      setVideoCoverUrl(CoverUrl);
-      setVideoExtraData(`Web: [${Url}](${Url})`);
-      setSelectedPreset(
+      Data.setCoverUrl(CoverUrl);
+      Data.setExtraData(`Web: [${Url}](${Url})`);
+      Data.setPreset(
         OgImage
           ? `"${OgImage}"`
           : JSON.stringify(Download?.defaultPreset) ?? `""`
@@ -104,18 +101,18 @@ function ToBeLoaded() {
   }, [contentData]);
 
   const addContentFunc = useCallback(() => {
-    const sanitizedVideoTitle = sanitizeTextForFileName(videoTitle);
+    const sanitizedVideoTitle = sanitizeTextForFileName(Data.title);
     if (!sanitizedVideoTitle) {
       alert("Title must not be blank");
-      setVideoTitle("");
+      Data.setTitle("");
       return;
     }
     const { Identifier, Site, Url, CoverUrl, Downloader } =
       GetDetailsFromPage();
     const SiteTag = `Site:${Site}`;
     const Time = Math.floor(Date.now() / 1000);
-    if (CoverUrl !== videoCoverUrl)
-      setSelectedTags((o) => [
+    if (CoverUrl !== Data.coverUrl)
+      Data.setTags((o) => [
         ...o,
         { label: "Util:Different_Cover", value: "Util:Different_Cover" },
       ]);
@@ -133,7 +130,7 @@ function ToBeLoaded() {
       setTags((oldTags: TagType) => {
         if (!oldTags[SiteTag]) oldTags[SiteTag] = { Count: 1 };
         else oldTags[SiteTag].Count = oldTags[SiteTag].Count + 1;
-        selectedTags.map((tag) => {
+        Data.tags.map((tag) => {
           oldTags[tag.value].Count++;
         });
         return oldTags;
@@ -142,42 +139,42 @@ function ToBeLoaded() {
       oldVids[Identifier] = {
         id: Identifier,
         Title: sanitizedVideoTitle,
-        CoverUrl: videoCoverUrl,
+        CoverUrl: Data.coverUrl,
         // @ts-ignore
         Tags: [
           ...new Set([
-            ...selectedTags.map((o) => o.value),
-            CoverUrl !== videoCoverUrl ? "Util:Different_Cover" : null,
+            ...Data.tags.map((o) => o.value),
+            CoverUrl !== Data.coverUrl ? "Util:Different_Cover" : null,
           ]),
         ].filter((o) => o),
         Url: Url,
         Added: Time,
         LastUpdated: Time,
-        extraData: videoExtraData,
+        extraData: Data.extraData,
         Download: {
           type: Downloader,
-          flags: JSON.parse(selectedPreset),
+          flags: JSON.parse(Data.preset),
         },
       };
       return oldVids;
     });
-    setVideoTitle(sanitizedVideoTitle);
+    Data.setTitle(sanitizedVideoTitle);
     setExists(true);
     setOpenModal(false);
-  }, [selectedTags, videoTitle, videoCoverUrl, videoExtraData, selectedPreset]);
+  }, [Data]);
 
   const updateContentFunc = useCallback(() => {
-    const sanitizedVideoTitle = sanitizeTextForFileName(videoTitle);
+    const sanitizedVideoTitle = sanitizeTextForFileName(Data.title);
     if (!sanitizeTextForFileName) {
       alert("Title must not be blank");
-      setVideoTitle("");
+      Data.setTitle("");
       return;
     }
     const { Identifier, Downloader } = GetDetailsFromPage();
 
     // @ts-ignore
     setContentData((oldContent: ContentDataType) => {
-      const updatedTags = selectedTags.map((o) => o.value);
+      const updatedTags = Data.tags.map((o) => o.value);
       // @ts-ignore
       setTags((oldTags: TagType) => {
         const Deleted = oldContent[Identifier].Tags.filter(
@@ -197,28 +194,28 @@ function ToBeLoaded() {
       });
 
       oldContent[Identifier].Title = sanitizedVideoTitle;
-      oldContent[Identifier].CoverUrl = videoCoverUrl;
-      oldContent[Identifier].Tags = selectedTags.map((o) => o.value);
-      oldContent[Identifier].extraData = videoExtraData;
+      oldContent[Identifier].CoverUrl = Data.coverUrl;
+      oldContent[Identifier].Tags = Data.tags.map((o) => o.value);
+      oldContent[Identifier].extraData = Data.extraData;
       oldContent[Identifier].LastUpdated = Math.floor(Date.now() / 1000);
       oldContent[Identifier].Download = {
         type: Downloader,
-        flags: JSON.parse(selectedPreset),
+        flags: JSON.parse(Data.preset),
       };
       return oldContent;
     });
-    setVideoTitle(sanitizedVideoTitle);
+    Data.setTitle(sanitizedVideoTitle);
     setExists(true);
     setOpenModal(false);
-  }, [selectedTags, videoTitle, videoCoverUrl, videoExtraData, selectedPreset]);
+  }, [Data]);
 
   const removeContent = useCallback(() => {
     if (!confirm("Confirm Deletion")) return;
     const { Identifier, Title } = GetDetailsFromPage();
     removeContents([Identifier]);
     setExists(false);
-    setSelectedTags([]);
-    setVideoTitle(Title);
+    Data.setTags([]);
+    Data.setTitle(Title);
   }, []);
 
   const toggleModalFunc = useCallback(() => {
@@ -261,10 +258,20 @@ function ToBeLoaded() {
             className="h-screen absolute w-full bg-black/10 backdrop-blur-xs"
           />
           <div className="max-w-md absolute w-full grid bg-secondary rounded shadow px-8 py-10">
-            <Label className="mb-2">Name</Label>
+            <div className="flex justify-between mb-1 items-center">
+              <Label>Name</Label>
+              <Button
+                onClick={Data.resetTitle}
+                size="icon"
+                variant="outline"
+                className="scale-80"
+              >
+                <Redo2 />
+              </Button>
+            </div>
             <Input
               maxLength={100}
-              value={videoTitle}
+              value={Data.title}
               onChange={handleNameChange}
               placeholder="Name"
               className="mb-4"
@@ -277,28 +284,48 @@ function ToBeLoaded() {
               }))}
               className="mb-4"
               placeholder="Tags"
-              value={selectedTags}
-              onChange={setSelectedTags}
+              value={Data.tags}
+              onChange={Data.setTags}
             />
             <SeeMore>
               <PresetsMenu
                 presets={presets}
-                selectedPreset={selectedPreset}
-                setSelectedPreset={setSelectedPreset}
+                selectedPreset={Data.preset}
+                setSelectedPreset={Data.setPreset}
               />
-              <Label className="mb-2">Cover Url</Label>
+              <div className="flex justify-between mb-1 items-center">
+                <Label>Cover Url</Label>
+                <Button
+                  onClick={Data.resetCoverUrl}
+                  size="icon"
+                  variant="outline"
+                  className="scale-80"
+                >
+                  <Redo2 />
+                </Button>
+              </div>
               <Input
-                value={videoCoverUrl}
-                onChange={(e) => setVideoCoverUrl(e.target.value)}
+                value={Data.coverUrl}
+                onChange={(e) => Data.setCoverUrl(e.target.value)}
                 placeholder="Name"
                 className="mb-4"
               />
-              <Label className="mb-2">Extra Data</Label>
+              <div className="flex justify-between mb-1 items-center">
+                <Label>Extra Data</Label>
+                <Button
+                  onClick={Data.resetExtraData}
+                  size="icon"
+                  variant="outline"
+                  className="scale-80"
+                >
+                  <Redo2 />
+                </Button>
+              </div>
               <CodeEditor
-                value={videoExtraData}
+                value={Data.extraData}
                 language="md"
                 placeholder="Extra data."
-                onChange={(e) => setVideoExtraData(e.target.value)}
+                onChange={(e) => Data.setExtraData(e.target.value)}
                 padding={15}
                 className="bg-background/80! mb-4"
                 style={{

@@ -1,3 +1,5 @@
+import { SiteData } from "@/entrypoints/main/routes/supported";
+
 export default function GetTagAppSiteData() {
   let Data: SiteData;
   try {
