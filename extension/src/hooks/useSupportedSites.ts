@@ -36,15 +36,24 @@ export default function useSupportedSites() {
     []
   );
 
-  const refreshSupportedHostsIndex = useCallback(() => {
-    setSupportedHostsIndex(() => {
-      let index: Record<string, string> = {};
-      for (const Site in supportedSites) {
-        for (const host of supportedSites[Site].Hosts) index[host] = Site;
-      }
-      return index;
-    });
-  }, [supportedSites]);
+  const refreshSupportedHostsIndex = useCallback(
+    (supportSSites?: typeof supportedSites) => {
+      setSupportedHostsIndex(() => {
+        let index: Record<string, string> = {};
+        if (supportSSites) {
+          for (const Site in supportSSites) {
+            for (const host of supportSSites[Site].Hosts) index[host] = Site;
+          }
+          return index;
+        }
+        for (const Site in supportedSites) {
+          for (const host of supportedSites[Site].Hosts) index[host] = Site;
+        }
+        return index;
+      });
+    },
+    [supportedSites]
+  );
 
   return {
     supportedSites,

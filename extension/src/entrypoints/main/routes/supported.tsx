@@ -139,6 +139,7 @@ export default function Supported() {
             }
             tmp[siteData.data.Name] = siteData.data;
           }
+          refreshSupportedHostsIndex(tmp);
           return tmp;
         });
       })
@@ -187,7 +188,7 @@ export default function Supported() {
         variant="secondary"
         className="mx-auto grid mb-10 text-xs"
         size="sm"
-        onClick={refreshSupportedHostsIndex}
+        onClick={() => refreshSupportedHostsIndex()}
       >
         Force Refresh Index
       </Button>
