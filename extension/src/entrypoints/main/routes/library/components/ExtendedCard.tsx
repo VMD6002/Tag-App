@@ -76,7 +76,7 @@ const ExtendedCard = memo(({ id }: { id: string }) => {
             </h1>
           </a>
           <div className="text-muted-foreground text-xs mb-4">
-            {new Date(Added).toLocaleString("en-GB", {
+            {new Date(Added * 1000).toLocaleString("en-GB", {
               day: "numeric",
               month: "short",
               year: "numeric",
