@@ -24,15 +24,14 @@ const queryClient = new QueryClient({
   },
 });
 
-interface tagAndtagParents {
-  tags: Record<string, { Count: number; CoverUrl?: string }>;
-  tagParents: string[];
-}
-
 const ToBeLoaded = ({ serverUrl, overwrite, setOverwrite }: any) => {
   const orpc = useOrpc();
   const { tags, tagParents, setTags, setTagParents } = useTagData();
-  const GetTagsFromServerQuery = useQuery(orpc.webSync.getTags.queryOptions());
+  const GetTagsFromServerQuery = useQuery(
+    orpc.webSync.getTags.queryOptions({
+      enabled: false,
+    })
+  );
   const getFunc = useCallback(() => {
     GetTagsFromServerQuery.refetch();
   }, []);

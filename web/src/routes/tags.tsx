@@ -1,5 +1,6 @@
 import TitleHeader from "@/components/craft/TitleHeader";
 import { Button } from "@/components/ui/button";
+import { orpc } from "@/lib/orpc";
 import {
   QueryClient,
   QueryClientProvider,
@@ -7,7 +8,6 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { orpc } from "@/lib/orpc";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,16 +22,15 @@ const queryClient = new QueryClient({
 const TagGroup = ({
   tags,
   parent,
+  taags,
 }: {
   tags: ServerTagType;
   parent: string;
+  taags: string[];
 }) => {
   const Children = useMemo(
-    () =>
-      Object.keys(tags)
-        .filter((k) => k.startsWith(parent))
-        .sort(),
-    [tags, parent]
+    () => taags.filter((k) => k.startsWith(parent)).sort(),
+    [parent, taags]
   );
   return (
     <div key={`Section-${parent}`} className="mb-3">
@@ -83,6 +82,8 @@ function Child() {
     setTags(Data);
   }, [GetTagsFromServerQuery.data]);
 
+  const taags = useMemo(() => Object.keys(tags), [tags]);
+
   return (
     <>
       <TitleHeader Title="Server Tags" />
@@ -102,11 +103,11 @@ function Child() {
         </Button>
       </div>
       <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 mb-10 rounded">
-        <h1 className="text-3xl mb-5 text-foreground">Tags ({tags.length})</h1>
-        {[...new Set(Object.keys(tags).map((tag) => tag.split(":")[0]))]
+        <h1 className="text-3xl mb-5 text-foreground">Tags ({taags.length})</h1>
+        {[...new Set(taags.map((tag) => tag.split(":")[0]))]
           .sort()
           .map((parent: string) => (
-            <TagGroup key={parent} parent={parent} tags={tags} />
+            <TagGroup key={parent} parent={parent} tags={tags} taags={taags} />
           ))}
       </div>
     </>

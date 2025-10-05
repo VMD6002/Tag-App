@@ -1,7 +1,7 @@
 import { os } from "@orpc/server";
 import { readFile, writeFile } from "node:fs/promises";
 import z from "zod";
-import type { ContentJsonType } from "../schemas/contentData.js";
+import { type ContentJsonType } from "../schemas/contentData.js";
 
 const webContentDataFileName = "./webSync/contentData.json";
 export const getContentData = os.handler(async () => {

@@ -45,7 +45,7 @@ const ToBeLoaded = ({ overwrite, setOverwrite }: any) => {
   }, [GetWebContentServerQuery.data]);
 
   const SetWebContentMutaion = useMutation(
-    orpc.webSync.setTags.mutationOptions()
+    orpc.webSync.setContentData.mutationOptions()
   );
   const setFunc = useCallback(() => {
     SetWebContentMutaion.mutate(JSON.stringify(contentData));

@@ -15,7 +15,7 @@ export default function useData() {
 
   const resetCoverUrl = useCallback(() => {
     const { CoverUrl } = GetDetailsFromPage();
-    setTitle(CoverUrl);
+    setCoverUrl(CoverUrl);
   }, []);
 
   const resetExtraData = useCallback(() => {
