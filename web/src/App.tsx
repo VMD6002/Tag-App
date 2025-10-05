@@ -26,26 +26,23 @@ function App() {
               <Route path="/">
                 <Library />
               </Route>
-
               <Route path="/tags">
                 <TagPage />
               </Route>
-
               <DocProvider>
-                <Route path="/server/img/:id">
+                <Route path="/img/:id">
                   <ImagePage />
                 </Route>
-                <Route path="/server/video/:id">
+                <Route path="/video/:id">
                   <VideoPage />
                 </Route>
-                <Route path="/server/ImgSet/:id">
+                <Route path="/ImgSet/:id">
                   <ImgSetPage />
                 </Route>
-                <Route path="/server/VideoSet/:id">
+                <Route path="/VideoSet/:id">
                   <VideoSet />
                 </Route>
               </DocProvider>
-
               <Route>
                 <PageNotFound />
               </Route>

@@ -27,25 +27,21 @@ export default function useFilter() {
     const url = new URL(location.href);
     const params = url.searchParams;
 
-    FilterData.any.length
-      ? params.set("any", FilterData.any.join(","))
-      : params.delete("any");
+    if (FilterData.any.length) params.set("any", FilterData.any.join(","));
+    else params.delete("any");
 
-    FilterData.none.length
-      ? params.set("none", FilterData.none.join(","))
-      : params.delete("none");
+    if (FilterData.none.length) params.set("none", FilterData.none.join(","));
+    else params.delete("none");
 
-    FilterData.all.length
-      ? params.set("all", FilterData.all.join(","))
-      : params.delete("all");
+    if (FilterData.all.length) params.set("all", FilterData.all.join(","));
+    else params.delete("all");
 
-    FilterData.types.length
-      ? params.set("types", FilterData.types.join(","))
-      : params.delete("types");
+    if (FilterData.types.length)
+      params.set("types", FilterData.types.join(","));
+    else params.delete("types");
 
-    FilterData.search.trim()
-      ? params.set("search", FilterData.search)
-      : params.delete("search");
+    if (FilterData.search.trim()) params.set("search", FilterData.search);
+    else params.delete("search");
 
     history.pushState({}, "", url.toString());
   }, [FilterData]);

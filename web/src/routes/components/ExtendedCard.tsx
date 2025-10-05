@@ -20,7 +20,7 @@ function getCoverUrl(Type: string, Title: string, ext: string[]) {
   }
 }
 
-const getUrl = (id: string, Type: string) => `/main.html#/server/${Type}/${id}`;
+const getUrl = (id: string, Type: string) => `/#/${Type}/${id}`;
 
 const contentTypeColor = {
   img: (

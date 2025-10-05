@@ -43,7 +43,7 @@ export function useDoc() {
 }
 
 export function Child({ children }: { children: React.ReactNode }) {
-  const { id } = useRoute("/server/:contentType/:id")[1] as { id: string };
+  const { id } = useRoute("/:contentType/:id")[1] as { id: string };
   const [doc, setDoc] = useState<ContentType>(docPlaceholderData);
 
   const getDocQuery = useQuery(
