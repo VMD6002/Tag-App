@@ -1,0 +1,32 @@
+{
+  "YouTube": {
+    "Name": "YouTube",
+    "Links": ["www.youtube.com"],
+    "BegonEvalErrors": true,
+    "Download": {
+      "presets": [
+        {
+          "label": "1080p",
+          "value": "-f \"b[height<=1080]\""
+        },
+        {
+          "label": "720p",
+          "value": "-f \"b[height<=720]\""
+        },
+        {
+          "label": "480p",
+          "value": "-f \"b[height<=480]\""
+        },
+        {
+          "label": "360",
+          "value": "-f \"b[height<=360]\""
+        }
+      ],
+      "defaultPreset": {
+        "label": "1080p",
+        "value": "-f \"b[height<=1080]\""
+      }
+    },
+    "Script": "let firstRun = true;\nfunction checkVideoOrShort() {\n  scriptData.ClickRemove()\n  if (!(location.href.includes(\"/shorts\") || location.href.includes(\"/watch\")))\n    return false;\n  const PageTitle = document.title;\n  if (PageTitle === \"YouTube\" || !PageTitle) return false;\n  return true;\n}\n\nfunction GetID() {\n  if (location.href.includes(\"/shorts\")) return location.pathname.slice(8);\n  return new URL(location.href).searchParams.get(\"v\");\n}\n\nfunction YouTube() {\n  if (!checkVideoOrShort()) return;\n  ContentData.Title = document.title;\n  ContentData.Url = location.href;\n  const ID = GetID();\n  ContentData.Identifier = `yt_${ID}`;\n  ContentData.CoverUrl = `https://img.youtube.com/vi/${ID}/hqdefault.jpg`;\n  if (firstRun) {\n    scriptData.ready = true;\n    firstRun = false;\n  } else scriptData.ClickUpdateOrRefresh();\n}\n\nContentData.Site = \"YouTube\";\nconst titleElement = document.querySelector(\"title\");\nconst observer = new MutationObserver(YouTube);\nobserver.observe(titleElement, { childList: true });\n"
+  }
+}
