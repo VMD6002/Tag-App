@@ -101,12 +101,12 @@ export function ServerProvider({ children }: any) {
           content.Title = sanitizedTitle;
           content.Tags = Update.Data.tags;
           content.extraData = Update.Data.extraData;
+          updateContentModified.mutate(content!);
           return content;
         }
         return val;
       })
     );
-    updateContentModified.mutate(content!);
     Update.setTitle(sanitizedTitle);
     Update.setModalOpen(false);
   }, [Update.Data]);

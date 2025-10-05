@@ -19,6 +19,8 @@ export const docValidator = z.object({
       flags: z.union([presetSchema, z.string()]),
     })
     .optional(),
+  Type: z.enum(["img", "video", "ImgSet", "VideoSet"]).optional(),
+  ext: z.array(z.string()).optional(),
 });
 
 export const dataValidator = z.array(docValidator);

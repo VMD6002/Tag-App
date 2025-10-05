@@ -43,7 +43,7 @@ export async function getSyncData() {
     TimePath: string
   ) => {
     const Temp = randomUUID();
-    const Time = (await stat(TimePath)).mtime.toISOString();
+    const Time = Math.floor((await stat(TimePath)).mtime.getTime() / 1000);
     const JsonData = {
       id: Temp,
       Title: Name,
