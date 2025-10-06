@@ -15,8 +15,11 @@ function GetSearchIds(ids: contentData[], search: string) {
   const fuse = new Fuse(ids, {
     keys: ["Title"],
     threshold: 0.5,
+    shouldSort: false,
   });
-  return fuse.search(search);
+  const results: any[] | contentData[] = fuse.search(search);
+  results.forEach((fuseObj, i) => (results[i] = fuseObj.item));
+  return results;
 }
 
 const filterDataFunc = (filterData: QueryParams) => {
@@ -43,12 +46,16 @@ const filterDataFunc = (filterData: QueryParams) => {
   }
 
   // run search last (expensive)
-  const finalResults =
+  const preFinalResult =
     search && search.trim().length > 0
       ? GetSearchIds(results, search)
       : results;
 
-  return orderByLatest ? finalResults.reverse() : finalResults;
+  const finalResult = orderByLatest
+    ? preFinalResult.sort((a, b) => b.Added - a.Added)
+    : preFinalResult.sort((a, b) => a.Added - b.Added);
+
+  return finalResult;
 };
 
 export default filterDataFunc;
