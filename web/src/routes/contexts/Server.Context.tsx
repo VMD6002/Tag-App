@@ -33,6 +33,7 @@ export function ServerProvider({ children }: any) {
   const contentDataQuery = useQuery(
     orpc.main.getData.queryOptions({
       input: Filter.FilterData,
+      queryKey: orpc.main.getData.key(),
     })
   );
   const filterData = useCallback(() => {

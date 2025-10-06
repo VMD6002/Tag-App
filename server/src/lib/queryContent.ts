@@ -20,17 +20,18 @@ function GetSearchIds(ids: contentData[], search: string) {
 }
 
 const filterDataFunc = (filterData: QueryParams) => {
-  const { any, all, none, search, orderByLatest } = filterData;
+  const { any, all, none, search, types, orderByLatest } = filterData;
   const hasAny = !!any?.length;
   const hasAll = !!all?.length;
   const hasNone = !!none?.length;
+  const allTypes = !types.length;
 
   const keys = Object.keys(contentDataDB.data);
   const results: contentData[] = [];
 
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
+  for (const key of keys) {
     const item = contentDataDB.data[key];
+    if (!allTypes && !types.includes(item.Type)) continue;
     const tags = item.Tags;
 
     // apply all filters in one pass
