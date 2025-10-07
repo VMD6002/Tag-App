@@ -4,7 +4,8 @@
     "dev:ext": "cd extension && bun dev",
     "build:ext": "cd extension && bun run build",
     "dev:server": "cd server && bun dev",
-    "build:web": "cd web && bun run build && rm -rf ../server/WebUI && cp -r dist/ ../server/WebUI"
+    "build:web": "cd web && bun run build && rm -rf ../server/WebUI && cp -r dist/ ../server/WebUI",
+    "build:serverFull": "cd web && bun run build && rm -rf ../server/WebUI && cp -r dist/ ../server/WebUI && cd ../server && bun run build"
   },
   "workspaces": [
     "web",
