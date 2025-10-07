@@ -3,13 +3,15 @@ import { rm } from "node:fs/promises";
 import type { IndividualContentDataType } from "../schemas/contentData.js";
 import { contentDataDB } from "../db/contentData.js";
 import { DecrementTagCount, tagDB } from "../db/tags.js";
+import { ORPCError } from "@orpc/server";
 
 export async function deleteData(IdList: string[]) {
   const Deleted: IndividualContentDataType[] = [];
   for await (const ID of IdList) {
-    if (!contentDataDB.data[ID]) {
-      return `Content wiht ID ${ID} not found while deleting`;
-    }
+    if (!contentDataDB.data[ID])
+      throw new ORPCError("BAD_REQUEST", {
+        message: `Content with id ${ID} doesn't exist`,
+      });
     const data = contentDataDB.data[ID];
     Deleted.push(data);
     delete contentDataDB.data[ID];

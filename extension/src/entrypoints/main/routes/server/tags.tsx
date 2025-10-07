@@ -4,7 +4,6 @@ import {
   QueryClient,
   QueryClientProvider,
   useMutation,
-  useQuery,
 } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
@@ -55,8 +54,12 @@ function Child() {
   const orpc = useOrpc();
   const [tags, setTags] = useState<ServerTagType>({});
 
-  const GetTagsFromServerQuery = useQuery(
-    orpc.main.getServerTags.queryOptions()
+  const GetTagsFromServerMutation = useMutation(
+    orpc.main.getServerTags.mutationOptions({
+      onSuccess: (res) => {
+        setTags(res);
+      },
+    })
   );
 
   const FixServerTagsMutation = useMutation(
@@ -64,23 +67,16 @@ function Child() {
   );
 
   const RemoveUnusedServerTagsMutation = useMutation(
-    orpc.fix.hardResetTagCount.mutationOptions({
-      onSuccess: () => {
-        setTags((old) => {
-          const temp = { ...old };
-          for (const tag in temp) {
-            if (!temp[tag]) delete temp[tag];
-          }
-          return temp;
-        });
+    orpc.fix.softResetTagCount.mutationOptions({
+      onSuccess: (res) => {
+        setTags(res);
       },
     })
   );
 
   useEffect(() => {
-    const Data = GetTagsFromServerQuery.data ?? {};
-    setTags(Data);
-  }, [GetTagsFromServerQuery.data]);
+    GetTagsFromServerMutation.mutate({});
+  }, []);
 
   const taags = useMemo(() => Object.keys(tags), [tags]);
 

@@ -81,5 +81,5 @@ export async function setDoc(input: ContentJsonType) {
   await contentDataDB.write();
   await tagDB.write();
   console.log(`Contents of ${NewData.id} Updated`);
-  return `Contents of ${NewData.id} Updated`;
+  return NewData;
 }

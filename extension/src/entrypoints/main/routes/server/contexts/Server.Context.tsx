@@ -68,7 +68,11 @@ export function ServerProvider({ children }: any) {
     const addedTags = updatedTags.filter(
       (x) => !Selection.tagsInitial.current.includes(x)
     );
-
+    setTags((old) => {
+      const unSyncedTags = addedTags.filter((tag) => !old.includes(tag));
+      if (!unSyncedTags.length) return old;
+      return [...old, ...unSyncedTags];
+    });
     setFiltered((oldFiltered: ContentType[]) =>
       oldFiltered.map((content: ContentType) => {
         if (!Selection.entries.includes(content.id)) return content;
@@ -101,6 +105,15 @@ export function ServerProvider({ children }: any) {
           content = { ...val };
           content.Title = sanitizedTitle;
           content.Tags = Update.Data.tags;
+          const oldTags = content.Tags;
+          const addedTags = Update.Data.tags.filter(
+            (tag) => !oldTags.includes(tag)
+          );
+          setTags((old) => {
+            const unSyncedTags = addedTags.filter((tag) => !old.includes(tag));
+            if (!unSyncedTags.length) return old;
+            return [...old, ...unSyncedTags];
+          });
           content.extraData = Update.Data.extraData;
           updateContentModified.mutate(content!);
           return content;

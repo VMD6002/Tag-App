@@ -3,7 +3,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "rm -rf dist && bun build src/index.ts --outfile dist/server.js --target node && cp -r WebUI/ dist/",
+    "build-default": "tsc",
     "start": "node dist/index.js"
   },
   "dependencies": {

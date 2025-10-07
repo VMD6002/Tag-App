@@ -9,6 +9,7 @@ const AppDirs = [
   "media/ImgSets",
   "media/VideoSets",
   "webSync",
+  "DB",
 ];
 
 export default function createAppDirs() {

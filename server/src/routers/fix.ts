@@ -11,7 +11,7 @@ export const hardResetTagCount = os.handler(async () => {
   }
   await tagDB.write();
   console.log("Server Tag Count Fixed");
-  return "Server Tag Count Fixed";
+  return tagDB.data;
 });
 
 export const softResetTagCount = os.handler(async () => {
@@ -19,5 +19,5 @@ export const softResetTagCount = os.handler(async () => {
     if (!tagDB.data[tag]) delete tagDB.data[tag];
   }
   console.log("Tag with zero count removed");
-  return "Tag with zero count removed";
+  return tagDB.data;
 });
