@@ -9,7 +9,13 @@ export default function UpdateModal({
   Update,
   updateContentFunc,
   isServer = false,
-}: any) {
+  inputDisabled = false,
+}: {
+  Update: ReturnType<typeof useUpdate>;
+  updateContentFunc: () => void;
+  isServer?: boolean;
+  inputDisabled?: boolean;
+}) {
   const { tags } = useTagData();
 
   if (!Update.modalOpen) return <></>;
@@ -55,8 +61,8 @@ export default function UpdateModal({
             <>
               <Label className="mb-2">Cover Url</Label>
               <Input
-                value={Update.coverUrl}
-                onChange={(e) => Update.setCoverUrl(e.target.value)}
+                value={Update.cover}
+                onChange={(e) => Update.setCover(e.target.value)}
                 placeholder="Name"
                 className="mb-4"
               />
@@ -77,6 +83,7 @@ export default function UpdateModal({
           />
         </SeeMore>
         <Button
+          disabled={inputDisabled}
           onClick={updateContentFunc}
           className="max-w-sm w-11/12 mx-auto"
         >

@@ -3,7 +3,6 @@ import {
   QueryClient,
   QueryClientProvider,
   useMutation,
-  useQuery,
 } from "@tanstack/react-query";
 import { useRoute } from "wouter";
 import UpdateModal from "@/components/craft/UpdateModal";
@@ -56,49 +55,72 @@ export function Child({ children }: { children: React.ReactNode }) {
   const { serverUrl } = useSettingsData();
   const Update = useUpdate();
   const [doc, setDoc] = useState<ContentType>(docPlaceholderData);
+  const [inputDisabled, setInputDisabled] = useState(false);
 
-  const getDocQuery = useQuery(
-    orpc.main.getDoc.queryOptions({
-      input: id,
+  const getDocMutation = useMutation(
+    orpc.main.getDoc.mutationOptions({
+      onSuccess: (res) => {
+        Update.setTitle(res.Title);
+        Update.setExtraData(res.extraData);
+        Update.setTags(res.Tags.map((tag) => ({ label: tag, value: tag })));
+        setTimeout(
+          () => (document.title = `${document.title} - ${res.Title}`),
+          0
+        );
+      },
+      onError: () => {
+        alert("Couldn't get doc, check console for errors");
+      },
     })
   );
 
-  const updateContentsModified = useMutation(
-    orpc.main.setDoc.mutationOptions()
+  const updateContentModified = useMutation(
+    orpc.main.setDoc.mutationOptions({
+      onSuccess: (res) => {
+        setDoc(res);
+        Update.setTitle(res.Title);
+        Update.setModalOpen(false);
+        setInputDisabled(false);
+      },
+      onError: () => {
+        alert("Couldn't update, check console for error");
+        setInputDisabled(false);
+      },
+    })
   );
-  const updateContentFunc = useCallback(async () => {
-    if (!Update.Data.title.trim()) {
+  const updateContentFunc = useCallback(() => {
+    const sanitizedTitle = sanitizeStringForFileName(Update.Data.Title);
+    if (!sanitizedTitle) {
       alert("Title must not be blank");
       Update.setTitle("");
       return;
     }
-    let content: ContentType;
-    const sanitizedTitle = sanitizeStringForFileName(Update.Data.title);
-    setDoc((old) => {
-      content = { ...old };
-      content.Title = sanitizedTitle;
-      content.Tags = Update.Data.tags;
-      content.extraData = Update.Data.extraData;
-      return content;
-    });
-    updateContentsModified.mutate(content!);
-    Update.setTitle(sanitizedTitle);
-    Update.setModalOpen(false);
+    const temp: any = Update.Data;
+    delete temp.Cover;
+    const newDoc = {
+      ...doc,
+      ...temp,
+      Title: sanitizedTitle,
+    };
+    setInputDisabled(true);
+    updateContentModified.mutate(newDoc);
   }, [Update.Data]);
 
   const deleteContentsModified = useMutation(
     orpc.main.deleteData.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (res) => {
         navigate("/server");
+      },
+      onError: () => {
+        alert("delete contents failed, check console for error");
       },
     })
   );
   const removeContent = useCallback(() => {
-    if (confirm(`Please Confirm deletion of "${doc.Title}"`))
-      deleteContentsModified.mutate([id]);
-  }, [id, doc.Title]);
+    deleteContentsModified.mutate([id]);
+  }, [id]);
 
-  const value = useMemo(
+  const value: DocContext = useMemo(
     () => ({
       doc,
       setDoc,
@@ -108,24 +130,14 @@ export function Child({ children }: { children: React.ReactNode }) {
       updateContentFunc,
       orpc,
     }),
-    [doc, Update, serverUrl, orpc]
+    [doc, Update, serverUrl]
   );
 
   useEffect(() => {
-    if (!getDocQuery.data?.id) return;
-    setDoc(getDocQuery.data);
-    Update.setTags(
-      getDocQuery.data?.Tags?.map((o: string) => ({ label: o, value: o }))
-    );
-    Update.setTitle(getDocQuery.data?.Title);
-    Update.setExtraData(getDocQuery.data?.extraData);
-    setTimeout(
-      () => (document.title = `${document.title} - ${getDocQuery.data?.Title}`),
-      0
-    );
-  }, [getDocQuery.data]);
+    getDocMutation.mutate(id);
+  }, [id]);
 
-  if (getDocQuery.isLoading)
+  if (getDocMutation.isPending)
     return (
       <div className="h-[calc(100vh-8rem)] grid place-items-center">
         <Disc3 className="animate-spin" size={"4rem"} />
@@ -138,6 +150,7 @@ export function Child({ children }: { children: React.ReactNode }) {
         isServer
         Update={Update}
         updateContentFunc={updateContentFunc}
+        inputDisabled={inputDisabled}
       />
       {children}
     </DocContext.Provider>

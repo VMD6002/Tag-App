@@ -1,6 +1,6 @@
 import useFilter from "@/hooks/useFilter";
 import { orpc } from "@/lib/orpc";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   createContext,
   useCallback,
@@ -30,15 +30,23 @@ export function ServerProvider({ children }: any) {
   const [tags, setTags] = useState<string[]>([]);
   const Filter = useFilter();
 
-  const contentDataQuery = useQuery(
-    orpc.main.getData.queryOptions({
-      input: Filter.FilterData,
-      queryKey: orpc.main.getData.key(),
+  const ServerTagMutation = useMutation(
+    orpc.main.getServerTags.mutationOptions({
+      onSuccess: (res) => setTags(Object.keys(res)),
     })
   );
+  const contentDataMutation = useMutation(
+    orpc.main.getData.mutationOptions({
+      onSuccess: (res) => {
+        ServerTagMutation.mutate({});
+        setFiltered(res);
+      },
+    })
+  );
+
   const filterData = useCallback(() => {
-    contentDataQuery.refetch();
-  }, [contentDataQuery]);
+    contentDataMutation.mutate(Filter.FilterData);
+  }, [Filter.FilterData]);
 
   const value = useMemo(
     () => ({
@@ -53,14 +61,8 @@ export function ServerProvider({ children }: any) {
   );
 
   useEffect(() => {
-    setFiltered(contentDataQuery?.data ?? []);
-  }, [contentDataQuery.data]);
-
-  const ServerTagQuery = useQuery(orpc.main.getServerTags.queryOptions());
-  useEffect(() => {
-    const serverTags = Object.keys(ServerTagQuery?.data ?? {});
-    setTags(serverTags);
-  }, [ServerTagQuery.data]);
+    contentDataMutation.mutate(Filter.FilterData);
+  }, []);
 
   return (
     <ServerContext.Provider value={value}>{children}</ServerContext.Provider>

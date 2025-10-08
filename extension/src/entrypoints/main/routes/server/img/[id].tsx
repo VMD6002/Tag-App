@@ -7,7 +7,7 @@ import Markdown from "react-markdown";
 
 export default function ImagePage() {
   const { doc, serverUrl, Update, removeContent } = useDoc() as DocContext;
-  if (!doc.Title) return <></>;
+
   return (
     <>
       <TitleHeader Title="Image" />

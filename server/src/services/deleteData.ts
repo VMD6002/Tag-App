@@ -57,5 +57,5 @@ export async function deleteData(IdList: string[]) {
   await contentDataDB.write();
   await tagDB.write();
   console.log("Changes Written TO DB");
-  return "Exterminated it, EXTERMINATED!";
+  return IdList;
 }

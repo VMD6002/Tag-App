@@ -76,7 +76,6 @@ const ExtendedCard = memo(({ data }: { data: ContentType }) => {
     const removeContent = useCallback(() => {
       if (!confirm("Confirm Deletion")) return;
       removeContents([data.id]);
-      setFiltered((old: ContentType[]) => old.filter((val) => val.id !== id));
     }, []);
 
     const Selected = useMemo(() => isSelected(id), [isSelected, id]);
@@ -98,10 +97,7 @@ const ExtendedCard = memo(({ data }: { data: ContentType }) => {
             src={`${serverUrl}/${getCoverUrl(Type!, Title, ext!)}`}
           />
         </div>
-        <div className="relative h-5">
-          {/* @ts-ignore */}
-          {contentTypeColor[Type]}
-        </div>
+        <div className="relative h-5">{contentTypeColor[Type!]}</div>
         <div className="w-[95%] ml-[2.5%] break-all">
           <div className="mb-3">
             <Button

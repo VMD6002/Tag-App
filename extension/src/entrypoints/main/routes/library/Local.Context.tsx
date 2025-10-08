@@ -77,37 +77,39 @@ export function LocalProvider({ children }: { children: React.ReactNode }) {
   }, [Selection.tags, Selection.entries, Selection.tagsInitial]);
 
   const updateContentFunc = useCallback(() => {
-    if (!Update.Data.title.trim()) {
+    if (!Update.Data.Title.trim()) {
       alert("Title must not be blank");
       Update.setTitle("");
       return;
     }
     // @ts-ignore
-    Content.setContentData((oldContent: ContentDataType) => {
-      // @ts-ignore
-      Tag.setTags((oldTags: TagType) => {
-        const Deleted = oldContent[Update.Data.ID].Tags.filter(
-          (a) => !Update.Data.tags.includes(a)
+    Content.setContentData((oldContent) => {
+      Tag.setTags((oldTags) => {
+        const Deleted = oldContent![Update.Data.id].Tags.filter(
+          (a) => !Update.Data.Tags.includes(a)
         );
         Deleted.map((tag) => {
-          oldTags[tag].Count--;
+          oldTags![tag].Count--;
         });
 
-        const Added = Update.Data.tags.filter(
-          (a) => !oldContent[Update.Data.ID].Tags.includes(a)
+        const Added = Update.Data.Tags.filter(
+          (a) => !oldContent![Update.Data.id].Tags.includes(a)
         );
         Added.map((tag) => {
-          oldTags[tag].Count++;
+          oldTags![tag].Count++;
         });
-        return oldTags;
+        return oldTags!;
       });
 
-      oldContent[Update.Data.ID].Title = Update.Data.title;
-      oldContent[Update.Data.ID].Tags = Update.Data.tags;
-      oldContent[Update.Data.ID].CoverUrl = Update.Data.coverUrl;
-      oldContent[Update.Data.ID].extraData = Update.Data.extraData;
-      oldContent[Update.Data.ID].LastUpdated = Math.floor(Date.now() / 1000);
-      return oldContent;
+      const temp: any = Update.Data;
+      temp.CoverUrl = temp.Cover;
+      delete temp.Cover;
+      const newContent: ContentType = {
+        ...oldContent![Update.Data.id],
+        ...temp,
+        LastUpdated: Math.floor(Date.now() / 1000),
+      };
+      return newContent;
     });
     Update.setModalOpen(false);
   }, [Update.Data]);

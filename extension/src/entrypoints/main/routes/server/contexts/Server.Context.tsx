@@ -1,6 +1,6 @@
 import useOrpc from "@/hooks/useOrpc";
 import sanitizeStringForFileName from "@/lib/sanitizeStringForFileName";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { createContext } from "react";
 
 export interface ServerContext {
@@ -12,6 +12,7 @@ export interface ServerContext {
   filtered: ContentType[];
   setFiltered: React.Dispatch<React.SetStateAction<ContentType[]>>;
   serverUrl: string;
+  inputDisabled: boolean;
   removeContents: (keys: string[]) => void;
   updateContentFunc: () => void;
   bulkUpdateContentFunc: () => void;
@@ -29,37 +30,130 @@ export function useServer() {
 export function ServerProvider({ children }: any) {
   const orpc = useOrpc();
   const [filtered, setFiltered] = useState<ContentType[]>([]);
+  const [inputDisabled, setInputDisabled] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const { serverUrl } = useSettingsData();
   const Filter = useFilter();
   const Selection = useSelection();
   const Update = useUpdate();
 
-  const contentDataQuery = useQuery(
-    orpc.main.getData.queryOptions({
-      input: Filter.FilterData,
-      queryKey: orpc.main.getData.key(),
+  const ServerTagsMutation = useMutation(
+    orpc.main.getServerTags.mutationOptions({
+      onSuccess: (res) => {
+        setTags(Object.keys(res));
+      },
+      onError: () => {
+        alert("Could't fetch server tags");
+      },
+    })
+  );
+  const contentDataMutation = useMutation(
+    orpc.main.getData.mutationOptions({
+      onSuccess: (res) => {
+        ServerTagsMutation.mutate({});
+        setFiltered(res);
+      },
+      onError: () => {
+        alert("DB, online ?");
+      },
     })
   );
   const filterData = useCallback(() => {
     Selection.setEntries([]);
     Selection.setOn(false);
-    contentDataQuery.refetch();
-  }, []);
+    contentDataMutation.mutate(Filter.FilterData);
+  }, [Filter.FilterData]);
 
   const syncContentsModified = useMutation(
     orpc.main.sync.mutationOptions({
       onSuccess: () => {
-        contentDataQuery.refetch();
+        contentDataMutation.mutate(Filter.FilterData);
       },
     })
   );
-  const serverSyncFunc = useCallback(
-    () => syncContentsModified.mutate({}),
-    [contentDataQuery]
-  );
+  const serverSyncFunc = useCallback(() => syncContentsModified.mutate({}), []);
 
-  const updateContentModified = useMutation(orpc.main.setDoc.mutationOptions());
+  const updateContentModified = useMutation(
+    orpc.main.setDoc.mutationOptions({
+      onSuccess: (res) => {
+        setFiltered((old) =>
+          old.map((val) => {
+            if (val.id !== res.id) return val;
+            const content = { ...val };
+            const oldTags = content.Tags;
+            const addedTags = res.Tags.filter((tag) => !oldTags.includes(tag));
+            setTags((old) => {
+              const unSyncedTags = addedTags.filter(
+                (tag) => !old.includes(tag)
+              );
+              if (!unSyncedTags.length) return old;
+              return [...old, ...unSyncedTags];
+            });
+            return res;
+          })
+        );
+        Update.setTitle(res.Title);
+        Update.setModalOpen(false);
+        setInputDisabled(false);
+      },
+      onError: () => {
+        alert("Couldn't update, check console for error");
+        setInputDisabled(false);
+      },
+    })
+  );
+  const updateContentFunc = useCallback(() => {
+    const sanitizedTitle = sanitizeStringForFileName(Update.Data.Title);
+    if (!sanitizedTitle) {
+      alert("Title must not be blank");
+      Update.setTitle("");
+      return;
+    }
+    let content: ContentType = filtered.filter(
+      (doc) => (doc.id = Update.Data.id)
+    )[0];
+    const temp: any = Update.Data;
+    delete temp.Cover;
+    content = {
+      ...content,
+      ...temp,
+      Title: sanitizedTitle,
+    };
+    setInputDisabled(true);
+    updateContentModified.mutate(content);
+  }, [Update.Data, filtered]);
+
+  const bulkUpdateMutation = useMutation(
+    orpc.main.bulkUpdate.mutationOptions({
+      onSuccess: (res) => {
+        setTags((old) => {
+          const unSyncedTags = res.added.filter((tag) => !old.includes(tag));
+          if (!unSyncedTags.length) return old;
+          return [...old, ...unSyncedTags];
+        });
+        setFiltered((oldFiltered: ContentType[]) =>
+          oldFiltered.map((content: ContentType) => {
+            if (!res.ids.includes(content.id)) return content;
+            for (const tag of res.removed) {
+              content.Tags = content.Tags.filter((val) => val !== tag);
+              content.LastUpdated = Math.floor(Date.now() / 1000);
+            }
+            for (const tag of res.added) {
+              if (content.Tags.includes(tag)) continue;
+              content.Tags.push(tag);
+            }
+            return content;
+          })
+        );
+        Selection.setModalOpen(false);
+        setInputDisabled(false);
+      },
+      onError: () => {
+        alert("Bulk update failed, check console for error");
+        setInputDisabled(false);
+      },
+    })
+  );
   const bulkUpdateContentFunc = useCallback(() => {
     const updatedTags = Selection.tags.map((o) => o.value);
     const removedTags = Selection.tagsInitial.current.filter(
@@ -68,62 +162,13 @@ export function ServerProvider({ children }: any) {
     const addedTags = updatedTags.filter(
       (x) => !Selection.tagsInitial.current.includes(x)
     );
-    setTags((old) => {
-      const unSyncedTags = addedTags.filter((tag) => !old.includes(tag));
-      if (!unSyncedTags.length) return old;
-      return [...old, ...unSyncedTags];
+    setInputDisabled(true);
+    bulkUpdateMutation.mutate({
+      ids: Selection.entries,
+      added: addedTags,
+      removed: removedTags,
     });
-    setFiltered((oldFiltered: ContentType[]) =>
-      oldFiltered.map((content: ContentType) => {
-        if (!Selection.entries.includes(content.id)) return content;
-        for (const tag of removedTags) {
-          content.Tags = content.Tags.filter((val) => val !== tag);
-          content.LastUpdated = Math.floor(Date.now() / 1000);
-        }
-        for (const tag of addedTags) {
-          if (content.Tags.includes(tag)) continue;
-          content.Tags.push(tag);
-        }
-        updateContentModified.mutate(content);
-        return content;
-      })
-    );
-
-    Selection.setModalOpen(false);
   }, [Selection.tags, Selection.entries, Selection.tagsInitial]);
-  const updateContentFunc = useCallback(() => {
-    if (!Update.Data.title.trim()) {
-      alert("Title must not be blank");
-      Update.setTitle("");
-      return;
-    }
-    let content: ContentType;
-    const sanitizedTitle = sanitizeStringForFileName(Update.Data.title);
-    setFiltered((old) =>
-      old.map((val) => {
-        if (val.id === Update.Data.ID) {
-          content = { ...val };
-          content.Title = sanitizedTitle;
-          content.Tags = Update.Data.tags;
-          const oldTags = content.Tags;
-          const addedTags = Update.Data.tags.filter(
-            (tag) => !oldTags.includes(tag)
-          );
-          setTags((old) => {
-            const unSyncedTags = addedTags.filter((tag) => !old.includes(tag));
-            if (!unSyncedTags.length) return old;
-            return [...old, ...unSyncedTags];
-          });
-          content.extraData = Update.Data.extraData;
-          updateContentModified.mutate(content!);
-          return content;
-        }
-        return val;
-      })
-    );
-    Update.setTitle(sanitizedTitle);
-    Update.setModalOpen(false);
-  }, [Update.Data]);
 
   const isSelected = useCallback(
     (id: string) => Selection.entries.includes(id),
@@ -131,23 +176,24 @@ export function ServerProvider({ children }: any) {
   );
 
   const deleteContentsModified = useMutation(
-    orpc.main.deleteData.mutationOptions()
+    orpc.main.deleteData.mutationOptions({
+      onSuccess: (res) => {
+        setFiltered((old) => old.filter((doc) => !res.includes(doc.id)));
+      },
+      onError: () => {
+        alert("delete contents failed, check console for error");
+      },
+    })
   );
   const removeContents = useCallback((keys: string[]) => {
     deleteContentsModified.mutate(keys);
   }, []);
 
   useEffect(() => {
-    setFiltered(contentDataQuery?.data ?? []);
-  }, [contentDataQuery.data]);
+    contentDataMutation.mutate(Filter.FilterData);
+  }, []);
 
-  const ServerTagQuery = useQuery(orpc.main.getServerTags.queryOptions());
-  useEffect(() => {
-    const serverTags = Object.keys(ServerTagQuery?.data ?? {});
-    setTags(serverTags);
-  }, [ServerTagQuery.data]);
-
-  const value = useMemo(
+  const value: ServerContext = useMemo(
     () => ({
       tags,
       setTags,
@@ -156,6 +202,7 @@ export function ServerProvider({ children }: any) {
       Update,
       filtered,
       serverUrl,
+      inputDisabled,
       removeContents,
       setFiltered,
       updateContentFunc,
@@ -164,7 +211,7 @@ export function ServerProvider({ children }: any) {
       isSelected,
       serverSyncFunc,
     }),
-    [tags, Filter, Selection, Update, filtered, serverUrl]
+    [tags, Filter, Selection, Update, filtered, inputDisabled, serverUrl]
   );
 
   return (

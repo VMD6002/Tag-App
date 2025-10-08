@@ -2,6 +2,7 @@ import type { contentData } from "../db/contentData.js";
 import { tagDB } from "../db/tags.js";
 import queryContent from "../lib/queryContent.js";
 import { docValidator, queryValidator } from "../schemas/contentData.js";
+import { bulkUpdate as bulkUpdateTags } from "../services/bulkUpdate.js";
 import { deleteData as deleteDocs } from "../services/deleteData.js";
 import { getDoc as get } from "../services/getDoc.js";
 import { getSyncData as gtSyncData } from "../services/getSyncData.js";
@@ -17,6 +18,16 @@ export const sync = os.handler(syncContent);
 export const setDoc = os
   .input(docValidator)
   .handler(async ({ input }) => await set(input));
+
+export const bulkUpdate = os
+  .input(
+    z.object({
+      ids: z.array(z.string()),
+      added: z.array(z.string()),
+      removed: z.array(z.string()),
+    })
+  )
+  .handler(async ({ input }) => await bulkUpdateTags(input));
 
 export const deleteData = os
   .input(z.string().array())

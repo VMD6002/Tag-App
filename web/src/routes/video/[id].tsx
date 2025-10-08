@@ -4,7 +4,7 @@ import Markdown from "react-markdown";
 
 export default function VideoPage() {
   const { doc } = useDoc() as DocContext;
-  if (!doc.Title) return <></>;
+
   return (
     <>
       <TitleHeader Title="Video" />

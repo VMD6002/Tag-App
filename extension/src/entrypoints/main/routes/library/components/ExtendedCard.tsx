@@ -19,7 +19,7 @@ const ExtendedCard = memo(({ id }: { id: string }) => {
 
     const updateSetupFunc = useCallback(() => {
       Update.setTitle(Title);
-      Update.setCoverUrl(CoverUrl!);
+      Update.setCover(CoverUrl!);
       Update.setExtraData(extraData);
       Update.setTags(Tags.map((o: string) => ({ label: o, value: o })));
       Update.ID.current = id;

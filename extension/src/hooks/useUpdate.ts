@@ -1,20 +1,20 @@
 export default function useUpdate() {
   const [modalOpen, setModalOpen] = useState(false);
   const [title, setTitle] = useState("");
-  const [coverUrl, setCoverUrl] = useState("");
+  const [cover, setCover] = useState("");
   const [extraData, setExtraData] = useState("");
   const [tags, setTags] = useState<MultiSelectOption[]>([]);
   const ID = useRef("");
 
   const Data = useMemo(
     () => ({
-      title,
-      tags: tags.map((o) => o.value),
-      ID: ID.current,
-      coverUrl: coverUrl,
+      Title: title,
+      Tags: tags.map((o) => o.value),
+      id: ID.current,
+      Cover: cover,
       extraData: extraData,
     }),
-    [title, tags, ID, coverUrl, extraData]
+    [title, tags, ID, cover, extraData]
   );
 
   const toggleModalFunc = useCallback(() => {
@@ -30,8 +30,8 @@ export default function useUpdate() {
     title,
     setTitle,
     // --
-    coverUrl,
-    setCoverUrl,
+    cover,
+    setCover,
     // --
     tags,
     setTags,

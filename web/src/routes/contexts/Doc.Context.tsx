@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import {
   QueryClient,
   QueryClientProvider,
-  useQuery,
+  useMutation,
 } from "@tanstack/react-query";
 import { useRoute } from "wouter";
 import { orpc } from "@/lib/orpc";
@@ -46,22 +46,23 @@ export function Child({ children }: { children: React.ReactNode }) {
   const { id } = useRoute("/:contentType/:id")[1] as { id: string };
   const [doc, setDoc] = useState<ContentType>(docPlaceholderData);
 
-  const getDocQuery = useQuery(
-    orpc.main.getDoc.queryOptions({
-      input: id,
+  const getDocMutation = useMutation(
+    orpc.main.getDoc.mutationOptions({
+      onSuccess: (res) => {
+        setDoc(res);
+        setTimeout(
+          () => (document.title = `${document.title} - ${res.Title}`),
+          0
+        );
+      },
     })
   );
 
   useEffect(() => {
-    if (!getDocQuery.data?.id) return;
-    setDoc(getDocQuery.data);
-    setTimeout(
-      () => (document.title = `${document.title} - ${getDocQuery.data?.Title}`),
-      0
-    );
-  }, [getDocQuery.data]);
+    getDocMutation.mutate(id);
+  }, [id]);
 
-  if (getDocQuery.isLoading) return <Spinner />;
+  if (getDocMutation.isPending) return <Spinner />;
 
   return (
     <DocContext.Provider

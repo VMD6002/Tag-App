@@ -11,7 +11,6 @@ import {
   QueryClient,
   QueryClientProvider,
   useMutation,
-  useQuery,
 } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
@@ -31,19 +30,16 @@ const ToBeLoaded = ({ overwrite, setOverwrite }: any) => {
   const { contentData, setContentData, filtered, getDataGivenKeys } =
     useLocal() as LocalContext;
 
-  const GetWebContentServerQuery = useQuery(
-    orpc.webSync.getContentData.queryOptions({
-      enabled: false,
+  const GetWebContentServerQuery = useMutation(
+    orpc.webSync.getContentData.mutationOptions({
+      onSuccess: (res) => {
+        setContentData(res);
+      },
     })
   );
   const getFunc = useCallback(() => {
-    GetWebContentServerQuery.refetch();
+    GetWebContentServerQuery.mutate({});
   }, []);
-  useEffect(() => {
-    if (!GetWebContentServerQuery.data) return;
-    setContentData(GetWebContentServerQuery.data);
-  }, [GetWebContentServerQuery.data]);
-
   const SetWebContentMutaion = useMutation(
     orpc.webSync.setContentData.mutationOptions()
   );

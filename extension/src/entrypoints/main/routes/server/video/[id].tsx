@@ -6,7 +6,6 @@ import type { DocContext } from "../contexts/Doc.Context";
 
 export default function VideoPage() {
   const { doc, serverUrl, Update, removeContent } = useDoc() as DocContext;
-  if (!doc.Title) return <></>;
   return (
     <>
       <TitleHeader Title="Video" />

@@ -25,6 +25,7 @@ function Child() {
     bulkUpdateContentFunc,
     Selection,
     Filter,
+    inputDisabled,
   } = useServer() as ServerContext;
 
   return (
@@ -33,6 +34,7 @@ function Child() {
         Update={Update}
         updateContentFunc={updateContentFunc}
         isServer={true}
+        inputDisabled={inputDisabled}
       />
       <BulkUpdateModal
         Selection={Selection}

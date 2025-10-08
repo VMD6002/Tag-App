@@ -64,8 +64,6 @@ export default function VideoSet() {
     [VideoSetDataQuery.data]
   );
 
-  if (!doc.Title) return <></>;
-
   return (
     <>
       <TitleHeader Title="Video Set" />

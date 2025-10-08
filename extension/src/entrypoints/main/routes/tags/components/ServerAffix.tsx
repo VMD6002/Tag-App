@@ -24,23 +24,20 @@ const queryClient = new QueryClient({
   },
 });
 
-const ToBeLoaded = ({ serverUrl, overwrite, setOverwrite }: any) => {
+const ToBeLoaded = ({ overwrite, setOverwrite }: any) => {
   const orpc = useOrpc();
   const { tags, tagParents, setTags, setTagParents } = useTagData();
-  const GetTagsFromServerQuery = useQuery(
-    orpc.webSync.getTags.queryOptions({
-      enabled: false,
+  const GetTagsFromServerQuery = useMutation(
+    orpc.webSync.getTags.mutationOptions({
+      onSuccess: (res) => {
+        setTags(res.tags);
+        setTagParents(res.tagParents);
+      },
     })
   );
   const getFunc = useCallback(() => {
-    GetTagsFromServerQuery.refetch();
+    GetTagsFromServerQuery.mutate({});
   }, []);
-  useEffect(() => {
-    if (!GetTagsFromServerQuery.data) return;
-    const Data = GetTagsFromServerQuery.data;
-    setTags(Data.tags);
-    setTagParents(Data.tagParents);
-  }, [GetTagsFromServerQuery.data]);
 
   const SetServerTagsMutation = useMutation(
     orpc.webSync.setTags.mutationOptions()
@@ -81,7 +78,7 @@ export default function ServerAffix() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ToBeLoaded serverUrl={serverUrl} {...{ overwrite, setOverwrite }} />
+      <ToBeLoaded overwrite={overwrite} setOverwrite={setOverwrite} />
     </QueryClientProvider>
   );
 }

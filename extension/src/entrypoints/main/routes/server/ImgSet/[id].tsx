@@ -103,8 +103,6 @@ export default function ImgSetPage() {
     [ImgSetImagesQuery.data]
   );
 
-  if (!doc.Title) return <></>;
-
   return (
     <>
       {openModal ? (

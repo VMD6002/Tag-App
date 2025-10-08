@@ -54,7 +54,6 @@ function VideoCard({
 export default function VideoSet() {
   const { doc, setDoc, serverUrl, Update, removeContent, orpc } =
     useDoc() as DocContext;
-  if (!doc.Title) return <></>;
   const [currentVideo, setCurrentVideo] = useState("");
 
   const VideoSetDataQuery = useQuery(
@@ -197,15 +196,17 @@ export default function VideoSet() {
               updateCover={updateCover}
             />
           ))}
-          {// @ts-ignore
-          VideoSetData.CoverFiles?.extra?.map((extra) => (
-            <VideoCard
-              Title={extra}
-              ImgUrl={getMediaURL(`covers/${extra}`)}
-              notVideo={true}
-              updateCover={updateCover}
-            />
-          ))}
+          {
+            // @ts-ignore
+            VideoSetData.CoverFiles?.extra?.map((extra) => (
+              <VideoCard
+                Title={extra}
+                ImgUrl={getMediaURL(`covers/${extra}`)}
+                notVideo={true}
+                updateCover={updateCover}
+              />
+            ))
+          }
         </div>
       </div>
     </>

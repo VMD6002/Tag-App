@@ -26,7 +26,6 @@ export default function ImgSetPage() {
     () => ImgSetImagesQuery.data ?? [],
     [ImgSetImagesQuery.data]
   );
-  if (!doc.Title) return <></>;
 
   return (
     <>
