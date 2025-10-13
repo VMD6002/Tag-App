@@ -54,7 +54,7 @@ export function ServerProvider({ children }: any) {
         setFiltered(res);
       },
       onError: () => {
-        alert("DB, online ?");
+        console.warn("DB, online ?");
       },
     })
   );

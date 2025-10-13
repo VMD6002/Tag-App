@@ -62,10 +62,7 @@ const ExtendedCard = memo(({ data }: { data: ContentType }) => {
             src={`/${getCoverUrl(Type!, Title, ext!)}`}
           />
         </div>
-        <div className="relative h-5">
-          {/* @ts-ignore */}
-          {contentTypeColor[Type]}
-        </div>
+        <div className="relative h-5">{contentTypeColor[Type!]}</div>
         <div className="w-[95%] ml-[2.5%] break-all">
           <a href={getUrl(id, Type!)} target="_blank">
             <h1 className="mb-1 text-lg font-semibold font-stretch-condensed">
