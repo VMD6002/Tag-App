@@ -56,8 +56,7 @@ export default function ImgSetPage() {
         alert("ImgSet cover updated");
         setDoc((oldDoc: ContentType) => {
           const temp = { ...oldDoc };
-          // @ts-ignore
-          temp.ext[0] = selectedCover;
+          temp.ext![0] = selectedCover;
           return temp;
         });
         setSelectedCover("");

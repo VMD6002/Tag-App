@@ -63,6 +63,7 @@ export function Child({ children }: { children: React.ReactNode }) {
         Update.setTitle(res.Title);
         Update.setExtraData(res.extraData);
         Update.setTags(res.Tags.map((tag) => ({ label: tag, value: tag })));
+        setDoc(res);
         setTimeout(
           () => (document.title = `${document.title} - ${res.Title}`),
           0

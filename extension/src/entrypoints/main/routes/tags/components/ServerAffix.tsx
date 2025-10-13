@@ -11,7 +11,6 @@ import {
   QueryClient,
   QueryClientProvider,
   useMutation,
-  useQuery,
 } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
