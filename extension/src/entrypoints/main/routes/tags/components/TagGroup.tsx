@@ -25,15 +25,14 @@ export default function TagGroup({
       <h1 className="text-xl mb-3 text-foreground">
         {parent.replaceAll("_", " ")} ({Children.length})
       </h1>
-      <div className="grid gap-y-5 text-sm">
+      <div className="grid gap-y-3 text-sm">
         {Children.map((tag) => (
           <div key={`${parent}-${tag}`} className="break-inside-avoid-column">
-            <img
-              className="w-full"
-              src={
-                tags[tag].CoverUrl ? getCover(tags[tag].CoverUrl) : undefined
-              }
-            />
+            {tags[tag].CoverUrl ? (
+              <img className="w-full" src={getCover(tags[tag].CoverUrl)} />
+            ) : (
+              <></>
+            )}
             <div className="bg-secondary flex place-items-center justify-between">
               <Button size={"icon"} onClick={() => openCoverModal(tag)}>
                 <Image />
