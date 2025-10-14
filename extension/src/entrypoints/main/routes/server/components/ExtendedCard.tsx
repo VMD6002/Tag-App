@@ -54,14 +54,8 @@ const contentTypeColor = {
 
 const ExtendedCard = memo(({ data }: { data: ContentType }) => {
   try {
-    const {
-      removeContents,
-      setFiltered,
-      Selection,
-      Update,
-      isSelected,
-      serverUrl,
-    } = useServer() as ServerContext;
+    const { removeContents, Selection, Update, isSelected, serverUrl } =
+      useServer() as ServerContext;
 
     const { id, Title, Tags, Added, Type, ext, extraData } = data;
 

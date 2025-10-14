@@ -70,8 +70,7 @@ const ToBeLoaded = ({ overwrite, setOverwrite }: any) => {
 };
 
 export default function ServerAffix() {
-  const { serverUrl, serverFeatures, overwrite, setOverwrite } =
-    useSettingsData();
+  const { serverFeatures, overwrite, setOverwrite } = useSettingsData();
 
   if (!serverFeatures) return <></>;
 

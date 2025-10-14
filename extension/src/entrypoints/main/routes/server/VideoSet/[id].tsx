@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Ellipsis } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import post from "@/lib/post";
 import { DocContext, useDoc } from "../contexts/Doc.Context";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Markdown from "react-markdown";
@@ -16,7 +15,7 @@ function VideoCard({
   Title,
   ImgUrl,
   notVideo = false,
-  setCurrent = (a: string) => null,
+  setCurrent = (a: string) => a,
   updateCover,
 }: {
   Title: string;

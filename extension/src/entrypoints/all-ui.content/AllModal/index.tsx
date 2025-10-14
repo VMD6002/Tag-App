@@ -63,7 +63,7 @@ function ToBeLoaded() {
       return;
     }
     const { Download } = GetTagAppSiteData();
-    if (contentData.hasOwnProperty(Identifier)) {
+    if (Identifier in contentData) {
       log("Already Exists returning");
       const mediaData = contentData[Identifier];
       Data.setTitle(mediaData.Title);
@@ -119,7 +119,7 @@ function ToBeLoaded() {
 
     // @ts-ignore
     setContentData((oldVids: ContentDataType) => {
-      if (oldVids.hasOwnProperty(Identifier)) {
+      if (Identifier in oldVids) {
         log("Already Exists returning");
         setExists(true);
         setOpenModal(false);

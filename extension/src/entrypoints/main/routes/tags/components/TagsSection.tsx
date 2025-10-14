@@ -35,7 +35,7 @@ export default function TagsSection() {
       .map((a) => `${selectedParent}:${a}`);
     setTags((oldTags) => {
       newTags.map((tag) => {
-        if (oldTags!.hasOwnProperty(tag)) return;
+        if (tag in oldTags!) return;
         oldTags![tag] = { Count: 0 };
       });
       return { ...oldTags };

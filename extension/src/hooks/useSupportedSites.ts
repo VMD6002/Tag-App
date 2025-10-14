@@ -39,7 +39,7 @@ export default function useSupportedSites() {
   const refreshSupportedHostsIndex = useCallback(
     (supportSSites?: typeof supportedSites) => {
       setSupportedHostsIndex(() => {
-        let index: Record<string, string> = {};
+        const index: Record<string, string> = {};
         if (supportSSites) {
           for (const Site in supportSSites) {
             for (const host of supportSSites[Site].Hosts) index[host] = Site;

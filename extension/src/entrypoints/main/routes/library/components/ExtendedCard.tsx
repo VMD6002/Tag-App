@@ -24,7 +24,7 @@ const ExtendedCard = memo(({ id }: { id: string }) => {
       Update.setTags(Tags.map((o: string) => ({ label: o, value: o })));
       Update.ID.current = id;
       Update.toggleModalFunc();
-    }, [Title, Tags, Update.Data]);
+    }, [Title, Tags, Update.Data, CoverUrl, Title, Tags, extraData, id]);
 
     const removeContent = useCallback(() => {
       if (!confirm("Confirm Deletion")) return;

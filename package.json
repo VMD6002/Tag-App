@@ -12,9 +12,6 @@
     "extension",
     "server"
   ],
-  "resolutions": {
-    "@tanstack/query-core": "5.90.2"
-  },
   "trustedDependencies": [
     "@swc/core",
     "@tailwindcss/oxide",

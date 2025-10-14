@@ -107,9 +107,9 @@ export function Child({ children }: { children: React.ReactNode }) {
     updateContentModified.mutate(newDoc);
   }, [Update.Data]);
 
-  const deleteContentsModified = useMutation(
+  const removeContentsMutaion = useMutation(
     orpc.main.deleteData.mutationOptions({
-      onSuccess: (res) => {
+      onSuccess: () => {
         navigate("/server");
       },
       onError: () => {
@@ -118,7 +118,7 @@ export function Child({ children }: { children: React.ReactNode }) {
     })
   );
   const removeContent = useCallback(() => {
-    deleteContentsModified.mutate([id]);
+    removeContentsMutaion.mutate([id]);
   }, [id]);
 
   const value: DocContext = useMemo(
@@ -131,7 +131,7 @@ export function Child({ children }: { children: React.ReactNode }) {
       updateContentFunc,
       orpc,
     }),
-    [doc, Update, serverUrl]
+    [doc, Update, serverUrl, orpc]
   );
 
   useEffect(() => {

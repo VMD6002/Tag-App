@@ -82,13 +82,10 @@ export default function ImgSetPage() {
     setOpenModal((old) => !old);
   }, []);
 
-  const onImgClick = useCallback(
-    (img: string) => {
-      setSelectedCover(img);
-      toggleModal();
-    },
-    [coverSelectMode]
-  );
+  const onImgClick = useCallback((img: string) => {
+    setSelectedCover(img);
+    toggleModal();
+  }, []);
 
   const getImgURL = useCallback(
     (img: any) =>

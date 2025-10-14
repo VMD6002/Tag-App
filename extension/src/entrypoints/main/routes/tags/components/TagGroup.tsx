@@ -17,7 +17,7 @@ export default function TagGroup({
   const { openCoverModal, getCover, tags } = useTagContext() as TagContext;
   const Children = useMemo(
     () => tagsStringArray.filter((k) => k.startsWith(parent)).sort(),
-    [tagsStringArray]
+    [tagsStringArray, parent]
   );
 
   return (

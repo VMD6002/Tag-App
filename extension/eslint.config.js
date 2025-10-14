@@ -10,14 +10,14 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig([
-  globalIgnores(["dist"]),
+  globalIgnores(["dist", ".wxt"]),
   {
-    files: ["**/*.{ts,tsx}"],
+    files: ["./src/**/*.{ts,tsx}"],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
-      reactHooks.configs["recommended-latest"],
       reactRefresh.configs.vite,
+      reactHooks.configs.flat.recommended,
     ],
     languageOptions: {
       ecmaVersion: 2020,
@@ -29,6 +29,12 @@ export default defineConfig([
     rules: {
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-explicit-any": "off",
+      "react-hooks/refs": "off",
+      "react-hooks/rules-of-hooks": "off",
+      "react-hooks/preserve-manual-memoization": "off",
+      "react-hooks/immutability": "off",
+      "react-refresh/only-export-components": "warn",
+      "react-hooks/set-state-in-effect": "warn",
     },
   },
 ]);

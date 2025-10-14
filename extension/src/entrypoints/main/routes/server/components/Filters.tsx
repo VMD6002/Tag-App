@@ -53,7 +53,7 @@ export default function Filters() {
   const openBulkUpdateModal = useCallback(() => {
     syncSelectedTags();
     Selection.toggleModalFunc();
-  }, [filterData, Selection.entries]);
+  }, [syncSelectedTags]);
 
   const tagsForMultiSelectComponent = useMemo(
     () =>
