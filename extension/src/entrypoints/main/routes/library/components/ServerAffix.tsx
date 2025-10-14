@@ -51,7 +51,19 @@ const ToBeLoaded = ({ overwrite, setOverwrite }: any) => {
     orpc.download.set.mutationOptions()
   );
   const downFunc = useCallback(() => {
-    SetServerDownloadMutaion.mutate(getDataGivenKeys(filtered));
+    interface DownloadType {
+      id: string;
+      Title: string;
+      CoverUrl: string;
+      Tags: string[];
+      Download: ContentDownload;
+      Url: string;
+      Added: number;
+      LastUpdated: number;
+      extraData: string;
+    }
+    const downloadData = getDataGivenKeys(filtered) as DownloadType[];
+    SetServerDownloadMutaion.mutate(downloadData);
   }, [filtered]);
 
   return (

@@ -96,15 +96,12 @@ export function Child({ children }: { children: React.ReactNode }) {
       Update.setTitle("");
       return;
     }
-    const temp: any = Update.Data;
-    delete temp.Cover;
-    const newDoc = {
-      ...doc,
-      ...temp,
+    const content = {
+      ...Update.Data,
       Title: sanitizedTitle,
     };
     setInputDisabled(true);
-    updateContentModified.mutate(newDoc);
+    updateContentModified.mutate(content);
   }, [Update.Data]);
 
   const removeContentsMutaion = useMutation(

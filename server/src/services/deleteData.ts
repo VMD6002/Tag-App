@@ -1,12 +1,11 @@
 import { CTypeDir } from "../lib/constants.js";
 import { rm } from "node:fs/promises";
-import type { IndividualContentDataType } from "../schemas/contentData.js";
-import { contentDataDB } from "../db/contentData.js";
+import { contentDataDB, type contentData } from "../db/contentData.js";
 import { DecrementTagCount, tagDB } from "../db/tags.js";
 import { ORPCError } from "@orpc/server";
 
 export async function deleteData(IdList: string[]) {
-  const Deleted: IndividualContentDataType[] = [];
+  const Deleted: contentData[] = [];
   for await (const ID of IdList) {
     if (!contentDataDB.data[ID])
       throw new ORPCError("BAD_REQUEST", {

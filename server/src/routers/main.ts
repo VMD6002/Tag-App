@@ -1,7 +1,6 @@
 import type { contentData } from "../db/contentData.js";
 import { tagDB } from "../db/tags.js";
-import queryContent from "../lib/queryContent.js";
-import { docValidator, queryValidator } from "../schemas/contentData.js";
+import queryContent, { queryValidator } from "../lib/queryContent.js";
 import { bulkUpdate as bulkUpdateTags } from "../services/bulkUpdate.js";
 import { deleteData as deleteDocs } from "../services/deleteData.js";
 import { getDoc as get } from "../services/getDoc.js";
@@ -14,6 +13,15 @@ import z from "zod";
 export const getSyncData = os.handler(gtSyncData);
 
 export const sync = os.handler(syncContent);
+
+const docValidator = z.object({
+  id: z.string(),
+  Title: z.string(),
+  Tags: z.string().array(),
+  extraData: z.string(),
+});
+
+export type DocType = z.infer<typeof docValidator>;
 
 export const setDoc = os
   .input(docValidator)

@@ -73,7 +73,7 @@ export function ServerProvider({ children }: any) {
   );
   const serverSyncFunc = useCallback(() => syncContentsModified.mutate({}), []);
 
-  const updateContentModified = useMutation(
+  const updateContentMutaion = useMutation(
     orpc.main.setDoc.mutationOptions({
       onSuccess: (res) => {
         setFiltered((old) =>
@@ -109,18 +109,9 @@ export function ServerProvider({ children }: any) {
       Update.setTitle("");
       return;
     }
-    let content: ContentType = filtered.filter(
-      (doc) => (doc.id = Update.Data.id)
-    )[0];
-    const temp: any = Update.Data;
-    delete temp.Cover;
-    content = {
-      ...content,
-      ...temp,
-      Title: sanitizedTitle,
-    };
+    const content = { ...Update.Data, Title: sanitizedTitle };
     setInputDisabled(true);
-    updateContentModified.mutate(content);
+    updateContentMutaion.mutate(content);
   }, [Update.Data, filtered]);
 
   const bulkUpdateMutation = useMutation(

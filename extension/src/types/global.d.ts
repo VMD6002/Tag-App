@@ -1,3 +1,9 @@
+type preset = {
+  label: string;
+  value: string;
+  cookies?: true;
+};
+
 interface ContentDownload {
   type: "yt-dlp" | "curl";
   flags: preset | string;
@@ -46,12 +52,6 @@ interface MultiSelectOption {
 }
 
 type ServerTagType = Record<string, number>;
-
-type preset = {
-  label: string;
-  value: string;
-  cookies?: true;
-};
 
 interface SiteContentData {
   Downloader: "yt-dlp" | "curl";

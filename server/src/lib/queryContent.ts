@@ -1,15 +1,18 @@
+import z from "zod";
 import { contentDataDB, type contentData } from "../db/contentData.js";
 import { ArrayHasAll, ArryaHasAnyModified } from "../lib/HelperFunctions.js";
 import Fuse from "fuse.js";
 
-interface QueryParams {
-  any: string[]; // 1st array - content with at least one of these tags
-  all: string[]; // 2nd array - content with all these tags
-  none: string[]; // 3rd array - content without any of these tags
-  search: string; // string for title search
-  types: string[]; // array of types to include (e.g., ["img", "video"])
-  orderByLatest: boolean;
-}
+export const queryValidator = z.object({
+  any: z.string().array(), // 1st array - content with at least one of these tags
+  all: z.string().array(), // 2nd array - content with all these tags
+  none: z.string().array(), // 3rd array - content without any of these tags
+  search: z.string(), // string for title search
+  types: z.string().array(), // array of types to include (e.g., ["img", "video"])
+  orderByLatest: z.boolean(),
+});
+
+export type QueryParams = z.infer<typeof queryValidator>;
 
 function GetSearchIds(ids: contentData[], search: string) {
   const fuse = new Fuse(ids, {

@@ -10,9 +10,9 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig([
-  globalIgnores(["dist"]),
+  globalIgnores(["dist", "../server"]),
   {
-    files: ["**/*.{ts,tsx}"],
+    files: ["./src/**/*.{ts,tsx}"],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
@@ -29,6 +29,7 @@ export default defineConfig([
     rules: {
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-explicit-any": "off",
+      "react-refresh/only-export-components": "warn",
     },
   },
 ]);

@@ -1,7 +1,6 @@
 import { rm, rename } from "node:fs/promises";
 import { getSyncData } from "./getSyncData.js";
-import type { IndividualContentDataType } from "../schemas/contentData.js";
-import { contentDataDB } from "../db/contentData.js";
+import { contentDataDB, type contentData } from "../db/contentData.js";
 import { IncrementTagCount, tagDB } from "../db/tags.js";
 
 const CTypeDir = {
@@ -11,10 +10,7 @@ const CTypeDir = {
 };
 
 export async function syncContent() {
-  const Data = (await getSyncData()) as Record<
-    string,
-    IndividualContentDataType
-  >;
+  const Data = (await getSyncData()) as Record<string, contentData>;
   for (const id in Data) {
     const content = Data[id];
     contentDataDB.data[content.id] = content;

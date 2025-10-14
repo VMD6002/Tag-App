@@ -2,12 +2,12 @@ import { eqSet, SetDifferenceES6 } from "../lib/HelperFunctions.js";
 import { CTypeDir } from "../lib/constants.js";
 import { pathExists } from "fs-extra/esm";
 import { rename } from "node:fs/promises";
-import type { ContentJsonType } from "../schemas/contentData.js";
 import { contentDataDB } from "../db/contentData.js";
 import { DecrementTagCount, IncrementTagCount, tagDB } from "../db/tags.js";
 import { ORPCError } from "@orpc/server";
+import type { DocType } from "../routers/main.js";
 
-export async function setDoc(input: ContentJsonType) {
+export async function setDoc(input: DocType) {
   const NewData = input;
 
   const OldData = contentDataDB.data[NewData.id];
@@ -75,15 +75,16 @@ export async function setDoc(input: ContentJsonType) {
     IncrementTagCount(AddedTags);
   }
 
-  contentDataDB.data[NewData.id] = {
+  const updatedData = {
     ...NewData,
     LastUpdated: Math.floor(Date.now() / 1000),
-    extraData: NewData.extraData,
+    Added: OldData.Added,
     Type: OldData.Type,
     ext: OldData.ext,
   };
+  contentDataDB.data[NewData.id] = updatedData;
   await contentDataDB.write();
   await tagDB.write();
   console.log(`Contents of ${NewData.id} Updated`);
-  return NewData;
+  return updatedData;
 }

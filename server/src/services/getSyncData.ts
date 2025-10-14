@@ -2,19 +2,19 @@ import { randomUUID } from "node:crypto";
 import { readFile, writeFile, stat, readdir, rename } from "node:fs/promises";
 import { pathExists } from "fs-extra/esm";
 import getCtype from "../lib/getCtype.js";
-import type { ContentJsonType } from "../schemas/contentData.js";
+import type { ContentJsonType } from "../types/global.js";
 
 const GetDataFromJSON = async (path: string) => {
   const data = (await readFile(path)).toString();
   return JSON.parse(data);
 };
 
-interface UnSplittedDataType extends ContentJsonType {
+type contentType = "img" | "video" | "ImgSet" | "VideoSet";
+
+interface UnSplittedDataType extends Omit<ContentJsonType, "Url" | "CoverUrl"> {
   Url?: string;
   CoverUrl?: string;
 }
-
-type contentType = "img" | "video" | "ImgSet" | "VideoSet";
 
 export async function getSyncData() {
   const Folders: Set<string> = new Set();
