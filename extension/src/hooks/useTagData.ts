@@ -2,31 +2,23 @@ import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
 
 export const tagDefaultData = {
-  "Type:Img": { Count: 0, CoverUrl: "https://picsum.photos/200/300" },
-  "Type:GIF": { Count: 0, CoverUrl: "https://picsum.photos/200/300" },
+  "Type:Img": { Count: 0 },
+  "Type:GIF": { Count: 0 },
   "Type:Animation": {
     Count: 0,
-    CoverUrl: "https://picsum.photos/200/300",
   },
   "Type:3D": {
     Count: 0,
-    CoverUrl: "https://picsum.photos/200/300",
-  },
-  "Type:ImgSet": {
-    Count: 0,
-    CoverUrl: "https://picsum.photos/200/300",
   },
   "Type:Short_Clip": {
     Count: 0,
-    CoverUrl: "https://picsum.photos/200/300",
   },
   "Util:Downloaded": {
     Count: 0,
-    CoverUrl: "https://picsum.photos/200/300",
+    CoverUrl: "https://www.svgrepo.com/show/501864/disk.svg",
   },
   "Util:Different_Cover": {
     Count: 0,
-    CoverUrl: "https://picsum.photos/200/300",
   },
 };
 
