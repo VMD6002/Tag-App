@@ -10,7 +10,8 @@
   "workspaces": [
     "web",
     "extension",
-    "server"
+    "server",
+    "server-download-cli"
   ],
   "trustedDependencies": [
     "@swc/core",

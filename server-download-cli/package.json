@@ -1,0 +1,22 @@
+{
+  "name": "tmp",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --target node"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@inquirer/select": "^4.4.0",
+    "@types/cli-progress": "^3.11.6",
+    "ora": "^9.0.0",
+    "yoctocolors": "^2.1.2",
+    "yt-dlp-wrap-plus": "^2.3.20"
+  }
+}
