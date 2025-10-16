@@ -186,7 +186,7 @@ export default function ImgSetPage() {
             }
             onClick={() => onImgClick(img)}
           >
-            <img className="w-full" src={getImgURL(img)} />
+            <img loading="lazy" className="w-full" src={getImgURL(img)} />
           </button>
         ))}
       </div>

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import TitleHeader from "@/components/craft/TitleHeader";
 import { Slider } from "@/components/ui/slider";
 import { useDoc, type DocContext } from "../contexts/Doc.Context";
@@ -81,7 +80,7 @@ export default function ImgSetPage() {
       >
         {ImgSetImages.map((img) => (
           <button disabled={true} className={"w-full "}>
-            <img className="w-full" src={getImgURL(img)} />
+            <img loading="lazy" className="w-full" src={getImgURL(img)} />
           </button>
         ))}
       </div>

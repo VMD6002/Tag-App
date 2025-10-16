@@ -29,7 +29,11 @@ export default function TagGroup({
         {Children.map((tag) => (
           <div key={`${parent}-${tag}`} className="break-inside-avoid-column">
             {tags[tag].CoverUrl ? (
-              <img className="w-full" src={getCover(tags[tag].CoverUrl)} />
+              <img
+                loading="lazy"
+                className="w-full"
+                src={getCover(tags[tag].CoverUrl)}
+              />
             ) : (
               <></>
             )}
