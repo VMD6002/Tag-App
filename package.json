@@ -4,7 +4,9 @@
     "dev:ext": "cd extension && bun dev",
     "build:ext": "cd extension && bun run build",
     "dev:server": "cd server && bun dev",
+    "build:server": "cd server && bun run build",
     "build:web": "cd web && bun run build && rm -rf ../server/WebUI && cp -r dist/ ../server/WebUI",
+    "build:downCLI": "cd server-download-cli && bun run build && rm -rf ../server/Download/index.js &&  mkdir -p ../server/Download && cp dist/index.js ../server/Download/",
     "build:serverFull": "./serverFullBuild.sh",
     "update:all": "./updateAll.sh"
   },

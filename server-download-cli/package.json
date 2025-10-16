@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "rm -rf dist && bun build src/index.ts --outfile dist/download.js --target node"
+    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --target node"
   },
   "devDependencies": {
     "@types/bun": "latest"

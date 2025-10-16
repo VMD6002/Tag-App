@@ -2,6 +2,7 @@
 
 cd server-download-cli
 bun run build
+cp dist/index.js ../server/Download
 cd ../web 
 bun run build
 rm -rf ../server/WebUI
