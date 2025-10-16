@@ -19,7 +19,6 @@ export default function TagCoverModal() {
   const differedCoverValue = useDeferredValue(cover);
   const coverURL = useMemo(() => {
     const url = getImgURL(differedCoverValue, portAndIP[0], portAndIP[1]);
-    console.log(url);
     return url;
   }, [differedCoverValue, portAndIP]);
 
