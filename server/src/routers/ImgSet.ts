@@ -1,8 +1,9 @@
 import { ORPCError, os } from "@orpc/server";
-import { readdir } from "node:fs/promises";
+import { readdir, rm } from "node:fs/promises";
 import z from "zod";
 import errorLog from "../lib/errorLog.js";
 import { contentDataDB } from "../db/contentData.js";
+import { exists } from "fs-extra";
 
 export const getImages = os.input(z.string()).handler(async ({ input }) => {
   if (!input) {
@@ -28,4 +29,19 @@ export const setCover = os
     await contentDataDB.write();
     console.log(`Succefully updated Cover of ${input.Name}`);
     return "Succefully updated Cover of ${input.Name}";
+  });
+
+export const removeImages = os
+  .input(z.object({ name: z.string(), imgs: z.string().array() }))
+  .handler(async ({ input }) => {
+    if (!(await exists("./media/ImgSets/" + input.name)))
+      throw new ORPCError("NOT_FOUND", {
+        message: `ImgSet with name ${input.name} doesn't exist`,
+      });
+    for (const img of input.imgs)
+      await rm(`./media/ImgSets/${input.name}/${img}`, {
+        recursive: true,
+        force: true,
+      });
+    return input.imgs;
   });

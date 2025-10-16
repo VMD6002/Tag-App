@@ -1,10 +1,11 @@
 import TitleHeader from "@/components/craft/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Image } from "lucide-react";
+import { Grid2X2Check, Image, Trash } from "lucide-react";
 import { DocContext, useDoc } from "../contexts/Doc.Context";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import Markdown from "react-markdown";
+import { cn } from "@/lib/utils";
 
 const CoverUpdateModal = ({
   toggleModal,
@@ -39,14 +40,20 @@ const CoverUpdateModal = ({
 export default function ImgSetPage() {
   const { doc, setDoc, serverUrl, Update, removeContent, orpc } =
     useDoc() as DocContext;
-  const [coverSelectMode, setCoverSelectMode] = useState(false);
+  const [selectionState, setSelectionState] = useState<
+    "cover" | "remove" | null
+  >(null);
   const [openModal, setOpenModal] = useState(false);
   const [selectedCover, setSelectedCover] = useState("");
+  const [imgSetImages, setImgSetImages] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const { imgSetWidth, setImgSetWidth } = useSettingsData();
 
-  const ImgSetImagesQuery = useQuery(
-    orpc.ImgSet.getImages.queryOptions({
-      input: doc.Title,
+  const getImgSetImagesMutation = useMutation(
+    orpc.ImgSet.getImages.mutationOptions({
+      onSuccess: (res) => {
+        setImgSetImages(res);
+      },
     })
   );
 
@@ -78,14 +85,42 @@ export default function ImgSetPage() {
     [selectedCover, doc]
   );
 
+  const removeImgSetMutation = useMutation(
+    orpc.ImgSet.removeImages.mutationOptions({
+      onSuccess: (res) => {
+        setImgSetImages((old) => old.filter((img) => !res.includes(img)));
+        setSelected([]);
+        alert("Images removed");
+      },
+      onError: () => {
+        alert("There was an error removing the image");
+      },
+    })
+  );
+  const removeImgs = useCallback(() => {
+    if (confirm("Confirm Deletion"))
+      removeImgSetMutation.mutate({ name: doc.Title, imgs: selected });
+  }, [selected, doc.Title]);
+
   const toggleModal = useCallback(() => {
     setOpenModal((old) => !old);
   }, []);
 
-  const onImgClick = useCallback((img: string) => {
-    setSelectedCover(img);
-    toggleModal();
-  }, []);
+  const onImgClick = useCallback(
+    (img: string) => {
+      if (!selectionState) return;
+      if (selectionState === "remove") {
+        setSelected((old) => {
+          if (old.includes(img)) return old.filter((o) => o !== img);
+          return [...old, img];
+        });
+      } else {
+        setSelectedCover(img);
+        toggleModal();
+      }
+    },
+    [selectionState]
+  );
 
   const getImgURL = useCallback(
     (img: any) =>
@@ -94,10 +129,17 @@ export default function ImgSetPage() {
     [serverUrl, doc.Title, doc.id]
   );
 
-  const ImgSetImages: string[] = useMemo(
-    () => ImgSetImagesQuery.data ?? [],
-    [ImgSetImagesQuery.data]
+  const isSelected = useCallback(
+    (img: string) => {
+      if (selectionState !== "remove") return false;
+      return selected.includes(img);
+    },
+    [selected, selectionState]
   );
+
+  useEffect(() => {
+    getImgSetImagesMutation.mutate(doc.Title);
+  }, [doc.Title]);
 
   return (
     <>
@@ -175,32 +217,68 @@ export default function ImgSetPage() {
       />
       <div
         style={{ width: imgSetWidth + "%" }}
-        className="mx-auto space-y-5 bg-input/30 min-h-96 rounded overflow-hidden"
+        className="mx-auto space-y-2 min-h-96 rounded overflow-hidden"
       >
-        {ImgSetImages.map((img) => (
+        {imgSetImages.map((img) => (
           <button
-            disabled={!coverSelectMode}
-            className={
-              "w-full " +
-              (coverSelectMode ? "p-1 border-2 border-foreground my-1" : "")
-            }
+            className={cn(
+              "w-full",
+              selectionState ? "p-1 border-2 border-foreground my-1" : "",
+              isSelected(img) ? "border-red-500" : ""
+            )}
             onClick={() => onImgClick(img)}
           >
             <img loading="lazy" className="w-full" src={getImgURL(img)} />
           </button>
         ))}
       </div>
-      <Button
-        onClick={() => setCoverSelectMode((old) => !old)}
-        variant="secondary"
-        size="icon"
-        className={
-          "fixed bottom-8 right-8 p-2 scale-150 backdrop-blur-xs border-2 " +
-          (coverSelectMode ? "!border-foreground" : "")
-        }
-      >
-        <Image size={"3rem"} />
-      </Button>
+      <div className="fixed bottom-8 right-8 grid gap-5">
+        {selectionState === "remove" ? (
+          <div className="relative">
+            <span className="mx-auto block text-center text-sm mb-3">
+              {String(selected.length).padStart(2, "0")}
+            </span>
+            <Button
+              disabled={!selected.length}
+              onClick={removeImgs}
+              variant="secondary"
+              size="icon"
+              className="p-2 scale-150 backdrop-blur-xs border-2 border-red-500 "
+            >
+              <Trash className="text-red-500" size={"3rem"} />
+            </Button>
+          </div>
+        ) : (
+          <></>
+        )}
+        <Button
+          onClick={() => {
+            setSelected([]);
+            setSelectionState((old) => (old === "remove" ? null : "remove"));
+          }}
+          variant="secondary"
+          size="icon"
+          className={
+            "p-2 scale-150 backdrop-blur-xs border-2 " +
+            (selectionState === "remove" ? "!border-foreground" : "")
+          }
+        >
+          <Grid2X2Check size={"3rem"} />
+        </Button>
+        <Button
+          onClick={() =>
+            setSelectionState((old) => (old === "cover" ? null : "cover"))
+          }
+          variant="secondary"
+          size="icon"
+          className={
+            "p-2 scale-150 backdrop-blur-xs border-2 " +
+            (selectionState === "cover" ? "!border-foreground" : "")
+          }
+        >
+          <Image size={"3rem"} />
+        </Button>
+      </div>
     </>
   );
 }
