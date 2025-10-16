@@ -36,7 +36,7 @@ const IncrementTagCount = (tags: string[] | Set<string>) => {
     tagsArray.forEach((tag) => {
       const newCount = (tagDB.data[tag] ?? 0) + 1;
       tagDB.data[tag] = newCount;
-      console.log(`Decrement: New Count = ${newCount}, Tag = ${tag}`);
+      console.log(`Increment: New Count = ${newCount}, Tag = ${tag}`);
     });
     tagsArray.length && console.log("All tag decrement operations completed.");
   } catch (batchError) {
