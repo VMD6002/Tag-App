@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -9,7 +9,7 @@
     <script type="module">
       import { Storage } from "@plasmohq/storage";
       const storage = new Storage({ area: "local" });
-      const serverFeatures = (await storage.get("serverFeatures")) ?? false;
+      const serverFeatures = (await storage.get("serverFeatures")) ?? true;
       if (serverFeatures)
         document.body.insertAdjacentHTML(
           "beforeend",

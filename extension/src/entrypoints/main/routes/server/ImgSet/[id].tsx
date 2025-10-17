@@ -4,8 +4,8 @@ import { Slider } from "@/components/ui/slider";
 import { Grid2X2Check, Image, Trash } from "lucide-react";
 import { DocContext, useDoc } from "../contexts/Doc.Context";
 import { useMutation } from "@tanstack/react-query";
-import Markdown from "react-markdown";
 import { cn } from "@/lib/utils";
+import DocInfoSection from "../components/DocInfoSection";
 
 const CoverUpdateModal = ({
   toggleModal,
@@ -165,67 +165,16 @@ export default function ImgSetPage() {
         <></>
       )}
       <TitleHeader Title="Image Set" />
-      <div className="grid place-items-center md:place-items-start md:flex gap-4">
+      <div className="grid place-items-center sm:place-items-start sm:flex gap-4">
         <img
-          className="w-full md:w-3/5 rounded-sm object-contain bg-input/50 max-h-[60vh]"
+          className="w-full sm:w-3/5 rounded-sm object-contain bg-input/50 max-h-[60vh]"
           src={getImgURL(doc.ext?.[0])}
         />
-        <div className="md:w-[calc(40%-1rem)] md:max-h-96 md:overflow-y-auto">
-          <div className="mb-3">
-            <Button
-              className="w-1/2 rounded-r-none bg-neutral-300/10 dark:!bg-neutral-800/30"
-              variant="outline"
-              onClick={Update.toggleModalFunc}
-            >
-              Edit
-            </Button>
-            <Button
-              className="w-1/2 rounded-l-none text-red-500 !bg-red-600/10 dark:!bg-red-950/20"
-              variant="outline"
-              onClick={removeContent}
-            >
-              Remove
-            </Button>
-          </div>
-          <h1 className="mb-1 text-lg font-semibold font-stretch-condensed">
-            {doc.Title}
-          </h1>
-          <div className="text-muted-foreground text-xs">
-            {new Date(doc.Added).toLocaleString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
-            })}
-          </div>
-          {doc.Tags.length ? (
-            <>
-              <hr className="my-4" />
-              <div className="text-sm space-y-1">
-                {[...new Set([...doc.Tags.map((k: string) => k.split(":")[0])])]
-                  .sort()
-                  .map((parent) => (
-                    <div key={parent}>
-                      {parent}:{" "}
-                      <span className="text-muted-foreground">
-                        {doc.Tags.filter((k: string) => k.startsWith(parent))
-                          .sort()
-                          .map((e: string) => e.replace(parent + ":", ""))
-                          .join(", ")}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            </>
-          ) : (
-            <></>
-          )}
-          <hr className="my-4" />
-          <div className="w-11/12 prose prose-sm dark:prose-invert max-w-full break-all mb-4">
-            <Markdown>{doc.extraData}</Markdown>
-          </div>
-        </div>
+        <DocInfoSection
+          doc={doc}
+          removeContent={removeContent}
+          toggleModalFunc={Update.toggleModalFunc}
+        />
       </div>
       <div className="h-10 sticky top-19 grid bg-background">
         <Slider

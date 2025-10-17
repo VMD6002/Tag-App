@@ -1,6 +1,6 @@
 import TitleHeader from "@/components/craft/TitleHeader";
 import { useDoc, type DocContext } from "../contexts/Doc.Context";
-import Markdown from "react-markdown";
+import DocInfoSection from "../components/DocInfoSection";
 
 export default function VideoPage() {
   const { doc } = useDoc() as DocContext;
@@ -8,9 +8,9 @@ export default function VideoPage() {
   return (
     <>
       <TitleHeader Title="Video" />
-      <div className="grid place-items-center md:place-items-start md:flex gap-4">
+      <div className="grid place-items-center sm:place-items-start sm:flex gap-4">
         <video
-          className="w-full md:w-3/5 rounded-sm object-contain max-h-[60vh] min-h-64 bg-input/50"
+          className="w-full sm:w-3/5 rounded-sm object-contain max-h-[60vh] min-h-64 bg-input/50"
           src={`/media/Videos/${encodeURIComponent(
             `${doc.Title}.${doc.ext?.[1]}`
           )}`}
@@ -19,46 +19,7 @@ export default function VideoPage() {
           )}`}
           controls
         />
-        <div className="md:w-[calc(40%-1rem)] md:max-h-96 md:overflow-y-auto">
-          <h1 className="mb-1 text-lg font-semibold font-stretch-condensed">
-            {doc.Title}
-          </h1>
-          <div className="text-muted-foreground text-xs mb-4">
-            {new Date(doc.Added).toLocaleString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
-            })}
-          </div>
-          {doc.Tags.length ? (
-            <>
-              <hr className="my-4" />
-              <div className="text-sm space-y-1">
-                {[...new Set([...doc.Tags.map((k: string) => k.split(":")[0])])]
-                  .sort()
-                  .map((parent) => (
-                    <div key={parent}>
-                      {parent}:{" "}
-                      <span className="text-muted-foreground">
-                        {doc.Tags.filter((k: string) => k.startsWith(parent))
-                          .sort()
-                          .map((e: string) => e.replace(parent + ":", ""))
-                          .join(", ")}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            </>
-          ) : (
-            <></>
-          )}
-          <hr className="my-4" />
-          <div className="w-11/12 prose prose-sm dark:prose-invert max-w-full break-all mb-4">
-            <Markdown>{doc.extraData}</Markdown>
-          </div>
-        </div>
+        <DocInfoSection doc={doc} />
       </div>
     </>
   );
