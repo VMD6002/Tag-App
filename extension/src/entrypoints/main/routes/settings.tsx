@@ -82,7 +82,9 @@ const Restore = ({
             setTags((old) => ({ ...old, ...data.tags }));
           }
           alert(
-            `Successfully restored Tags and ContentData by ${overwrite ? "Overwriting" : "Merging"}`
+            `Successfully restored Tags and ContentData by ${
+              overwrite ? "Overwriting" : "Merging"
+            }`
           );
         })
         .catch((error: any) => {
@@ -118,7 +120,9 @@ const Restore = ({
           // @ts-ignore
           else setTags((old) => ({ ...old, ...data.tags }));
           alert(
-            `Successfully restored Tags by ${overwrite ? "Overwriting" : "Merging"}`
+            `Successfully restored Tags by ${
+              overwrite ? "Overwriting" : "Merging"
+            }`
           );
         })
         .catch((error: any) => {
@@ -156,7 +160,9 @@ const Restore = ({
             setContentData((old) => ({ ...old, ...data.contentData }));
           }
           alert(
-            `Successfully restored ContentData by ${overwrite ? "Overwriting" : "Merging"}`
+            `Successfully restored ContentData by ${
+              overwrite ? "Overwriting" : "Merging"
+            }`
           );
         })
         .catch((error: any) => {
@@ -170,7 +176,7 @@ const Restore = ({
   return (
     <section className="max-w-xs w-full grid gap-4">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-xl text-muted-foreground">Restore Backup</h3>
+        <h3 className="text-xl">Restore Backup</h3>
         <div className="flex space-x-3">
           <Label>Overwrite</Label>
           <Switch
@@ -180,7 +186,7 @@ const Restore = ({
         </div>
       </div>
       <div className="grid w-full items-center">
-        <Label className="mb-2 text-muted-foreground">All</Label>
+        <Label className="mb-2">All</Label>
         <Input
           type="file"
           accept=".json,application/json"
@@ -189,9 +195,8 @@ const Restore = ({
         />
       </div>
       <div className="grid w-full items-center">
-        <Label className="mb-2 text-muted-foreground">Only ContentData</Label>
+        <Label className="mb-2">Only ContentData</Label>
         <Input
-          disabled
           type="file"
           accept=".json,application/json"
           onChange={restoreContentData}
@@ -199,9 +204,8 @@ const Restore = ({
         />
       </div>
       <div className="grid w-full items-center">
-        <Label className="mb-2 text-muted-foreground">Only Tags</Label>
+        <Label className="mb-2">Only Tags</Label>
         <Input
-          disabled
           type="file"
           accept=".json,application/json"
           onChange={restoreTags}
@@ -261,7 +265,7 @@ function BackUp({
   }, [contentData]);
   return (
     <section className="max-w-xs w-full grid gap-3">
-      <h3 className="text-xl mb-3 text-muted-foreground">Backup Data</h3>
+      <h3 className="text-xl mb-3">Backup Data</h3>
       <Button onClick={handleAll} variant={"outline"}>
         Backup All
       </Button>

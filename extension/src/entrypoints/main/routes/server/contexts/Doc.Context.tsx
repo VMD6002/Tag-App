@@ -99,10 +99,11 @@ export function Child({ children }: { children: React.ReactNode }) {
     const content = {
       ...Update.Data,
       Title: sanitizedTitle,
+      id: doc.id,
     };
     setInputDisabled(true);
     updateContentModified.mutate(content);
-  }, [Update.Data]);
+  }, [Update.Data, doc.id]);
 
   const removeContentsMutaion = useMutation(
     orpc.main.deleteData.mutationOptions({
@@ -135,7 +136,7 @@ export function Child({ children }: { children: React.ReactNode }) {
     getDocMutation.mutate(id);
   }, [id]);
 
-  if (getDocMutation.isPending)
+  if (getDocMutation.isPending || !doc.Title)
     return (
       <div className="h-[calc(100vh-8rem)] grid place-items-center">
         <Disc3 className="animate-spin" size={"4rem"} />

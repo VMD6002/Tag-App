@@ -19,7 +19,7 @@ export default function VideoPage() {
           )}`}
           controls
         />
-        <div className="md:w-[calc(40%-1rem)] w-full">
+        <div className="md:w-[calc(40%-1rem)] md:max-h-96 md:overflow-y-auto">
           <h1 className="mb-1 text-lg font-semibold font-stretch-condensed">
             {doc.Title}
           </h1>
@@ -32,23 +32,31 @@ export default function VideoPage() {
               minute: "2-digit",
             })}
           </div>
-          <div className="w-11/12 prose prose-lg max-w-full break-all mb-4">
+          {doc.Tags.length ? (
+            <>
+              <hr className="my-4" />
+              <div className="text-sm space-y-1">
+                {[...new Set([...doc.Tags.map((k: string) => k.split(":")[0])])]
+                  .sort()
+                  .map((parent) => (
+                    <div key={parent}>
+                      {parent}:{" "}
+                      <span className="text-muted-foreground">
+                        {doc.Tags.filter((k: string) => k.startsWith(parent))
+                          .sort()
+                          .map((e: string) => e.replace(parent + ":", ""))
+                          .join(", ")}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
+          <hr className="my-4" />
+          <div className="w-11/12 prose prose-sm dark:prose-invert max-w-full break-all mb-4">
             <Markdown>{doc.extraData}</Markdown>
-          </div>
-          <div className="text-sm space-y-1">
-            {[...new Set([...doc.Tags.map((k: string) => k.split(":")[0])])]
-              .sort()
-              .map((parent) => (
-                <div key={parent}>
-                  {parent}:{" "}
-                  <span className="text-muted-foreground">
-                    {doc.Tags.filter((k: string) => k.startsWith(parent))
-                      .sort()
-                      .map((e: string) => e.replace(parent + ":", ""))
-                      .join(", ")}
-                  </span>
-                </div>
-              ))}
           </div>
         </div>
       </div>

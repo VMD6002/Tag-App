@@ -17,6 +17,7 @@ export default function UpdateModal({
   inputDisabled?: boolean;
 }) {
   const { tags } = useTagData();
+  const { theme } = useTheme();
 
   if (!Update.modalOpen) return <></>;
 
@@ -69,18 +70,21 @@ export default function UpdateModal({
             </>
           )}
           <Label className="mb-2">Extra Data</Label>
-          <CodeEditor
-            value={Update.extraData}
-            language="md"
-            placeholder="Extra data."
-            onChange={(evn) => Update.setExtraData(evn.target.value)}
-            padding={15}
-            className="bg-background/80! mb-4"
-            style={{
-              fontFamily:
-                "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-            }}
-          />
+          <div className="max-h-36 overflow-y-scroll mb-4">
+            <CodeEditor
+              value={Update.extraData}
+              language="md"
+              placeholder="Extra data."
+              onChange={(evn) => Update.setExtraData(evn.target.value)}
+              padding={15}
+              className="bg-background/80!"
+              style={{
+                fontFamily:
+                  "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
+              }}
+              data-color-mode={theme === "system" ? "dark" : theme}
+            />
+          </div>
         </SeeMore>
         <Button
           disabled={inputDisabled}

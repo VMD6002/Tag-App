@@ -98,6 +98,14 @@ export default function ImgSetPage() {
     })
   );
   const removeImgs = useCallback(() => {
+    if (selected.length === 0) {
+      alert("No images selected");
+      return;
+    }
+    if (selected.length >= imgSetImages.length) {
+      alert("All images selected, Just delete the imgSet already");
+      return;
+    }
     if (confirm("Confirm Deletion"))
       removeImgSetMutation.mutate({ name: doc.Title, imgs: selected });
   }, [selected, doc.Title]);
@@ -124,8 +132,11 @@ export default function ImgSetPage() {
 
   const getImgURL = useCallback(
     (img: any) =>
-      doc.id &&
-      `${serverUrl}/media/ImgSets/${encodeURIComponent(`${doc.Title}/${img}`)}`,
+      doc.id
+        ? `${serverUrl}/media/ImgSets/${encodeURIComponent(
+            `${doc.Title}/${img}`
+          )}`
+        : undefined,
     [serverUrl, doc.Title, doc.id]
   );
 
@@ -159,7 +170,7 @@ export default function ImgSetPage() {
           className="w-full md:w-3/5 rounded-sm object-contain bg-input/50 max-h-[60vh]"
           src={getImgURL(doc.ext?.[0])}
         />
-        <div className="md:w-[calc(40%-1rem)]">
+        <div className="md:w-[calc(40%-1rem)] md:max-h-96 md:overflow-y-auto">
           <div className="mb-3">
             <Button
               className="w-1/2 rounded-r-none bg-neutral-300/10 dark:!bg-neutral-800/30"
@@ -179,7 +190,7 @@ export default function ImgSetPage() {
           <h1 className="mb-1 text-lg font-semibold font-stretch-condensed">
             {doc.Title}
           </h1>
-          <div className="text-muted-foreground text-xs mb-4">
+          <div className="text-muted-foreground text-xs">
             {new Date(doc.Added).toLocaleString("en-GB", {
               day: "numeric",
               month: "short",
@@ -188,39 +199,50 @@ export default function ImgSetPage() {
               minute: "2-digit",
             })}
           </div>
-          <div className="w-11/12 prose prose-lg max-w-full break-all mb-4">
+          {doc.Tags.length ? (
+            <>
+              <hr className="my-4" />
+              <div className="text-sm space-y-1">
+                {[...new Set([...doc.Tags.map((k: string) => k.split(":")[0])])]
+                  .sort()
+                  .map((parent) => (
+                    <div key={parent}>
+                      {parent}:{" "}
+                      <span className="text-muted-foreground">
+                        {doc.Tags.filter((k: string) => k.startsWith(parent))
+                          .sort()
+                          .map((e: string) => e.replace(parent + ":", ""))
+                          .join(", ")}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
+          <hr className="my-4" />
+          <div className="w-11/12 prose prose-sm dark:prose-invert max-w-full break-all mb-4">
             <Markdown>{doc.extraData}</Markdown>
-          </div>
-          <div className="text-sm space-y-1">
-            {[...new Set([...doc.Tags.map((k: string) => k.split(":")[0])])]
-              .sort()
-              .map((parent) => (
-                <div key={parent}>
-                  {parent}:{" "}
-                  <span className="text-muted-foreground">
-                    {doc.Tags.filter((k: string) => k.startsWith(parent))
-                      .sort()
-                      .map((e: string) => e.replace(parent + ":", ""))
-                      .join(", ")}
-                  </span>
-                </div>
-              ))}
           </div>
         </div>
       </div>
-      <Slider
-        className="my-6 w-[calc(100%-2rem)] mx-auto"
-        value={[Number(imgSetWidth)]}
-        onValueChange={(o) => setImgSetWidth(o[0])}
-        max={100}
-        step={1}
-      />
+      <div className="h-10 sticky top-19 grid bg-background">
+        <Slider
+          className="w-[calc(100%-2rem)] m-auto"
+          value={[Number(imgSetWidth)]}
+          onValueChange={(o) => setImgSetWidth(o[0])}
+          max={100}
+          step={1}
+        />
+      </div>
       <div
         style={{ width: imgSetWidth + "%" }}
         className="mx-auto space-y-2 min-h-96 rounded overflow-hidden"
       >
         {imgSetImages.map((img) => (
           <button
+            key={img}
             className={cn(
               "w-full",
               selectionState ? "p-1 border-2 border-foreground my-1" : "",
@@ -232,52 +254,66 @@ export default function ImgSetPage() {
           </button>
         ))}
       </div>
-      <div className="fixed bottom-8 right-8 grid gap-5">
+      <div className="fixed bottom-4 right-4 grid gap-1">
         {selectionState === "remove" ? (
-          <div className="relative">
-            <span className="mx-auto block text-center text-sm mb-3">
-              {String(selected.length).padStart(2, "0")}
-            </span>
+          <div className="flex gap-1">
             <Button
-              disabled={!selected.length}
+              onClick={() => {
+                if (imgSetImages.length === selected.length) setSelected([]);
+                else if (confirm("Select All ?")) setSelected(imgSetImages);
+              }}
+              variant="secondary"
+              size="icon"
+              className={
+                "backdrop-blur-xs border-2 size-12 " +
+                (imgSetImages.length === selected.length
+                  ? "!border-foreground"
+                  : "")
+              }
+            >
+              {String(selected.length).padStart(2, "0")}
+            </Button>
+            <Button
               onClick={removeImgs}
               variant="secondary"
               size="icon"
-              className="p-2 scale-150 backdrop-blur-xs border-2 border-red-500 "
+              className="backdrop-blur-xs border-2 border-red-500 size-12"
             >
-              <Trash className="text-red-500" size={"3rem"} />
+              <Trash className="text-red-500 scale-125" />
             </Button>
           </div>
         ) : (
           <></>
         )}
-        <Button
-          onClick={() => {
-            setSelected([]);
-            setSelectionState((old) => (old === "remove" ? null : "remove"));
-          }}
-          variant="secondary"
-          size="icon"
-          className={
-            "p-2 scale-150 backdrop-blur-xs border-2 " +
-            (selectionState === "remove" ? "!border-foreground" : "")
-          }
-        >
-          <Grid2X2Check size={"3rem"} />
-        </Button>
-        <Button
-          onClick={() =>
-            setSelectionState((old) => (old === "cover" ? null : "cover"))
-          }
-          variant="secondary"
-          size="icon"
-          className={
-            "p-2 scale-150 backdrop-blur-xs border-2 " +
-            (selectionState === "cover" ? "!border-foreground" : "")
-          }
-        >
-          <Image size={"3rem"} />
-        </Button>
+        <div className="flex gap-1">
+          <Button
+            onClick={() =>
+              setSelectionState((old) => (old === "cover" ? null : "cover"))
+            }
+            variant="secondary"
+            size="icon"
+            className={
+              "backdrop-blur-xs border-2 size-12 " +
+              (selectionState === "cover" ? "!border-foreground" : "")
+            }
+          >
+            <Image className="scale-125" />
+          </Button>
+          <Button
+            onClick={() => {
+              setSelected([]);
+              setSelectionState((old) => (old === "remove" ? null : "remove"));
+            }}
+            variant="secondary"
+            size="icon"
+            className={
+              "backdrop-blur-xs border-2 size-12 " +
+              (selectionState === "remove" ? "!border-foreground" : "")
+            }
+          >
+            <Grid2X2Check className="scale-125" />
+          </Button>
+        </div>
       </div>
     </>
   );

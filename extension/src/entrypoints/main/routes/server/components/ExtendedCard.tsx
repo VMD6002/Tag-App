@@ -29,25 +29,25 @@ const contentTypeColor = {
   img: (
     <Image
       size={"2rem"}
-      className="absolute bg-background p-1 -top-5 right-2 rounded"
+      className="absolute bg-background p-1.5 -top-5 right-2 rounded"
     />
   ),
   video: (
     <SquarePlay
       size={"2rem"}
-      className="absolute bg-background py-1 -top-5 right-2 rounded"
+      className="absolute bg-background p-1.5 -top-5 right-2 rounded"
     />
   ),
   ImgSet: (
     <Images
       size={"2rem"}
-      className="absolute bg-background p-1 -top-5 right-2 rounded"
+      className="absolute bg-background p-1.5 -top-5 right-2 rounded"
     />
   ),
   VideoSet: (
     <ListVideo
       size={"2rem"}
-      className="absolute bg-background p-1 -top-5 right-2 rounded"
+      className="absolute bg-background p-1.5 -top-5 right-2 rounded"
     />
   ),
 };
@@ -91,7 +91,7 @@ const ExtendedCard = memo(({ data }: { data: ContentType }) => {
             src={`${serverUrl}/${getCoverUrl(Type!, Title, ext!)}`}
           />
         </div>
-        <div className="relative h-5">{contentTypeColor[Type!]}</div>
+        <div className="h-5 relative">{contentTypeColor[Type!]}</div>
         <div className="w-[95%] ml-[2.5%] break-all">
           <div className="mb-3">
             <Button
