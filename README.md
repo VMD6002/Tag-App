@@ -9,3 +9,7 @@ This project consists of three parts
 3. Frontend for the Server
 
 [Scripting Guide](extension/Scripting%20Guid.md)
+
+### Versioning
+
+[Major Version].[New Feature].[Minor Fixes]
