@@ -83,8 +83,8 @@ function ToBeLoaded() {
       Data.setTitle(sanitizeTextForFileName(Title));
       const SiteTag = `Site:${Site}`;
       Data.setTags([
-        ...defaultTags.map((o) => ({ label: o, value: o })),
         { label: SiteTag, value: SiteTag, fixed: true },
+        ...defaultTags.map((o) => ({ label: o, value: o })),
       ]);
       Data.setCoverUrl(CoverUrl);
       Data.setExtraData(`Web: [${Url}](${Url})`);

@@ -43,10 +43,13 @@ export default function TagsSection() {
     setTagString("");
   }, [tagString, selectedParent]);
 
-  const removeTagFunc = useCallback((tag: string) => {
-    if (!confirm(`Confirm deletion of tag ${tag}`)) return;
-    removeTag(tag);
-  }, []);
+  const removeTagFunc = useCallback(
+    (tag: string) => {
+      if (!confirm(`Confirm deletion of tag ${tag}`)) return;
+      removeTag(tag);
+    },
+    [removeTag]
+  );
 
   const tagsStringArray = useMemo(() => Object.keys(tags), [tags]);
 

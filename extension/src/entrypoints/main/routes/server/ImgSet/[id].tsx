@@ -68,6 +68,7 @@ export default function ImgSetPage() {
         });
         setSelectedCover("");
         toggleModal();
+        setSelectionState(null);
       },
       onError: () => {
         alert("There was an error updating the cover");

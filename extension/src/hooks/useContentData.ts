@@ -38,7 +38,6 @@ export default function useContentData() {
     });
   }, []);
 
-  // Dont panic, filterDataFunc is a curried function
   const getFilteredContent = useCallback(
     (filterData: FilterDataType) => filterDataFunc(contentData, filterData),
     [contentData]

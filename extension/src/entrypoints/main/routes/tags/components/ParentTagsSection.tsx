@@ -28,7 +28,7 @@ export default function ParentTagsSection() {
         return;
       removeParent(parent);
     },
-    []
+    [removeParent]
   );
 
   return (
@@ -52,17 +52,20 @@ export default function ParentTagsSection() {
         </Button>
       </form>
       <div className="flex w-fit gap-2 flex-wrap mx-auto">
-        {tagParents.toSorted().map((parent) => (
-          <Button
-            variant={"secondary"}
-            key={`List-item-${parent}`}
-            size="sm"
-            onClick={removeParentFunc(parent)}
-          >
-            {parent}
-            <X />
-          </Button>
-        ))}
+        {tagParents
+          .filter((parent) => parent !== "Site")
+          .toSorted()
+          .map((parent) => (
+            <Button
+              variant={"secondary"}
+              key={`List-item-${parent}`}
+              size="sm"
+              onClick={removeParentFunc(parent)}
+            >
+              {parent}
+              <X />
+            </Button>
+          ))}
         {!tagParents.length ? (
           <span className="text-muted-foreground text-xs">
             No parent tags are present. Add parent tags to view them here...
