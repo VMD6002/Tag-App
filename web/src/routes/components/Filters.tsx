@@ -17,6 +17,18 @@ export default function Filters() {
     [tags]
   );
 
+  const anyAndNoneTagsForMuliSelectComponent = useMemo(() => {
+    const convertTedParentTags = [
+      ...new Set(tags.map((o: string) => o.split(":")[0])),
+    ]
+      .sort()
+      .map((o: string) => ({
+        label: o + ":*",
+        value: o + ":*",
+      }));
+    return [...tagsForMultiSelectComponent, ...convertTedParentTags];
+  }, [tagsForMultiSelectComponent, tags]);
+
   return (
     <>
       <Input
@@ -40,13 +52,13 @@ export default function Filters() {
         <MultipleSelector
           value={Filter.any}
           onChange={Filter.setAny}
-          options={tagsForMultiSelectComponent}
+          options={anyAndNoneTagsForMuliSelectComponent}
           placeholder={"Any of these tags"}
         />
         <MultipleSelector
           value={Filter.none}
           onChange={Filter.setNone}
-          options={tagsForMultiSelectComponent}
+          options={anyAndNoneTagsForMuliSelectComponent}
           placeholder={"None of these tags"}
         />
         <MultipleSelector
