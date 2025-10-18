@@ -14,7 +14,7 @@
     "@orpc/server": "^1.9.4",
     "fs-extra": "^11.3.2",
     "fuse.js": "^7.1.0",
-    "hono": "^4.9.12",
+    "hono": "^4.10.1",
     "lowdb": "^7.0.1",
     "postgres": "^3.4.7",
     "zod": "^4.1.12"
@@ -22,7 +22,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^20.19.21",
+    "@types/node": "^20.19.22",
     "babel-cli": "^6.26.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
