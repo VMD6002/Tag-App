@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useEffectEvent,
   useMemo,
   useState,
 } from "react";
@@ -59,9 +60,12 @@ export function ServerProvider({ children }: any) {
     }),
     [tags, Filter, filtered, filterData]
   );
+  const initialFilterData = useEffectEvent(() =>
+    contentDataMutation.mutate(Filter.FilterData)
+  );
 
   useEffect(() => {
-    contentDataMutation.mutate(Filter.FilterData);
+    setTimeout(() => initialFilterData(), 0);
   }, []);
 
   return (

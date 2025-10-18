@@ -1,7 +1,7 @@
 import useOrpc from "@/hooks/useOrpc";
 import sanitizeStringForFileName from "@/lib/sanitizeStringForFileName";
 import { useMutation } from "@tanstack/react-query";
-import { createContext } from "react";
+import { createContext, useEffectEvent } from "react";
 
 export interface ServerContext {
   tags: string[];
@@ -180,8 +180,12 @@ export function ServerProvider({ children }: any) {
     deleteContentsModified.mutate(keys);
   }, []);
 
+  const initialFilterData = useEffectEvent(() =>
+    contentDataMutation.mutate(Filter.FilterData)
+  );
+
   useEffect(() => {
-    contentDataMutation.mutate(Filter.FilterData);
+    setTimeout(() => initialFilterData(), 0);
   }, []);
 
   const value: ServerContext = useMemo(
