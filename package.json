@@ -22,5 +22,8 @@
     "core-js",
     "spawn-sync",
     "tag-app-extension"
-  ]
+  ],
+  "overrides": {
+    "@tanstack/react-query": "5.90.4"
+  }
 }
