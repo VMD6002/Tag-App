@@ -62,7 +62,7 @@ export default function ParentTagsSection() {
               size="sm"
               onClick={removeParentFunc(parent)}
             >
-              {parent}
+              {parent.replaceAll("_", " ")}
               <X />
             </Button>
           ))}
