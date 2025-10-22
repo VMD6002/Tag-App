@@ -1,6 +1,7 @@
 import { defineConfig } from "wxt";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import MarkdownPlugin from "@goodforyou/vite-plugin-markdown-import";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -8,7 +9,7 @@ export default defineConfig({
   srcDir: "src",
   modules: ["@wxt-dev/auto-icons", "@wxt-dev/module-react"],
   vite: () => ({
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), MarkdownPlugin()],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"), // or "./src" if using src directory

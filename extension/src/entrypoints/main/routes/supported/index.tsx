@@ -162,6 +162,15 @@ export default function Supported() {
   return (
     <>
       <TitleHeader Title="Suported Sites" />
+      <a href="/main.html#/supported/docs" target="_blank">
+        <Button
+          variant="secondary"
+          className="mx-auto grid mb-2 text-xs"
+          size="sm"
+        >
+          Open Scripting Guide
+        </Button>
+      </a>
       <div className="flex w-full justify-center gap-2 mb-2">
         <div className="flex items-center">
           <Button variant="secondary" onClick={handleFileClick}>

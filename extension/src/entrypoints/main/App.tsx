@@ -14,6 +14,7 @@ import ImagePage from "./routes/server/img/[id]";
 import VideoPage from "./routes/server/video/[id]";
 import VideoSet from "./routes/server/VideoSet/[id]";
 import DocProvider from "./routes/server/contexts/Doc.Context";
+import ScriptingGuid from "./routes/supported/doc";
 
 function App() {
   return (
@@ -31,6 +32,9 @@ function App() {
               </Route>
               <Route path={"/supported"}>
                 <Supported />
+              </Route>
+              <Route path={"/supported/docs"}>
+                <ScriptingGuid />
               </Route>
               <Route path={"/settings"}>
                 <Settings />

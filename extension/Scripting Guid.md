@@ -19,10 +19,12 @@
 3. Shorten Urls to the best your ability. Often urls have uneccesary bulk in it
 
    eg: In some sites what they use to get the page is often only the id at then end, whcih in the below example is 1000
+
    - someSite.com/video/how-i-built-a-dam-10000
    - someSite.com/video/10000
 
    Also in some sites its one specific search params, see in the below links only the v search param matters. ( In youtube often search param t might be present for the video to start from there )
+
    - someSite.com/video?v=10000&j=sdasdd&sdasdad
    - someSite.com/video?v=10000
 
@@ -57,4 +59,4 @@ TagAppExt comes with some build helper functions for that can be accessed by `sc
   Generates a 13 digit base 36 number given a string input, Use this for sites that don't have any other identification other than long titles and such
 
 - `decodeHtmlEntities(str: string)`
-  Decode's html entieties. eg: decodeHtmlEntities("&lt;") // returns ">"
+  Decode's html entieties. eg: decodeHtmlEntities("\&lt;") // returns "<"
