@@ -81,7 +81,6 @@ export function LocalProvider({ children }: { children: React.ReactNode }) {
       Update.setTitle("");
       return;
     }
-    // @ts-ignore
     Content.setContentData((oldContent) => {
       Tag.setTags((oldTags) => {
         const Deleted = oldContent![Update.Data.id].Tags.filter(
@@ -108,7 +107,8 @@ export function LocalProvider({ children }: { children: React.ReactNode }) {
         ...temp,
         LastUpdated: Math.floor(Date.now() / 1000),
       };
-      return newContent;
+      oldContent![newContent.id] = newContent;
+      return { ...oldContent };
     });
     Update.setModalOpen(false);
   }, [Update.Data]);

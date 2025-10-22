@@ -129,7 +129,7 @@ const ExtendedCard = memo(({ data }: { data: ContentType }) => {
             {[...new Set(Tags.map((tag: string) => tag.split(":")[0]))]
               .sort()
               .map((parent: string) => (
-                <div key={Title + "-" + parent}>
+                <div key={`${id}-${parent}`}>
                   {parent.replaceAll("_", " ")} :{" "}
                   <span className="text-muted-foreground">
                     {Tags.filter((tag: string) => tag.startsWith(parent))

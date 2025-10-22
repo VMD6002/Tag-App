@@ -88,7 +88,7 @@ const ExtendedCard = memo(({ id }: { id: string }) => {
             {[...new Set(Tags.map((tag: string) => tag.split(":")[0]))]
               .sort()
               .map((parent) => (
-                <div>
+                <div key={`${id}-${parent}`}>
                   {(parent as string).replaceAll("_", " ")} :{" "}
                   <span className="text-muted-foreground">
                     {Tags.filter((tag: string) =>
