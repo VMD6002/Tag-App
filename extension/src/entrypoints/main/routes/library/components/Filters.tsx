@@ -20,8 +20,6 @@ export default function Filters() {
     tagParents,
   } = useLocal() as LocalContext;
 
-  const { orderByLatest, setOrderByLatest } = useSettingsData();
-
   const onSelectAllCheckedChange = useCallback(
     (a: boolean) =>
       a ? Selection.selectAll(filtered) : Selection.unSelectAll(),
@@ -130,10 +128,10 @@ export default function Filters() {
         <div className="flex space-x-3">
           <Label>Order By Latest</Label>
           <Switch
-            checked={orderByLatest}
+            checked={Filter.orderByLatest}
             onCheckedChange={(a) => {
               setFiltered((old: string[]) => [...old].reverse());
-              setOrderByLatest(a);
+              Filter.setOrderByLatest(a);
             }}
           />
         </div>

@@ -19,8 +19,6 @@ export default function Filters() {
     serverSyncFunc,
   } = useServer() as ServerContext;
 
-  const { orderByLatest, setOrderByLatest } = useSettingsData();
-
   const onSelectAllCheckedChange = useCallback(
     (a: boolean) =>
       a
@@ -155,10 +153,10 @@ export default function Filters() {
         <div className="flex space-x-3">
           <Label>Order By Latest</Label>
           <Switch
-            checked={orderByLatest}
+            checked={Filter.orderByLatest}
             onCheckedChange={(a) => {
               setFiltered((old) => old.toReversed());
-              setOrderByLatest(a);
+              Filter.setOrderByLatest(a);
             }}
           />
         </div>

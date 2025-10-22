@@ -43,6 +43,9 @@ export default function useFilter() {
     if (FilterData.search.trim()) params.set("search", FilterData.search);
     else params.delete("search");
 
+    if (!FilterData.orderByLatest) params.set("orderByLatest", "false");
+    else params.delete("orderByLatest");
+
     history.pushState({}, "", url.toString());
   }, [FilterData]);
 
@@ -66,6 +69,7 @@ export default function useFilter() {
     if (urlFilterData.types)
       setTypes(urlArrToObjArrForMultiSelect(urlFilterData.types));
     if (urlFilterData.search) setSearch(urlFilterData.search);
+    if (urlFilterData.orderByLatest) setOrderByLatest(false);
   }, []);
 
   return {

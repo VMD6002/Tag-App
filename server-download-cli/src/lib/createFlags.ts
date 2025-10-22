@@ -28,10 +28,10 @@ export async function createFlag(item: DownloadItem) {
       `thumbnail:${TMP_DIR}/cover.${item.Title}.%(ext)s`
     );
   else {
-    console.log(chalk.italic("Downloading custom cover image..."));
+    console.log(chalk.italic("\nDownloading custom cover image..."));
     const ext = getImageExtensionFromURL(item.CoverUrl);
     await downloadImage(item.CoverUrl, `${TMP_DIR}/cover.${item.Title}.${ext}`);
-    console.log(chalk.green.dim("Downloaded custom cover image"));
+    console.log(chalk.green.dim("\nDownloaded custom cover image\n"));
   }
   return flags;
 }

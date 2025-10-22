@@ -2,16 +2,6 @@ import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
 
 export default function useSettingsData() {
-  const [orderByLatest, setOrderByLatest] = useStorage<boolean>(
-    {
-      key: "OrderByLatest",
-      instance: new Storage({
-        area: "local",
-      }),
-    },
-    (v) => (v === undefined ? true : v)
-  );
-
   const [imgSetWidth, setImgSetWidth] = useStorage<number | string>(
     {
       key: "imgSetWidth",
@@ -62,9 +52,6 @@ export default function useSettingsData() {
   );
 
   return {
-    orderByLatest,
-    setOrderByLatest,
-    // --
     serverUrl,
     setServerUrl,
     // --
