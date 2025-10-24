@@ -7,7 +7,7 @@ export default function DocInfoSection({ doc }: { doc: ContentType }) {
         {doc.Title}
       </h1>
       <div className="text-muted-foreground text-xs">
-        {new Date(doc.Added).toLocaleString("en-GB", {
+        {new Date(doc.Added * 1000).toLocaleString("en-GB", {
           day: "numeric",
           month: "short",
           year: "numeric",
