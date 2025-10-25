@@ -11,10 +11,10 @@
   "dependencies": {
     "@electric-sql/pglite": "^0.3.11",
     "@hono/node-server": "^1.19.5",
-    "@orpc/server": "^1.10.0",
+    "@orpc/server": "^1.10.1",
     "fs-extra": "^11.3.2",
     "fuse.js": "^7.1.0",
-    "hono": "^4.10.2",
+    "hono": "^4.10.3",
     "lowdb": "^7.0.1",
     "postgres": "^3.4.7",
     "zod": "^4.1.12"
