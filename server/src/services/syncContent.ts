@@ -7,6 +7,8 @@ const CTypeDir = {
   img: "./Images",
   gif: "./Images",
   video: "./Videos",
+  ImgSet: "./ImgSets",
+  VideoSet: "./VideoSets",
 };
 
 export async function syncContent() {
@@ -29,23 +31,18 @@ export async function syncContent() {
           `./Sync/${File}`,
           `./media/${CTypeDir[content.Type]}/${File}`
         );
-        await rm(`./Sync/${content.Title}.json`);
         break;
       case "ImgSet":
-        await rename(
-          `./Sync/${content.Title}.ImgSet`,
-          `./media/ImgSets/${content.Title}`
-        );
-        await rm(`./Sync/${content.Title}.json`);
-        break;
       case "VideoSet":
         await rename(
-          `./Sync/${content.Title}.VideoSet`,
-          `./media/VideoSets/${content.Title}`
+          `./Sync/${content.Title}.${content.Type}`,
+          `./media/${CTypeDir[content.Type]}/${content.Title}`
         );
-        await rm(`./Sync/${content.Title}.json`);
         break;
+      default:
+        continue;
     }
+    await rm(`./Sync/${content.Title}.json`, { recursive: true });
   }
   await contentDataDB.write();
   await tagDB.write();

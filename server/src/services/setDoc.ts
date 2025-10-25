@@ -32,7 +32,13 @@ export async function setDoc(input: DocType) {
             `./media/${CTypeDir[OldData.Type]}/${NewData.Title}.${
               OldData.ext[1]
             }`
-          ))
+          )) ||
+          (OldData.ext[2] &&
+            (await pathExists(
+              `./media/${CTypeDir[OldData.Type]}/Captions/caption.${
+                NewData.Title
+              }.vtt`
+            )))
         )
           throw new ORPCError("CONFLICT", {
             message: `Confiliction file with name ${NewData.Title} already exists`,
@@ -51,15 +57,34 @@ export async function setDoc(input: DocType) {
           }`,
           `./media/${CTypeDir[OldData.Type]}/${NewData.Title}.${OldData.ext[1]}`
         );
+        if (OldData.ext[2])
+          await rename(
+            `./media/${CTypeDir[OldData.Type]}/Captions/caption.${
+              OldData.Title
+            }.vtt`,
+            `./media/${CTypeDir[OldData.Type]}/Captions/caption.${
+              NewData.Title
+            }.vtt`
+          );
         break;
       case "ImgSet":
         if (await pathExists(`./ImgSets/${NewData.Title}`))
           throw new ORPCError("CONFLICT", {
-            message: `Confiliction ImgSet with name ${NewData.Title} already exists`,
+            message: `ImgSet with name ${NewData.Title} already exists`,
           });
         await rename(
           `./media/ImgSets/${OldData.Title}`,
           `./media/ImgSets/${NewData.Title}`
+        );
+        break;
+      case "VideoSet":
+        if (await pathExists(`./VideoSets/${NewData.Title}`))
+          throw new ORPCError("CONFLICT", {
+            message: `VideoSets with name ${NewData.Title} already exists`,
+          });
+        await rename(
+          `./media/VideoSets/${OldData.Title}`,
+          `./media/VideoSets/${NewData.Title}`
         );
         break;
     }
