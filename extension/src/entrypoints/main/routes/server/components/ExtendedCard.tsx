@@ -146,9 +146,9 @@ const ExtendedCard = memo(({ data }: { data: ContentType }) => {
         {Selection.on ? (
           <>
             {Selected ? (
-              <Check className="bg-foreground border-background border-[1px] top-4 left-4 text-background absolute rounded-sm" />
+              <Check className="bg-foreground border-background border top-4 left-4 text-background absolute rounded-sm" />
             ) : (
-              <div className="bg-background border-foreground border-[1px] aspect-square h-5 top-4 left-4 text-background absolute rounded-sm" />
+              <div className="bg-background border-foreground border aspect-square h-5 top-4 left-4 text-background absolute rounded-sm" />
             )}
           </>
         ) : (

@@ -8,7 +8,7 @@ export function clickUpdateOrRefresh(
 ) {
   parentDiv.textContent = JSON.stringify(contentData);
   if (firstRun || !isMounted.value) {
-    (document.head ?? document.documentElement).append(parentDiv);
+    document.documentElement.append(parentDiv);
     isMounted.value = true;
   }
 

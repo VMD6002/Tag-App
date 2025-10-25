@@ -119,7 +119,7 @@ export default function Filters() {
             Filter.injectFilterDataIntoURL();
             filterData();
           }}
-          className="w-full max-w-[18rem]"
+          className="w-full max-w-2xs"
         >
           Filter
         </Button>
