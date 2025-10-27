@@ -5,6 +5,7 @@ const AppDirs = [
   "UnSyncable",
   "Download",
   "media/Videos/Covers",
+  "media/Videos/Captions",
   "media/Images/Covers",
   "media/ImgSets",
   "media/VideoSets",

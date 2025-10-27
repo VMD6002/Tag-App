@@ -31,6 +31,13 @@ export async function syncContent() {
           `./Sync/${File}`,
           `./media/${CTypeDir[content.Type]}/${File}`
         );
+        if (content.ext[2])
+          await rename(
+            `./Sync/${File}`,
+            `./media/${CTypeDir[content.Type]}/Covers/caption.${
+              content.Title
+            }.vtt`
+          );
         break;
       case "ImgSet":
       case "VideoSet":
