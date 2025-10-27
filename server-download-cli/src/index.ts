@@ -138,7 +138,7 @@ for (const item of downloadData) {
     continue;
   }
 
-  const flags = await createFlag(item);
+  const flags = await createFlag(item, spinner);
 
   ytDlpWrap
     .exec(flags)

@@ -1,11 +1,12 @@
-import chalk from "chalk";
 import { TMP_DIR } from "./constants";
 import { downloadImage } from "./downloadImage";
 import { getImageExtensionFromURL } from "./getImageExtensionFromURL";
+import colors from "yoctocolors";
+import type { Ora } from "ora";
 
 const DEFAULT_FLAGS = ["--embed-thumbnail", "-R", "3"];
 
-export async function createFlag(item: DownloadItem) {
+export async function createFlag(item: DownloadItem, spinner: Ora) {
   const flags = [
     item.Url,
     "-o",
@@ -28,10 +29,13 @@ export async function createFlag(item: DownloadItem) {
       `thumbnail:${TMP_DIR}/cover.${item.Title}.%(ext)s`
     );
   else {
-    console.log(chalk.italic("\nDownloading custom cover image..."));
+    spinner.text = "Downloading custom cover image...";
     const ext = getImageExtensionFromURL(item.CoverUrl);
     await downloadImage(item.CoverUrl, `${TMP_DIR}/cover.${item.Title}.${ext}`);
-    console.log(chalk.green.dim("\nDownloaded custom cover image\n"));
+    spinner = spinner.stopAndPersist({
+      symbol: colors.green("✔"),
+      text: `Successfully downloaded cover image of "${item.Title}"`,
+    });
   }
   return flags;
 }
