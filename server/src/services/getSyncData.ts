@@ -115,7 +115,10 @@ export async function getSyncData() {
       case "video":
         if (!CoverFiles.has(Name)) break;
         const fileExts = [CoverFiles.get(Name), FileExt];
-        if (await exists(`./Sync/caption.${Name}.vtt`)) fileExts.push(true);
+        if (await exists(`./Sync/caption.${Name}.vtt`)) {
+          fileExts.push(true);
+          Files.delete(`caption.${Name}.vtt`);
+        }
         if (await pathExists(`./Sync/${Name}.json`)) {
           const JsonData = await ReadJSONFile(`./Sync/${Name}.json`);
           AddToNewContents(JsonData, fileExts, Ctype);

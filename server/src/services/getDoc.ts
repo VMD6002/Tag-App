@@ -8,6 +8,6 @@ export async function getDoc(id: string) {
 
   if (!Data) throw new ORPCError("NOT_FOUND");
 
-  console.log(`${id} data requested`);
+  console.log(`${Data.Title} - ${id} data requested`);
   return Data;
 }
