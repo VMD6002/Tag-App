@@ -32,10 +32,9 @@ export async function createFlag(item: DownloadItem, spinner: Ora) {
     spinner.text = "Downloading custom cover image...";
     const ext = getImageExtensionFromURL(item.CoverUrl);
     await downloadImage(item.CoverUrl, `${TMP_DIR}/cover.${item.Title}.${ext}`);
-    spinner = spinner.stopAndPersist({
-      symbol: colors.green("✔"),
-      text: `Successfully downloaded cover image of "${item.Title}"`,
-    });
+    spinner.text = `${colors.green(
+      "✔"
+    )} Successfully downloaded cover image of "${item.Title}"`;
   }
   return flags;
 }
