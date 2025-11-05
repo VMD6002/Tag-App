@@ -185,8 +185,9 @@ export function ServerProvider({ children }: any) {
   );
 
   useEffect(() => {
+    if (!serverUrl) return;
     setTimeout(() => initialFilterData(), 0);
-  }, []);
+  }, [serverUrl]);
 
   const value: ServerContext = useMemo(
     () => ({

@@ -19,7 +19,7 @@ export default function useSettingsData() {
         area: "local",
       }),
     },
-    (v) => (v === undefined ? "http://localhost:3000" : v)
+    (v) => (v === undefined ? "" : v)
   );
 
   const [serverFeatures, setServerFeatures] = useStorage<boolean>(

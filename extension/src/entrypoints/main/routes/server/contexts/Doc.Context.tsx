@@ -70,7 +70,7 @@ export function Child({ children }: { children: React.ReactNode }) {
         );
       },
       onError: () => {
-        alert("Couldn't get doc, check console for errors");
+        console.error("Couldn't get doc, check console for errors");
       },
     })
   );
@@ -133,8 +133,9 @@ export function Child({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
+    if (!serverUrl) return;
     getDocMutation.mutate(id);
-  }, [id]);
+  }, [id, serverUrl]);
 
   if (getDocMutation.isPending || !doc.Title)
     return (
