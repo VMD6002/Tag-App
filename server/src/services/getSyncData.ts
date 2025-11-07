@@ -12,9 +12,9 @@ interface UnSplittedDataType extends Omit<ContentJsonType, "Url" | "CoverUrl"> {
   CoverUrl?: string;
 }
 
-const Folders: Set<string> = new Set();
-const Files: Set<string> = new Set();
-const NewContents = new Map();
+let Folders: Set<string> = new Set();
+let Files: Set<string> = new Set();
+let NewContents = new Map();
 
 function AddToNewContents(
   Temp: ContentJsonType,
@@ -58,6 +58,10 @@ async function ReadJSONFile(path: string) {
 }
 
 export async function getSyncData() {
+  Folders = new Set();
+  Files = new Set();
+  NewContents = new Map();
+
   (await readdir("./Sync", { withFileTypes: true })).filter((j) =>
     j.isDirectory() ? Folders.add(j.name) : Files.add(j.name)
   );
