@@ -54,7 +54,15 @@ export default function Filters() {
       label: o + ":*",
       value: o + ":*",
     }));
-    return [...allTagsForMultiSelectComponent, ...tagParentsCoverted];
+
+    return [
+      ...allTagsForMultiSelectComponent,
+      {
+        label: "*",
+        value: "*",
+      },
+      ...tagParentsCoverted,
+    ];
   }, [allTagsForMultiSelectComponent, tagParents]);
 
   return (
