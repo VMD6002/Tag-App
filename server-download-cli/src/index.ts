@@ -62,7 +62,7 @@ let spinner = ora("Loading...");
 
 const ytDlpWrap: YTDlpWrap = new YTDlpWrapRuntime();
 
-function onComplete(item: DownloadItem, errorMassage?: string) {
+async function onComplete(item: DownloadItem, errorMassage?: string) {
   if (errorMassage) {
     spinner = spinner.stopAndPersist({
       symbol: colors.red("✖"),
@@ -103,6 +103,7 @@ function onComplete(item: DownloadItem, errorMassage?: string) {
 
   const newDownloadData = downloadData.filter((i) => i.id !== item.id);
   writeFileSync("tmp.json", JSON.stringify(newDownloadData, null, 2));
+  await DownloadContent();
 }
 
 if (!downloadData.length) {
@@ -112,7 +113,12 @@ if (!downloadData.length) {
 
 console.log(colors.bold(`Downloads`));
 
-for (const item of downloadData) {
+async function DownloadContent() {
+  const item = downloadData.pop();
+  if (!item) {
+    console.log(colors.bold(`Downloads Completed`));
+    return;
+  }
   spinner.start(`Processing: "${item.Title}"`);
 
   if (item.Download.type !== "yt-dlp") {
@@ -135,7 +141,6 @@ for (const item of downloadData) {
     } catch (err: Error | any) {
       onComplete(item, err?.message ?? "Unknown Error");
     }
-    continue;
   }
 
   const flags = await createFlag(item, spinner);
@@ -151,9 +156,57 @@ for (const item of downloadData) {
         (progressString += ` | Download: ${progress.currentSpeed}`);
       spinner.text = progressString;
     })
-    .on("error", (err) => onComplete(item, err.message))
-    .on("close", (code) => {
-      if (code !== 0 && code !== null) onComplete(item, "Unknown Error");
-      else onComplete(item);
+    .on("error", async (err) => await onComplete(item, err.message))
+    .on("close", async (code) => {
+      if (code !== 0 && code !== null) await onComplete(item, "Unknown Error");
+      else await onComplete(item);
     });
 }
+
+await DownloadContent();
+
+// for (const item of downloadData) {
+//   spinner.start(`Processing: "${item.Title}"`);
+
+//   if (item.Download.type !== "yt-dlp") {
+//     try {
+//       const coverExt = getImageExtensionFromURL(item.CoverUrl);
+//       spinner.text = "Downloading Cover...";
+//       await downloadImage(
+//         item.CoverUrl,
+//         `${TMP_DIR}/cover.${item.Title}.${coverExt}`
+//       );
+//       spinner.text = `Downloaded Cover`;
+//       spinner.text = `Downloadeding Image...`;
+
+//       const imgURL = item.Download.flags as string;
+//       const imgExt = getImageExtensionFromURL(imgURL);
+//       spinner.text = "Downloading image...";
+//       await downloadImage(imgURL, `${TMP_DIR}/${item.Title}.${imgExt}`);
+
+//       onComplete(item);
+//     } catch (err: Error | any) {
+//       onComplete(item, err?.message ?? "Unknown Error");
+//     }
+//     continue;
+//   }
+
+//   const flags = await createFlag(item, spinner);
+
+//   ytDlpWrap
+//     .exec(flags)
+//     .on("progress", (progress) => {
+//       let progressString = `Downloading: "${item.Title}"`;
+//       progress.percent &&
+//         (progressString += ` | Progress: ${progress.percent.toFixed(2)}%`);
+//       progress.eta && (progressString += ` | ETA: ${progress.eta}`);
+//       progress.currentSpeed &&
+//         (progressString += ` | Download: ${progress.currentSpeed}`);
+//       spinner.text = progressString;
+//     })
+//     .on("error", (err) => onComplete(item, err.message))
+//     .on("close", (code) => {
+//       if (code !== 0 && code !== null) onComplete(item, "Unknown Error");
+//       else onComplete(item);
+//     });
+// }
