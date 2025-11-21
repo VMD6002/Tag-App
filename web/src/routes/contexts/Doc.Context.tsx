@@ -51,8 +51,8 @@ export function Child({ children }: { children: React.ReactNode }) {
       onSuccess: (res) => {
         setDoc(res);
         setTimeout(
-          () => (document.title = `${document.title} - ${res.Title}`),
-          0
+          () => (document.title = document.title + " - " + res.Title),
+          100
         );
       },
     })

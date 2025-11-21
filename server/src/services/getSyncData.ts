@@ -120,7 +120,7 @@ export async function getSyncData() {
         if (!CoverFiles.has(Name)) break;
         const fileExts = [CoverFiles.get(Name), FileExt];
         if (await exists(`./Sync/caption.${Name}.vtt`)) {
-          fileExts.push(true);
+          fileExts.push(1);
           Files.delete(`caption.${Name}.vtt`);
         }
         if (await pathExists(`./Sync/${Name}.json`)) {
