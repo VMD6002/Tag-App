@@ -141,6 +141,7 @@ async function DownloadContent() {
     } catch (err: Error | any) {
       onComplete(item, err?.message ?? "Unknown Error");
     }
+    return;
   }
 
   const flags = await createFlag(item, spinner);
