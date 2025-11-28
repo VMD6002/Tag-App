@@ -6,6 +6,7 @@ import { DocContext, useDoc } from "../contexts/Doc.Context";
 import { useMutation } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import DocInfoSection from "../components/DocInfoSection";
+import LazyVideo from "@/components/LazyVideo";
 
 const CoverUpdateModal = ({
   toggleModal,
@@ -123,7 +124,8 @@ export default function ImgSetPage() {
           if (old.includes(img)) return old.filter((o) => o !== img);
           return [...old, img];
         });
-      } else {
+      } else if (img.endsWith("mp4")) return;
+      else {
         setSelectedCover(img);
         toggleModal();
       }
@@ -179,7 +181,7 @@ export default function ImgSetPage() {
       </div>
       <div className="h-10 sticky top-19 grid bg-background">
         <Slider
-          className="w-[calc(100%-2rem)] m-auto"
+          className="w-[calc(100%-2rem)] m-auto z-10"
           value={[Number(imgSetWidth)]}
           onValueChange={(o) => setImgSetWidth(o[0])}
           max={100}
@@ -200,7 +202,11 @@ export default function ImgSetPage() {
             )}
             onClick={() => onImgClick(img)}
           >
-            <img loading="lazy" className="w-full" src={getImgURL(img)} />
+            {img.endsWith("mp4") ? (
+              <LazyVideo src={getImgURL(img)} />
+            ) : (
+              <img loading="lazy" className="w-full" src={getImgURL(img)} />
+            )}
           </button>
         ))}
       </div>
@@ -217,7 +223,7 @@ export default function ImgSetPage() {
               className={
                 "backdrop-blur-xs border-2 size-12 " +
                 (imgSetImages.length === selected.length
-                  ? "!border-foreground"
+                  ? "border-foreground!"
                   : "")
               }
             >
@@ -244,7 +250,7 @@ export default function ImgSetPage() {
             size="icon"
             className={
               "backdrop-blur-xs border-2 size-12 " +
-              (selectionState === "cover" ? "!border-foreground" : "")
+              (selectionState === "cover" ? "border-foreground!" : "")
             }
           >
             <Image className="scale-125" />
@@ -258,7 +264,7 @@ export default function ImgSetPage() {
             size="icon"
             className={
               "backdrop-blur-xs border-2 size-12 " +
-              (selectionState === "remove" ? "!border-foreground" : "")
+              (selectionState === "remove" ? "border-foreground!" : "")
             }
           >
             <Grid2X2Check className="scale-125" />

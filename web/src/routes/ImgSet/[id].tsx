@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import DocInfoSection from "../components/DocInfoSection";
+import LazyVideo from "@/components/LazyVideo";
 
 export default function ImgSetPage() {
   const { doc, orpc } = useDoc() as DocContext;
@@ -50,11 +51,15 @@ export default function ImgSetPage() {
         style={{ width: imgSetWidth + "%" }}
         className="mx-auto space-y-5 bg-input/30 min-h-96 rounded overflow-hidden"
       >
-        {ImgSetImages.map((img) => (
-          <button disabled={true} className={"w-full "}>
-            <img loading="lazy" className="w-full" src={getImgURL(img)} />
-          </button>
-        ))}
+        {ImgSetImages.map((img) =>
+          img.endsWith("mp4") ? (
+            <LazyVideo src={getImgURL(img)} />
+          ) : (
+            <button disabled={true} className={"w-full "}>
+              <img loading="lazy" className="w-full" src={getImgURL(img)} />
+            </button>
+          )
+        )}
       </div>
     </>
   );
