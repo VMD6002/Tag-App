@@ -38,7 +38,7 @@ export default function ImgSetPage() {
         />
         <DocInfoSection doc={doc} />
       </div>
-      <div className="h-10 sticky top-19 grid bg-background">
+      <div className="h-10 sticky top-19 grid bg-background z-10">
         <Slider
           className="w-[calc(100%-2rem)] m-auto"
           value={[Number(imgSetWidth)]}

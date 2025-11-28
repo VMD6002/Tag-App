@@ -179,9 +179,9 @@ export default function ImgSetPage() {
           toggleModalFunc={Update.toggleModalFunc}
         />
       </div>
-      <div className="h-10 sticky top-19 grid bg-background">
+      <div className="h-10 sticky top-19 grid bg-background z-10">
         <Slider
-          className="w-[calc(100%-2rem)] m-auto z-10"
+          className="w-[calc(100%-2rem)] m-auto"
           value={[Number(imgSetWidth)]}
           onValueChange={(o) => setImgSetWidth(o[0])}
           max={100}
