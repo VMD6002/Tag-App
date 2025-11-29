@@ -251,7 +251,7 @@ function ToBeLoaded() {
       {openModal ? (
         <div
           style={{ zIndex: 2147483647 }}
-          className="grid fixed h-screen w-full place-items-center"
+          className="grid fixed min-h-screen w-full place-items-center overflow-y-auto overflow-x-clip"
         >
           <div
             onClick={toggleModalFunc}
@@ -321,19 +321,21 @@ function ToBeLoaded() {
                   <Redo2 />
                 </Button>
               </div>
-              <CodeEditor
-                value={Data.extraData}
-                language="md"
-                placeholder="Extra data."
-                onChange={(e) => Data.setExtraData(e.target.value)}
-                padding={15}
-                className="bg-background/80! mb-4"
-                style={{
-                  fontFamily:
-                    "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-                }}
-                data-color-mode="light"
-              />
+              <div className="max-h-28 overflow-y-scroll mb-4">
+                <CodeEditor
+                  value={Data.extraData}
+                  language="md"
+                  placeholder="Extra data."
+                  onChange={(e) => Data.setExtraData(e.target.value)}
+                  padding={15}
+                  className="bg-background/80!"
+                  style={{
+                    fontFamily:
+                      "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
+                  }}
+                  data-color-mode="light"
+                />
+              </div>
             </SeeMore>
 
             {!exists ? (

@@ -24,7 +24,7 @@ export default function UpdateModal({
   return (
     <div
       style={{ zIndex: 2147483647 }}
-      className="grid fixed h-screen top-0 right-0 w-full place-items-center"
+      className="grid fixed min-h-screen top-0 right-0 w-full place-items-center overflow-y-auto overflow-x-clip"
     >
       <div
         onClick={Update.toggleModalFunc}
