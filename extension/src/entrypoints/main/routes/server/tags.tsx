@@ -76,7 +76,7 @@ function Child() {
 
   useEffect(() => {
     GetTagsFromServerMutation.mutate({});
-  }, []);
+  }, [orpc]);
 
   const taags = useMemo(() => Object.keys(tags), [tags]);
 
