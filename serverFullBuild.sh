@@ -2,6 +2,7 @@
 
 cd server-download-cli
 bun run build
+mkdir -p ../server/Download
 cp dist/index.js ../server/Download
 cd ../web 
 bun run build
