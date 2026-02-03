@@ -1,8 +1,7 @@
 import { Hono } from "hono";
-import { serveStatic } from "@hono/node-server/serve-static";
+import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { trimTrailingSlash } from "hono/trailing-slash";
-import { serve } from "@hono/node-server";
 import { logger } from "hono/logger";
 
 import { RPCHandler } from "@orpc/server/fetch";
@@ -36,7 +35,7 @@ app.use(
     allowMethods: ["POST", "GET", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
     maxAge: 3600,
-  })
+  }),
 );
 // Sever the frontend
 app.use(
@@ -44,7 +43,7 @@ app.use(
   serveStatic({
     root: "./",
     rewriteRequestPath: (path) => `/WebUI/${path}`,
-  })
+  }),
 );
 
 const router = {
@@ -84,15 +83,12 @@ app.use(
     onNotFound: (path, c) => {
       console.log(`${path} not found, req url = ${c.req.path}`);
     },
-  })
+  }),
 );
 
-serve(
-  {
-    fetch: app.fetch,
-    port: Defaults.port,
-  },
-  (info) => {
-    console.log(`Server is running on http://localhost:${info.port}`);
-  }
-);
+console.log(`Server is running on http://localhost:${Defaults.port}`);
+
+export default {
+  port: Defaults.port,
+  fetch: app.fetch,
+};
