@@ -127,4 +127,5 @@ console.log(`Server is running on http://localhost:${Defaults.port}`);
 export default {
   port: Defaults.port,
   fetch: app.fetch,
+  hostname: "0.0.0.0",
 };
