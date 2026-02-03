@@ -62,4 +62,5 @@ interface SiteContentData {
   Url: string;
   defaultTags: string[];
   OgImage?: string;
+  extraData?: string;
 }

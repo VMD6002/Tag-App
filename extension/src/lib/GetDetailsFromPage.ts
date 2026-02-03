@@ -3,6 +3,7 @@ export default function GetDetailsFromPage() {
     Downloader: "yt-dlp",
     Site: "",
     Title: "",
+    extraData: "",
     CoverUrl: "",
     Identifier: "",
     Url: "",
@@ -13,9 +14,9 @@ export default function GetDetailsFromPage() {
       Data = JSON.parse(
         // @ts-ignore
         document.getElementById(
-          "tagAppScriptJSONDataFromSite"
+          "tagAppScriptJSONDataFromSite",
           // @ts-ignore
-        ).textContent
+        ).textContent,
       );
     }
   } catch (err) {

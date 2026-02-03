@@ -38,7 +38,7 @@ function ToBeLoaded() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       Data.setTitle(e.target.value);
     },
-    [] // dependency on sanitizeFilename
+    [], // dependency on sanitizeFilename
   );
 
   const { contentData, setContentData, removeContents } = useContentData();
@@ -48,8 +48,16 @@ function ToBeLoaded() {
 
   const checkExistance = useCallback(() => {
     setExists(false);
-    const { Identifier, Title, defaultTags, CoverUrl, Site, Url, OgImage } =
-      GetDetailsFromPage();
+    const {
+      Identifier,
+      Title,
+      extraData,
+      defaultTags,
+      CoverUrl,
+      Site,
+      Url,
+      OgImage,
+    } = GetDetailsFromPage();
     if (!Identifier && count.current < 20) {
       count.current++;
       log(count.current + ":" + " Existance");
@@ -72,7 +80,7 @@ function ToBeLoaded() {
         ...mediaData.Tags.map((o) =>
           o !== SiteTag
             ? { label: o, value: o }
-            : { label: o, value: o, fixed: true }
+            : { label: o, value: o, fixed: true },
         ),
       ]);
       Data.setCoverUrl(mediaData.CoverUrl!);
@@ -87,11 +95,13 @@ function ToBeLoaded() {
         ...defaultTags.map((o) => ({ label: o, value: o })),
       ]);
       Data.setCoverUrl(CoverUrl);
-      Data.setExtraData(`Web: [${Url}](${Url})`);
+      Data.setExtraData(
+        `Web: [${Url}](${Url})${extraData ? "\n" + extraData : ""}`,
+      );
       Data.setPreset(
         OgImage
           ? `"${OgImage}"`
-          : JSON.stringify(Download?.defaultPreset) ?? `""`
+          : (JSON.stringify(Download?.defaultPreset) ?? `""`),
       );
       setExists(false);
     }
@@ -178,14 +188,14 @@ function ToBeLoaded() {
       // @ts-ignore
       setTags((oldTags: TagType) => {
         const Deleted = oldContent[Identifier].Tags.filter(
-          (a) => !updatedTags.includes(a)
+          (a) => !updatedTags.includes(a),
         );
         Deleted.map((tag) => {
           oldTags[tag].Count--;
         });
 
         const Added = updatedTags.filter(
-          (a) => !oldContent[Identifier].Tags.includes(a)
+          (a) => !oldContent[Identifier].Tags.includes(a),
         );
         Added.map((tag) => {
           oldTags[tag].Count++;
