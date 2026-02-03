@@ -76,6 +76,42 @@ import clearDataBase from "./services/clearDataBase.js";
 app.get("/api/clearDB", clearDataBase);
 
 // Sever the media files
+
+app.use("/media/*", async (c, next) => {
+  const range = c.req.header("range");
+
+  // If there's no range header, just let serveStatic handle it normally
+  if (!range) {
+    return await next();
+  }
+
+  // Manually handle the range request for Bun
+  const urlPath = c.req.path.replace(/^\/media/, ""); // Remove the prefix
+  const filePath = `./media${urlPath}`; // Point to your actual folder
+  const file = Bun.file(filePath);
+
+  if (!(await file.exists())) {
+    return await next();
+  }
+
+  // Parse Range (e.g., "bytes=0-1024")
+  const parts = range.replace(/bytes=/, "").split("-");
+  const start = parseInt(parts[0], 10);
+  const end = parts[1] ? parseInt(parts[1], 10) : file.size - 1;
+  const chunksize = end - start + 1;
+
+  return new Response(file.slice(start, end + 1), {
+    status: 206,
+    headers: {
+      "Content-Range": `bytes ${start}-${end}/${file.size}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunksize.toString(),
+      "Content-Type": file.type, // Bun automatically detects mime type
+    },
+  });
+});
+
+// Fallback for non-range requests
 app.use(
   "/media/*",
   serveStatic({
