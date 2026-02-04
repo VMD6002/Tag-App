@@ -77,50 +77,53 @@ app.get("/api/clearDB", clearDataBase);
 
 // Sever the media files
 
-app.use("/media/*", async (c, next) => {
-  const range = c.req.header("range");
-
-  // If there's no range header, just let serveStatic handle it normally
-  if (!range) {
-    return await next();
-  }
-
-  // Manually handle the range request for Bun
-  const urlPath = c.req.path.replace(/^\/media/, ""); // Remove the prefix
-  const filePath = `./media${urlPath}`; // Point to your actual folder
+// Optimized Media Streaming with Range Support
+app.get("/media/*", async (c) => {
+  // Decode parameters to handle spaces and special characters in filenames
+  const urlPath = decodeURIComponent(c.req.path.replace(/^\/media/, ""));
+  const filePath = `./media${urlPath}`;
   const file = Bun.file(filePath);
 
   if (!(await file.exists())) {
-    return await next();
+    return c.notFound();
   }
 
-  // Parse Range (e.g., "bytes=0-1024")
-  const parts = range.replace(/bytes=/, "").split("-");
-  const start = parseInt(parts[0], 10);
-  const end = parts[1] ? parseInt(parts[1], 10) : file.size - 1;
-  const chunksize = end - start + 1;
+  const range = c.req.header("range");
 
-  return new Response(file.slice(start, end + 1), {
-    status: 206,
-    headers: {
-      "Content-Range": `bytes ${start}-${end}/${file.size}`,
-      "Accept-Ranges": "bytes",
-      "Content-Length": chunksize.toString(),
-      "Content-Type": file.type, // Bun automatically detects mime type
-    },
-  });
+  // Ensure AVIF and other types are correctly identified
+  let contentType = file.type;
+  if (filePath.endsWith(".avif")) contentType = "image/avif";
+
+  // If no range is requested (standard for thumbnails), serve normally
+  if (!range) {
+    return new Response(file, {
+      headers: {
+        "Accept-Ranges": "bytes",
+        "Content-Type": contentType,
+      },
+    });
+  }
+
+  // Handle Range Request (Seeking/Skipping)
+  try {
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : file.size - 1;
+    const chunksize = end - start + 1;
+
+    return new Response(file.slice(start, end + 1), {
+      status: 206,
+      headers: {
+        "Content-Range": `bytes ${start}-${end}/${file.size}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": chunksize.toString(),
+        "Content-Type": contentType,
+      },
+    });
+  } catch (e) {
+    return new Response(null, { status: 416 });
+  }
 });
-
-// Fallback for non-range requests
-app.use(
-  "/media/*",
-  serveStatic({
-    root: "./",
-    onNotFound: (path, c) => {
-      console.log(`${path} not found, req url = ${c.req.path}`);
-    },
-  }),
-);
 
 console.log(`Server is running on http://localhost:${Defaults.port}`);
 
