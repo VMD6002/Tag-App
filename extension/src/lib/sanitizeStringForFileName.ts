@@ -1,11 +1,25 @@
+// export default function sanitizeStringForFileName(value: string) {
+//   // Remove invalid characters
+//   value = value.trim();
+//   value = value.replace(/[^a-zA-Z0-9._\- ]/g, "_");
+//   // Limit length
+//   if (value.length > 100) {
+//     value = value.slice(0, 100);
+//     value = value.trim();
+//   }
+//   return value;
+// }
+
 export default function sanitizeStringForFileName(value: string) {
-  // Remove invalid characters
-  value = value.trim();
-  value = value.replace(/[^a-zA-Z0-9._\- ]/g, "_");
-  // Limit length
-  if (value.length > 100) {
-    value = value.slice(0, 100);
-    value = value.trim();
+  const MAX_FILENAME_LENGTH = 120; // Safe buffer for Windows paths
+
+  // 1. Sanitize forbidden chars
+  let safe = value.replace(/[?*<>:"/\\|]/g, "-");
+
+  // 2. Truncate if too long, leaving room for the extension
+  if (safe.length > MAX_FILENAME_LENGTH) {
+    safe = safe.substring(0, MAX_FILENAME_LENGTH).trim();
   }
-  return value;
+
+  return safe.trim();
 }

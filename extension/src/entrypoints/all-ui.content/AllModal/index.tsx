@@ -12,18 +12,7 @@ import SeeMore from "../../../components/craft/SeeMore";
 import log from "@/lib/log";
 import useData from "./useData";
 import { Redo2 } from "lucide-react";
-
-function sanitizeTextForFileName(value: string) {
-  // Remove invalid characters
-  value = value.trim();
-  value = value.replace(/[^a-zA-Z0-9._\- ]/g, "_");
-  // Limit length
-  if (value.length > 100) {
-    value = value.slice(0, 100);
-    value = value.trim();
-  }
-  return value;
-}
+import sanitizeStringForFileName from "@/lib/sanitizeStringForFileName";
 
 function ToBeLoaded() {
   const [load, setLoad] = useState(true);
@@ -88,7 +77,7 @@ function ToBeLoaded() {
       Data.setPreset(JSON.stringify(mediaData.Download?.flags));
       setExists(true);
     } else {
-      Data.setTitle(sanitizeTextForFileName(Title));
+      Data.setTitle(sanitizeStringForFileName(Title));
       const SiteTag = `Site:${Site}`;
       Data.setTags([
         { label: SiteTag, value: SiteTag, fixed: true },
@@ -111,7 +100,7 @@ function ToBeLoaded() {
   }, [contentData]);
 
   const addContentFunc = useCallback(() => {
-    const sanitizedVideoTitle = sanitizeTextForFileName(Data.title);
+    const sanitizedVideoTitle = sanitizeStringForFileName(Data.title);
     if (!sanitizedVideoTitle) {
       alert("Title must not be blank");
       Data.setTitle("");
@@ -174,8 +163,8 @@ function ToBeLoaded() {
   }, [Data]);
 
   const updateContentFunc = useCallback(() => {
-    const sanitizedVideoTitle = sanitizeTextForFileName(Data.title);
-    if (!sanitizeTextForFileName) {
+    const sanitizedVideoTitle = sanitizeStringForFileName(Data.title);
+    if (!sanitizeStringForFileName) {
       alert("Title must not be blank");
       Data.setTitle("");
       return;
