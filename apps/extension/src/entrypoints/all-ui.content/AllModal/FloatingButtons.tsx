@@ -25,7 +25,7 @@ export default function FloatingButtons({
             <Button
               onClick={toggleModalFunc}
               size="icon"
-              className="fixed bottom-8 top-auto left-auto right-8 border border-white scale-150"
+              className="cursor-pointer scale-150 backdrop-blur-sm"
             >
               <Plus />
             </Button>
@@ -37,14 +37,14 @@ export default function FloatingButtons({
               <Button
                 onClick={removeContent}
                 size="icon"
-                className="cursor-pointer scale-150 border border-background"
+                className="cursor-pointer scale-150 backdrop-blur-sm"
               >
                 <Trash />
               </Button>
               <Button
                 onClick={toggleModalFunc}
                 size="icon"
-                className="cursor-pointer scale-150 border border-background"
+                className="cursor-pointer scale-150 backdrop-blur-sm"
               >
                 <Pen />
               </Button>

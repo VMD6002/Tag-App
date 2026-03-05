@@ -8,6 +8,7 @@ type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
+  container?: HTMLElement | null;
 };
 
 type ThemeProviderState = {
@@ -26,12 +27,13 @@ export function ThemeProvider({
   children,
   defaultTheme = "system",
   storageKey = "vite-ui-theme",
+  container,
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useAtom(themeAtom);
 
   useEffect(() => {
-    const root = window.document.documentElement;
+    const root = container ?? window.document.documentElement;
 
     root.classList.remove("light", "dark");
 
@@ -46,7 +48,7 @@ export function ThemeProvider({
     }
 
     root.classList.add(theme);
-  }, [theme]);
+  }, [theme, container]);
 
   const value = {
     theme,

@@ -261,7 +261,7 @@ export default function MainContent() {
             onClick={() => setOpenModal(false)}
             className="h-screen absolute w-full bg-black/10 backdrop-blur-xs"
           />
-          <div className="max-w-md absolute w-full grid bg-secondary rounded shadow px-8 py-10">
+          <div className="max-w-md absolute w-full grid text-foreground text-base font-sans bg-secondary rounded shadow px-8 py-10">
             <div className="flex justify-between mb-1 items-center">
               <Label>Name</Label>
               <Button

@@ -11,7 +11,11 @@ const createOverlayUI = (ctx: ContentScriptContext) =>
     anchor: "html",
     onMount: (container) => {
       const root = ReactDOM.createRoot(container);
-      root.render(<App />);
+      root.render(
+        <ThemeProvider container={container}>
+          <App />
+        </ThemeProvider>,
+      );
       return root;
     },
     onRemove: (root) => {
