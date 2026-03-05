@@ -1,0 +1,40 @@
+:5000 {
+    # Set the root to your project directory
+    root * . 
+    encode zstd gzip
+
+    # 1. Media Headers
+    header /media/* Cache-Control "public, max-age=31536000, immutable"
+
+    # 2. Markdown Specific: Disable Cache
+    # This overrides the global header for .md files
+    @markdown path *.md
+    header @markdown Cache-Control "no-store, no-cache, must-revalidate"
+
+    # 3. Specific Media Logic
+    # We use 'handle' so the path /media/Images/ remains in the request
+    handle /media/* {
+        
+        # Try extensions for Images
+        @images path /media/Images/*
+        handle @images {
+            try_files {path}.avif {path}.jpg {path}.jpeg {path}.png {path}.webp {path}
+            file_server
+        }
+
+        # Try extensions for Videos
+        @videos path /media/Videos/*
+        handle @videos {
+            try_files {path}.mp4 {path}.webm {path}
+            file_server
+        }
+
+        # Everything else in /media (Captions, Texts, etc.)
+        file_server
+    }
+
+    # 3. Everything not caught by /media goes to Hono
+    handle {
+        reverse_proxy localhost:5001
+    }
+}
