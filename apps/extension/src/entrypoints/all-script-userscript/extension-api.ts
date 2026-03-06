@@ -4,12 +4,13 @@ export function clickUpdateOrRefresh(
   parentDiv: HTMLScriptElement,
   contentData: object,
   isMounted: { value: boolean },
-  firstRun = false,
+  firstRun = [false],
 ) {
   parentDiv.textContent = JSON.stringify(contentData);
-  if (firstRun || !isMounted.value) {
+  if (firstRun[0] || !isMounted.value) {
     document.documentElement.append(parentDiv);
     isMounted.value = true;
+    firstRun[0] = false;
   }
 
   document

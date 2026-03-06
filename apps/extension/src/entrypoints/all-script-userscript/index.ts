@@ -28,7 +28,7 @@ export default defineUnlistedScript(async () => {
   const scriptData = {
     ready: false,
     sleep,
-    clickUpdateOrRefresh: (firstRun?: boolean) =>
+    clickUpdateOrRefresh: (firstRun?: [boolean]) =>
       clickUpdateOrRefresh(parentDiv, ContentData, isMounted, firstRun),
     clickRemove,
     getMicroData,
@@ -36,9 +36,9 @@ export default defineUnlistedScript(async () => {
     getUniqueIdFromString: (str: string) => createUniqueId(h64, str),
     log,
     decodeHtmlEntities,
-    SPAContentRefresh(firstRun = false) {
+    SPAContentRefresh(firstRun = [false]) {
       try {
-        this.clickUpdateOrRefresh(firstRun);
+        this.clickUpdateOrRefresh(firstRun as [boolean]);
         scriptData.ready = true; // mark as initialized successfully
       } catch {
         log("SPAContentRefresh failed");
@@ -56,7 +56,7 @@ export default defineUnlistedScript(async () => {
       return;
     }
     if (document.querySelector("tag-app-ext-overlay") && scriptData.ready) {
-      scriptData.clickUpdateOrRefresh(true);
+      scriptData.clickUpdateOrRefresh([true]);
       clearInterval(interval);
     }
   }, 1000);
