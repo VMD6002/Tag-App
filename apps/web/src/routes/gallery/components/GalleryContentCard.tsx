@@ -24,7 +24,8 @@ const ContentMold = ({ data }: { data: entry }) => {
       );
     else
       return (
-        <video
+        <LazyVideo
+          autoPlay={false}
           src={contentUrl}
           className="w-full min-h-36 mb-2 object-contain"
         />
@@ -35,6 +36,7 @@ const ContentMold = ({ data }: { data: entry }) => {
       src={coverUrl || contentUrl}
       alt=""
       className="w-full min-h-36 mb-2 object-contain"
+      loading="lazy"
     />
   );
 };
