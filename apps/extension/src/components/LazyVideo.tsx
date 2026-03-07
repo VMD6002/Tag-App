@@ -58,12 +58,8 @@ const LazyVideo: React.FC<LazyVideoProps> = ({
   useEffect(() => {
     if (!videoRef.current) return;
 
-    if (AutoPlay) {
-      videoRef.current.play();
-    } else {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
+    if (AutoPlay) videoRef.current.play();
+    else videoRef.current.pause();
   }, [AutoPlay, videoRef.current]);
 
   return (
