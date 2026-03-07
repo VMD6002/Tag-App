@@ -12,6 +12,8 @@ import {
 } from "@/entrypoints/main/atoms/filter";
 import { filteredAtom } from "./atom";
 import TIMEOUTS from "@/lib/TIMEOUTS";
+import { serverUrlAtom } from "../../atoms/settings";
+import Spinner from "@/components/craft/Spinner";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,9 +26,12 @@ const queryClient = new QueryClient({
 });
 
 function Child() {
-  const filtered = useAtomValue(filteredAtom);
   const { updateContentFunc, bulkUpdateContentFunc, filterData } =
     useServerActions();
+
+  const filtered = useAtomValue(filteredAtom);
+  const serverUrl = useAtomValue(serverUrlAtom);
+
   const initializeFilterDataFromURL = useSetAtom(
     initializeFilterDataFromURLAtom,
   );
@@ -37,6 +42,8 @@ function Child() {
     TIMEOUTS.clearAllTimeouts();
     TIMEOUTS.setTimeout(() => filterData(), 100);
   }, []);
+
+  if (serverUrl === "") return <Spinner />;
 
   return (
     <>
