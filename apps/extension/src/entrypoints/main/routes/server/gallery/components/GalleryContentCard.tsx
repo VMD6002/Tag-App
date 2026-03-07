@@ -23,7 +23,13 @@ const getMediaUrl = (
 ) =>
   `${serverUrl}/media/Galleries/${encodedTitle}/${encodeURIComponent(contentPath)}`;
 
-const ContentMold = ({ data }: { data: entry }) => {
+const ContentMold = ({
+  data,
+  currentMode,
+}: {
+  data: entry;
+  currentMode: string;
+}) => {
   const { serverUrl, encodedTitle } = useDoc();
   const autoPlay = useAtomValue(autoPlayAtom);
 
@@ -37,7 +43,7 @@ const ContentMold = ({ data }: { data: entry }) => {
       <LazyVideo
         src={contentUrl}
         className="w-full min-h-36 mb-2 object-contain"
-        AutoPlay={autoPlay}
+        AutoPlay={currentMode !== "cover" ? autoPlay : false}
       />
     );
 
@@ -115,7 +121,7 @@ export default function GalleryContentCard({
         </Button>
       )}
       <button className="size-full" onClick={handleClick}>
-        <ContentMold data={data} />
+        <ContentMold data={data} currentMode={currentMode} />
         <span className="text-base">{data.name}</span>
       </button>
     </div>
