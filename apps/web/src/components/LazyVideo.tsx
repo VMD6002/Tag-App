@@ -3,11 +3,18 @@ import React, { useRef, useEffect, useState } from "react";
 type LazyVideoProps = React.VideoHTMLAttributes<HTMLVideoElement> & {
   src?: string;
   alt?: string;
+  AutoPlay?: boolean;
 };
 
-const LazyVideo: React.FC<LazyVideoProps> = ({ src, alt, ...props }) => {
+const LazyVideo: React.FC<LazyVideoProps> = ({
+  src,
+  alt,
+  AutoPlay,
+  ...props
+}) => {
   const [shouldLoad, setShouldLoad] = useState<boolean>(false);
-  const videoRef = useRef<HTMLDivElement | null>(null);
+  const parentDivRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     if ("IntersectionObserver" in window) {
@@ -19,7 +26,7 @@ const LazyVideo: React.FC<LazyVideoProps> = ({ src, alt, ...props }) => {
 
       const observerCallback: IntersectionObserverCallback = (
         entries,
-        observer
+        observer,
       ) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -31,15 +38,15 @@ const LazyVideo: React.FC<LazyVideoProps> = ({ src, alt, ...props }) => {
 
       const observer = new IntersectionObserver(
         observerCallback,
-        observerOptions
+        observerOptions,
       );
-      if (videoRef.current) {
-        observer.observe(videoRef.current);
+      if (parentDivRef.current) {
+        observer.observe(parentDivRef.current);
       }
 
       return () => {
-        if (videoRef.current) {
-          observer.unobserve(videoRef.current);
+        if (parentDivRef.current) {
+          observer.unobserve(parentDivRef.current);
         }
         observer.disconnect();
       };
@@ -48,11 +55,22 @@ const LazyVideo: React.FC<LazyVideoProps> = ({ src, alt, ...props }) => {
     }
   }, []);
 
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    if (AutoPlay) {
+      videoRef.current.play();
+    } else {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  }, [AutoPlay, videoRef.current]);
+
   return (
-    <div ref={videoRef} className="w-full">
+    <div ref={parentDivRef} className="w-full">
       {shouldLoad ? (
         <video
-          autoPlay
+          ref={videoRef}
           loop
           muted
           playsInline

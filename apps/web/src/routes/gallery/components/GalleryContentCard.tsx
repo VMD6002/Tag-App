@@ -15,21 +15,13 @@ const ContentMold = ({ data }: { data: entry }) => {
     data.cover && getMediaUrl(encodedTitle, ".gallery-covers/" + data.cover);
 
   if (data.type === "video" && (autoPlay || !data.cover))
-    if (autoPlay)
-      return (
-        <LazyVideo
-          src={contentUrl}
-          className="w-full min-h-36 mb-2 object-contain"
-        />
-      );
-    else
-      return (
-        <LazyVideo
-          autoPlay={false}
-          src={contentUrl}
-          className="w-full min-h-36 mb-2 object-contain"
-        />
-      );
+    return (
+      <LazyVideo
+        src={contentUrl}
+        className="w-full min-h-36 mb-2 object-contain"
+        AutoPlay={autoPlay}
+      />
+    );
 
   return (
     <img

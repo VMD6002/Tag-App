@@ -2,7 +2,8 @@ import { ORPCError, os } from "@orpc/server";
 import { pathExists, readJSON, writeJSON } from "fs-extra";
 import z from "zod";
 import { generateGalleryData } from "../lib/generateGalleryData";
-import { rm } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
+import { rmByBasename } from "../lib/fsBaseNameFunctions";
 
 const galleryExistsCheck = async (name: string, id: string) => {
   if (!(await pathExists(`./media/Galleries/${name}.${id}`))) {
@@ -91,5 +92,39 @@ export const removeGalleryContents = os
       newGalleryData,
     );
 
+    return newGalleryData;
+  });
+
+export const setCoverGivenFile = os
+  .input(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      content: z.string(),
+      file: z.instanceof(File),
+    }),
+  )
+  .handler(async ({ input }) => {
+    const { id, name, content, file } = input;
+    const buffer = Buffer.from(await file.arrayBuffer());
+    try {
+      await rmByBasename(
+        `./media/Galleries/${name}.${id}/.gallery-covers`,
+        `cover.${content}`,
+      );
+    } catch {}
+    await mkdir(`./media/Galleries/${name}.${id}/.gallery-covers`, {
+      recursive: true,
+    });
+    await writeFile(
+      `./media/Galleries/${name}.${id}/.gallery-covers/cover.${content}.${file.type.split("/")[1]}`,
+      buffer,
+    );
+
+    const newGalleryData = await generateGalleryData(`${name}.${id}`);
+    await writeJSON(
+      `./media/Galleries/${name}.${id}/gallery-data.json`,
+      newGalleryData,
+    );
     return newGalleryData;
   });

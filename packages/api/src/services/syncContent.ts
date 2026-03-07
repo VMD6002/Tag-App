@@ -13,14 +13,14 @@ export async function syncContent() {
     contentDataDB.data[content.id] = data;
     IncrementTagCount(content.tags);
     const coverFile = `cover.${content.title}.${content.id}.${content.ext[0]}`;
-    const file = `${content.title}.${content.id}.${content.ext[2]}`;
+    const file = `${content.title}.${content.id}.${content.ext[1]}`;
 
     switch (content.type) {
       case "img":
       case "video":
         await rename(
           `./Sync/${coverFile}`,
-          `./media/${CTypeDir[content.type]}/Covers/${coverFile}`,
+          `./media/${CTypeDir[content.type]}/.covers/${coverFile}`,
         );
         await rename(
           `./Sync/${file}`,
@@ -29,7 +29,7 @@ export async function syncContent() {
         if (content.tags.includes("meta:cc"))
           await rename(
             `./Sync/${content.title}.${content.id}.vtt`,
-            `./media/${CTypeDir[content.type]}/Covers/caption.${
+            `./media/${CTypeDir[content.type]}/.captions/caption.${
               content.title
             }.${content.id}.vtt`,
           );
@@ -41,10 +41,7 @@ export async function syncContent() {
           `./Sync/${content.title}.${content.id}.${content.type}`,
           `./media/${CTypeDir[content.type]}/${content.title}.${content.id}`,
         );
-        contentDataDB.data[content.id] = {
-          ...data,
-          cover: content.ext[0],
-        };
+        contentDataDB.data[content.id]!.cover = content.ext[0];
         break;
       default:
         continue;

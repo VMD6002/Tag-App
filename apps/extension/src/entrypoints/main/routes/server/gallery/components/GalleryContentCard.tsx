@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useDoc } from "../../contexts/Doc.Context";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
@@ -13,6 +14,7 @@ import {
 import LazyVideo from "@/components/LazyVideo";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const getMediaUrl = (
   serverUrl: string,
@@ -31,21 +33,13 @@ const ContentMold = ({ data }: { data: entry }) => {
     getMediaUrl(serverUrl, encodedTitle, ".gallery-covers/" + data.cover);
 
   if (data.type === "video" && (autoPlay || !data.cover))
-    if (autoPlay)
-      return (
-        <LazyVideo
-          src={contentUrl}
-          className="w-full min-h-36 mb-2 object-contain"
-        />
-      );
-    else
-      return (
-        <LazyVideo
-          autoPlay={false}
-          src={contentUrl}
-          className="w-full min-h-36 mb-2 object-contain"
-        />
-      );
+    return (
+      <LazyVideo
+        src={contentUrl}
+        className="w-full min-h-36 mb-2 object-contain"
+        AutoPlay={autoPlay}
+      />
+    );
 
   return (
     <img
@@ -90,7 +84,7 @@ export default function GalleryContentCard({
         if (data.type === "img") updateCover(data.name);
         else if (data.type === "video" && data.cover)
           updateCover(".gallery-covers/" + data.cover);
-        else alert("Invalid cover selection");
+        else alert("Invalid cover selection (its a video file)");
         break;
       default:
         break;
@@ -99,13 +93,16 @@ export default function GalleryContentCard({
 
   return (
     <div
-      className={
-        "w-full my-auto hover:cursor-pointer relative " +
-        (currentMode !== "view"
-          ? "border-2 p-3 " +
-            (selected.includes(data.name) ? "border-red-500" : "")
-          : "")
-      }
+      className={cn(
+        "relative my-auto w-full hover:cursor-pointer",
+        currentMode !== "view" && "border-2 p-3",
+        currentMode === "delete" &&
+          selected.includes(data.name) &&
+          "border-red-500",
+        currentMode === "cover" &&
+          !(data.type === "img" || data.cover) &&
+          "blur-[2px]",
+      )}
     >
       {data.cover && currentMode === "view" && (
         <Button
