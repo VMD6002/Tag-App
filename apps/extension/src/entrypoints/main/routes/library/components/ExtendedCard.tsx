@@ -67,8 +67,6 @@ const ExtendedCard = memo(
 
       const selectedTrue = useMemo(() => isSelected(id), [isSelected, id]);
 
-      console.log(Content);
-
       return (
         <div
           onClick={() => selectionOn && selectEntry(id)}

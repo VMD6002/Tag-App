@@ -104,7 +104,6 @@ function useDocContext() {
       Title: sanitizedTitle,
     };
     setInputDisabled(true);
-    console.log(content);
     updateContentModified.mutate(content);
   }, [updateData]);
 

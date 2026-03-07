@@ -32,7 +32,6 @@ export default function GalleryPage() {
     orpc.gallery.getGalleryData.mutationOptions({
       onSuccess: (data) => {
         setGalleryData(data);
-        console.log(data);
       },
     }),
   );
