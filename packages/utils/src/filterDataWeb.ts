@@ -4,7 +4,7 @@ import type { ContentWebDataType, FilterDataType } from "./types";
 
 type TitleIdObject = {
   id: string;
-  Title: string;
+  title: string;
 };
 
 function GetSearchIds(
@@ -14,10 +14,13 @@ function GetSearchIds(
 ) {
   const Data: TitleIdObject[] = [];
   ids.map((id) =>
-    Data.push({ id: contentData[id]!.id, Title: contentData[id]!.title }),
+    Data.push({
+      id: contentData[id]!.id,
+      title: contentData[id]!.title,
+    }),
   );
   const fuse = new Fuse(Data, {
-    keys: ["Title"],
+    keys: ["title"],
     threshold: 0.5,
   });
   return fuse.search(search).map((data) => data.item.id);
@@ -55,5 +58,9 @@ export const filterDataWeb = (
       : results;
 
   // Currently just reverse the array for orderByLatest, need to implement proper sorting
-  return orderByLatest ? finalResults.reverse() : finalResults;
+  return orderByLatest
+    ? finalResults.sort((a, b) => contentData[b]!.added - contentData[a]!.added)
+    : finalResults.sort(
+        (a, b) => contentData[a]!.added - contentData[b]!.added,
+      );
 };

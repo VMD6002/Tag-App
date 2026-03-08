@@ -21,9 +21,9 @@ function GetSearchIds(ids: ContentServerType[], search: string) {
     threshold: 0.5,
     shouldSort: false,
   });
-  const results: any[] | ContentServerType[] = fuse.search(search);
-  results.forEach((fuseObj, i) => (results[i] = fuseObj.item));
-  return results;
+  const fuseResults = fuse.search(search);
+  const finalResults = fuseResults.map((fuseObj) => fuseObj.item);
+  return finalResults;
 }
 
 const filterDataFunc = (filterData: QueryParams) => {
@@ -56,10 +56,10 @@ const filterDataFunc = (filterData: QueryParams) => {
       : results;
 
   const finalResult = orderByLatest
-    ? preFinalResult.sort((a, b) => b.Added - a.Added)
-    : preFinalResult.sort((a, b) => a.Added - b.Added);
+    ? preFinalResult.sort((a, b) => b.added - a.added)
+    : preFinalResult.sort((a, b) => a.added - b.added);
 
-  return finalResult as ContentServerType[];
+  return finalResult;
 };
 
 export default filterDataFunc;
