@@ -21,21 +21,57 @@ export async function setDoc(input: DocType) {
     switch (OldData.type) {
       case "img":
       case "video":
-        await renameByBasename(
-          `./media/${CTypeDir[OldData.type]}`,
-          OldData.title + "." + OldData.id,
-          NewData.title + "." + OldData.id,
-        );
-        await renameByBasename(
-          `./media/${CTypeDir[OldData.type]}/Covers`,
-          OldData.title + "." + OldData.id,
-          NewData.title + "." + OldData.id,
-        );
+        const mvOperationData = [
+          {
+            baseDir: `./media/${CTypeDir[OldData.type]}`,
+            oldPath: `${OldData.title}.${OldData.id}`,
+            newPath: `${NewData.title}.${OldData.id}`,
+          },
+          {
+            baseDir: `./media/${CTypeDir[OldData.type]}/.covers`,
+            oldPath: `cover.${OldData.title}.${OldData.id}`,
+            newPath: `cover.${NewData.title}.${OldData.id}`,
+          },
+        ];
+
         if (OldData.type === "video" && OldData.tags.includes("meta:cc"))
-          await rename(
-            `./media/${CTypeDir[OldData.type]}/Captions/caption.${OldData.title}.${OldData.id}.vtt`,
-            `./media/${CTypeDir[OldData.type]}/Captions/caption.${NewData.title}.${OldData.id}.vtt`,
-          );
+          mvOperationData.push({
+            baseDir: `./media/${CTypeDir[OldData.type]}/.captions`,
+            oldPath: `caption.${OldData.title}.${OldData.id}.vtt`,
+            newPath: `caption.${NewData.title}.${OldData.id}.vtt`,
+          });
+
+        let completed = [];
+        try {
+          for (const operation of mvOperationData) {
+            await renameByBasename(
+              operation.baseDir,
+              operation.oldPath,
+              operation.newPath,
+            );
+
+            completed.push(operation); // Keep track of what we've done
+          }
+        } catch (error) {
+          console.error("Renaming failed, rolling back changes...", error);
+
+          // Rollback in reverse order
+          for (const task of completed.reverse()) {
+            try {
+              await renameByBasename(task.baseDir, task.newPath, task.oldPath);
+            } catch (rollbackError) {
+              console.error(
+                "Critical Failure: Could not rollback a change!",
+                rollbackError,
+              );
+            }
+          }
+          throw new ORPCError("INTERNAL_SERVER_ERROR", {
+            message:
+              "Failed to rename media files. System attempted to rollback changes.",
+            cause: error, // Keeps the original filesystem error attached
+          });
+        }
         break;
       case "gallery":
       case "audio":
