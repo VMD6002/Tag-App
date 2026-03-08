@@ -24,6 +24,7 @@ import { serverUrlAtom } from "../../../atoms/settings";
 import { ContentServerType, CType } from "@tagapp/utils/types";
 import { CTypeDir } from "@tagapp/utils";
 import { useServerActions } from "../contexts/Server.Context";
+import { cn } from "@/lib/utils";
 
 function getCoverUrl(Content: ContentServerType) {
   const pathPrefix = `media/${CTypeDir[Content.type]}`;
@@ -98,12 +99,11 @@ const ExtendedCard = memo(({ Content }: { Content: ContentServerType }) => {
   return (
     <div
       onClick={() => selectionOn && selectEntry(Content.id)}
-      className={
-        "block p-2 h-fit text-left " +
-        (selectionOn ? "border-2 rounded-sm" : "") +
-        " " +
-        (Selected ? "border-white opacity-80" : "")
-      }
+      className={cn(
+        "block p-2 h-fit text-left relative",
+        selectionOn && "border-2 rounded-sm cursor-pointer",
+        selectionOn && Selected && "border-white opacity-80",
+      )}
     >
       {coverUrl && (
         <>
@@ -136,7 +136,11 @@ const ExtendedCard = memo(({ Content }: { Content: ContentServerType }) => {
             Remove
           </Button>
         </div>
-        <a href={getUrl(Content.id, Content.type)} target="_blank">
+        <a
+          href={getUrl(Content.id, Content.type)}
+          target="_blank"
+          className={selectionOn ? "pointer-events-none" : ""}
+        >
           <h1 className="mb-1 text-lg font-semibold font-stretch-condensed">
             {Content.title}
           </h1>
