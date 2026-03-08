@@ -174,7 +174,7 @@ export default function Filters() {
           <Switch
             checked={orderByLatest}
             onCheckedChange={(a) => {
-              setFiltered((old) => old.reverse());
+              setFiltered((old) => old.toReversed());
               setOrderByLatest(a);
             }}
           />
