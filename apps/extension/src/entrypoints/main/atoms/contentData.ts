@@ -3,7 +3,6 @@ import {
   selectionEntriesAtom,
   selectionTagsAtom,
   selectionTagsInitialAtom,
-  selectionModalOpenAtom,
 } from "./selection";
 import { tagsAtom } from "./tags";
 import { atomWithStorage } from "jotai/utils";
@@ -15,6 +14,7 @@ import {
   updateInputDisabledAtom,
 } from "@/components/craft/UpdateModal";
 import { ContentWebDataType, ContentWebType } from "@tagapp/utils/types";
+import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
 
 export const contentDataAtom = atomWithStorage<ContentWebDataType>(
   "contentData",
@@ -130,7 +130,7 @@ export const bulkUpdateContentFuncAtom = atom(null, async (get, set) => {
 
   set(tagsAtom, tagsData);
   set(contentDataAtom, contentData);
-  set(selectionModalOpenAtom, false);
+  set(bulkUpdateModalOpenAtom, false);
 });
 
 export const removeContentsAtom = atom(

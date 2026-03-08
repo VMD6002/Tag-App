@@ -3,7 +3,6 @@ import { contentDataAtom } from "./contentData";
 
 export const selectionOnAtom = atom(false);
 export const selectionEntriesAtom = atom<string[]>([]);
-export const selectionModalOpenAtom = atom(false);
 export const selectionTagsAtom = atom<MultiSelectOption[]>([]);
 export const selectionTagsInitialAtom = atom<string[]>([]);
 
