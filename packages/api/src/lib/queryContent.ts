@@ -17,7 +17,7 @@ export type QueryParams = z.infer<typeof queryValidator>;
 
 function GetSearchIds(ids: ContentServerType[], search: string) {
   const fuse = new Fuse(ids, {
-    keys: ["Title"],
+    keys: ["title"],
     threshold: 0.5,
     shouldSort: false,
   });
