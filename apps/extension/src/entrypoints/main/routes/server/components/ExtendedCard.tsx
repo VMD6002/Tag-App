@@ -136,11 +136,7 @@ const ExtendedCard = memo(({ Content }: { Content: ContentServerType }) => {
             Remove
           </Button>
         </div>
-        <a
-          href={getUrl(Content.id, Content.type)}
-          target="_blank"
-          className={selectionOn ? "pointer-events-none" : ""}
-        >
+        <a href={getUrl(Content.id, Content.type)} target="_blank">
           <h1 className="mb-1 text-lg font-semibold font-stretch-condensed">
             {Content.title}
           </h1>
