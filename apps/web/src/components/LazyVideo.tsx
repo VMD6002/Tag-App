@@ -56,7 +56,7 @@ const LazyVideo: React.FC<LazyVideoProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || !shouldLoad) return;
 
     if (AutoPlay) videoRef.current.play();
     else videoRef.current.pause();
@@ -70,6 +70,7 @@ const LazyVideo: React.FC<LazyVideoProps> = ({
           loop
           muted
           playsInline
+          autoPlay={AutoPlay}
           aria-label={alt}
           width="100%"
           {...props}
