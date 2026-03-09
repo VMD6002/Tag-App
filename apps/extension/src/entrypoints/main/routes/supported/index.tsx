@@ -48,12 +48,13 @@ const SiteDataScaffold: SiteData = {
   },
 };
 
-const defaultSiteScript = `// ContentData.Downloader = "curl"; Uncomment for Images
-// ContentData.OgImage = "curl"; Uncomment for Images
-ContentData.Title = document.title;
-ContentData.Url = location.href;
-ContentData.Identifier = \`someSite_\${SomeID}\`;
-ContentData.CoverUrl = scriptData.GetOgImage();
+const defaultSiteScript = `// ContentData.downloader = "curl"; Uncomment for Images
+// ContentData.ogImage = "curl"; Uncomment for Images
+ContentData.title = document.title;
+ContentData.url = location.href;
+ContentData.identifier = \`someSite_\${SomeID}\`;
+ContentData.coverUrl = scriptData.getOgImage();
+ContentData.extraData = "Hello there";
 scriptData.ready = true;`;
 
 const DefaultSiteDataString = JSON.stringify(SiteDataScaffold, null, 2);
