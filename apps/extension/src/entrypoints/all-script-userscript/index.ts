@@ -66,7 +66,7 @@ export default defineUnlistedScript(async () => {
   );
 
   // @ts-ignore
-  if (siteData.BegonEvalErrors && window.trustedTypes?.createPolicy) {
+  if (siteData.begonEvalErrors && window.trustedTypes?.createPolicy) {
     // @ts-ignore
     window.trustedTypes.createPolicy("tagAppPolicy", {
       // @ts-ignore

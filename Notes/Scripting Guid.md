@@ -1,8 +1,8 @@
 ## Extra ScriptData Properties
 
-1. `"BegonEvalErrors": true`, use this for sites that throw eval errors. ( Like YouTube )
+1. `"begonEvalErrors": true`, use this for sites that throw eval errors. ( Like YouTube )
 
-2. `"Cookies": true`, use this for sites that require cookies,
+2. `"cookies": true`, use this for sites that require cookies,
 
    **Note:** you must add the cookies file in the server at **Download/Cookies** folder. The filename must be of the format `<SiteName>.txt`.
    eg: If you want cookies for "YouTube" add "YouTube.txt" **Download/Cookies**
