@@ -1,5 +1,5 @@
 import { TMP_DIR } from "./constants";
-import { downloadImage } from "./downloadImage";
+import { downloadContent } from "./downloadContent";
 import { getImageExtensionFromURL } from "./getImageExtensionFromURL";
 import colors from "yoctocolors";
 import type { Ora } from "ora";
@@ -32,7 +32,7 @@ export async function createFlag(item: ContentWebType, spinner: Ora) {
   else {
     spinner.text = "Downloading custom cover image...";
     const ext = getImageExtensionFromURL(item.coverUrl);
-    await downloadImage(
+    await downloadContent(
       item.coverUrl,
       `${TMP_DIR}/cover.${item.title}.${item.id}.${ext}`,
     );
