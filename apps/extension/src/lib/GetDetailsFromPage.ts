@@ -3,11 +3,12 @@ export default function GetDetailsFromPage() {
     downloader: "yt-dlp",
     site: "",
     title: "",
-    extraData: "",
     coverUrl: "",
     identifier: "",
     url: "",
     defaultTags: [],
+    extraData: "",
+    contentUrl: "",
   };
   try {
     if (document.getElementById("tagAppScriptJSONDataFromSite")) {

@@ -55,7 +55,7 @@ export default function MainContent() {
       coverUrl,
       site,
       url,
-      ogImage,
+      contentUrl,
     } = GetDetailsFromPage();
     if (!identifier && count.current < 20) {
       count.current++;
@@ -98,8 +98,8 @@ export default function MainContent() {
         `Web: [${url}](${url})${extraData ? "\n" + extraData : ""}`,
       );
       Data.setPreset(
-        ogImage
-          ? `"${ogImage}"`
+        contentUrl
+          ? `"${contentUrl}"`
           : (JSON.stringify(download?.defaultPreset) ?? `""`),
       );
       setExists(false);

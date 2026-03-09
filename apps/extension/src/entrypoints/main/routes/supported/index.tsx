@@ -49,7 +49,8 @@ const SiteDataScaffold: SiteData = {
 };
 
 const defaultSiteScript = `// ContentData.downloader = "curl"; Uncomment for Images
-// ContentData.ogImage = "curl"; Uncomment for Images
+// ContentData.contentUrl = ""; Uncomment for Content URL, this is to be used in  conjuction with downloader set to curl
+// ContentData.defaultTags = ["<parent>:<tag>"]; Uncomment for Default Tags, eg: ["type:video", "author:John_Doe"]
 ContentData.title = document.title;
 ContentData.url = location.href;
 ContentData.identifier = \`someSite_\${SomeID}\`;

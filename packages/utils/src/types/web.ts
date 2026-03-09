@@ -19,6 +19,7 @@ export const contentWebSchema = ContentJsonSchema.extend({
   url: z.string(),
   coverUrl: z.string(),
   download: ContentDownloadSchema,
+  contentUrl: z.string().optional(),
 });
 export type ContentWebType = z.infer<typeof contentWebSchema>;
 

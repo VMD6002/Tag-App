@@ -20,6 +20,6 @@ interface SiteContentData {
   identifier: string;
   url: string;
   defaultTags: string[];
-  ogImage?: string;
+  contentUrl?: string;
   extraData?: string;
 }
