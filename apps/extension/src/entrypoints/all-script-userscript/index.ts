@@ -1,13 +1,10 @@
 import log from "@/lib/log";
-import xxhash from "xxhash-wasm";
 import { SiteData } from "../main/routes/supported";
 import { decodeHtmlEntities, getMicroData, getOgImage } from "./dom-utils";
 import { clickUpdateOrRefresh, clickRemove } from "./extension-api";
-import { sleep, createUniqueId } from "./helpers";
+import { sleep, getUniqueIdFromString } from "./helpers";
 
 export default defineUnlistedScript(async () => {
-  const { h64 } = await xxhash();
-
   const parentDiv = document.createElement("script");
   parentDiv.type = "application/json";
   parentDiv.id = "tagAppScriptJSONDataFromSite";
@@ -33,7 +30,7 @@ export default defineUnlistedScript(async () => {
     clickRemove,
     getMicroData,
     getOgImage,
-    getUniqueIdFromString: (str: string) => createUniqueId(h64, str),
+    getUniqueIdFromString,
     log,
     decodeHtmlEntities,
     SPAContentRefresh(firstRun = [false]) {

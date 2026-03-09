@@ -13,14 +13,14 @@ import SeeMore from "../../../components/craft/SeeMore";
 import log from "@/lib/log";
 import useData from "./useData";
 import { sanitizeStringForFileName } from "@tagapp/utils";
-import { useAtom, useSetAtom } from "jotai";
-import {
-  tagsAtom,
-  contentDataAtom,
-  removeContentsAtom,
-} from "@/entrypoints/main/atoms/core";
 import { useTheme } from "@/components/theme-provider";
 import { Redo2 } from "lucide-react";
+import { useAtom, useSetAtom } from "jotai";
+import {
+  contentDataAtom,
+  removeContentsAtom,
+} from "@/entrypoints/main/atoms/contentData";
+import { tagsAtom } from "@/entrypoints/main/atoms/tags";
 
 export default function MainContent() {
   const { theme } = useTheme();
