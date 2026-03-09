@@ -11,4 +11,14 @@ export const createWxtStorage = () => ({
   removeItem: async (key: string): Promise<void> => {
     await storage.removeItem(`local:${key}`);
   },
+
+  subscribe: <T>(
+    key: string,
+    callback: (value: T) => void,
+    initialValue: T,
+  ) => {
+    return storage.watch<T>(`local:${key}`, (newValue: T | null) => {
+      callback(newValue ?? initialValue);
+    });
+  },
 });
