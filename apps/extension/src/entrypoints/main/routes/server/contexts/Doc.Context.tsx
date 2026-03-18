@@ -99,9 +99,9 @@ function useDocContext() {
       setTitle("");
       return;
     }
-    const content = {
+    const content: typeof updateData = {
       ...updateData,
-      Title: sanitizedTitle,
+      title: sanitizedTitle,
     };
     setInputDisabled(true);
     updateContentModified.mutate(content);

@@ -112,7 +112,7 @@ const useServer = () => {
       setUpdateTitle("");
       return;
     }
-    const content = { ...updateData, Title: sanitizedTitle };
+    const content: typeof updateData = { ...updateData, title: sanitizedTitle };
     setInputDisabled(true);
     updateContentMutaion.mutate(content);
   }, [updateData]);
