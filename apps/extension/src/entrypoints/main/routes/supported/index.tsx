@@ -16,7 +16,7 @@ import { presetSchema } from "@tagapp/utils/types";
 const SiteDataSchema = z.object({
   name: z.string(),
   hosts: z.array(z.string()).min(1),
-  script: z.string().optional(),
+  script: z.string(),
   begonEvalErrors: z.literal(true).optional(),
   matchPatterns: z.array(z.string()).optional(),
   cookies: z.literal(true).optional(),
@@ -30,7 +30,17 @@ const SiteDataSchema = z.object({
 
 export type SiteData = z.infer<typeof SiteDataSchema>;
 
-const SiteDataScaffold: SiteData = {
+const defaultSiteScript = `// ContentData.downloader = "curl"; Uncomment for Images
+// ContentData.contentUrl = ""; Uncomment for Content URL, this is to be used in  conjuction with downloader set to curl
+// ContentData.defaultTags = ["<parent>:<tag>"]; Uncomment for Default Tags, eg: ["type:video", "author:John_Doe"]
+ContentData.title = document.title;
+ContentData.url = location.href;
+ContentData.identifier = \`someSite_\${SomeID}\`;
+ContentData.coverUrl = scriptData.getOgImage();
+ContentData.extraData = "Hello there";
+scriptData.ready = true;`;
+
+const SiteDataScaffold: Omit<SiteData, "script"> = {
   name: "SiteName",
   hosts: ["www.SiteName.com"],
   matchPatterns: ["/*"],
@@ -47,16 +57,6 @@ const SiteDataScaffold: SiteData = {
     },
   },
 };
-
-const defaultSiteScript = `// ContentData.downloader = "curl"; Uncomment for Images
-// ContentData.contentUrl = ""; Uncomment for Content URL, this is to be used in  conjuction with downloader set to curl
-// ContentData.defaultTags = ["<parent>:<tag>"]; Uncomment for Default Tags, eg: ["type:video", "author:John_Doe"]
-ContentData.title = document.title;
-ContentData.url = location.href;
-ContentData.identifier = \`someSite_\${SomeID}\`;
-ContentData.coverUrl = scriptData.getOgImage();
-ContentData.extraData = "Hello there";
-scriptData.ready = true;`;
 
 const DefaultSiteDataString = JSON.stringify(SiteDataScaffold, null, 2);
 
@@ -101,10 +101,9 @@ export default function Supported() {
 
   const setCurrentSiteData = useCallback((SiteData: SiteData) => {
     try {
-      setSiteScript(SiteData.script!);
-      const Temp = { ...SiteData };
-      delete Temp.script;
-      const JsonString = JSON.stringify(Temp, null, 2);
+      const { script, ...otherSiteData } = SiteData;
+      setSiteScript(script);
+      const JsonString = JSON.stringify(otherSiteData, null, 2);
       setSiteData(JsonString);
       setSiteDataEditorOpen(true);
     } catch (error) {
