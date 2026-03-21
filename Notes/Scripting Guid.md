@@ -50,26 +50,26 @@ interface SiteContentData {
 
 TagAppExt comes with some build helper functions for that can be accessed by `scriptData.<function>`
 
-- `ClickUpdateOrRefresh()`
+- `clickUpdateOrRefresh()`
   Update the contentData in page and calls extension to check if said data already exist.
 
 - `SPAContentRefresh(firstRun: [boolean])`
   Use this instead of ClickUpdateOrRefresh in spa as ClickUpdateOrRefresh for the first time won't after the script loaded and waited for 10 seconds.
 
-- `ClickRemove()`
+- `clickRemove()`
   Hides the extension overlay from the page.
 
 - `await sleep(timeInMilliSecond: number)`
   To stall script execution.
   eg: Some apps are fully client side and takes a second or 2 to load. You can stall ur script for the first 1-2 seconds then run to avoid missing reefrences.
 
-- `GetMicroData()`
+- `getMicroData()`
   Get linked JSON data in pages. They are placed there for better seo support and have some usefull data like title and cover images.
 
-- `GetOgImage()`
+- `getOgImage()`
   Gets the pages cover photo given in meta tags with property 'og:image'
 
-- `GetUniqeIdFromString()`
+- `getUniqueIdFromString(str: string)`
   Generates a 13 digit base 36 number given a string input, Use this for sites that don't have any other identification other than long titles and such
 
 - `decodeHtmlEntities(str: string)`
