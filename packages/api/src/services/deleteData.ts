@@ -24,14 +24,20 @@ export async function deleteData(IdList: string[]) {
       case "img":
       case "video":
         await rmByBasename(
-          `./media/${CTypeDir[ContentDeleted.type]}/Covers`,
+          `./media/${CTypeDir[ContentDeleted.type]}/.covers`,
           `cover.${ContentDeleted.title}.${ContentDeleted.id}`,
         );
         await rmByBasename(
           `./media/${CTypeDir[ContentDeleted.type]}`,
           `${ContentDeleted.title}.${ContentDeleted.id}`,
         );
-
+        if (ContentDeleted.tags.includes("meta:caption"))
+          await rm(
+            `./media/${CTypeDir[ContentDeleted.type]}/.captions/caption.${ContentDeleted.title}.${ContentDeleted.id}.vtt`,
+            {
+              force: true,
+            },
+          );
         console.log(
           `Removed ${ContentDeleted.title} from ${ContentDeleted.type}`,
         );
