@@ -127,12 +127,14 @@ async function DownloadContent() {
         `${TMP_DIR}/cover.${item.title}.${item.id}.${coverExt}`,
       );
       spinner.text = `Downloaded Cover`;
-      spinner.text = `Downloadeding Image...`;
 
       const imgURL = item.download.flags as string;
       const imgExt = getImageExtensionFromURL(imgURL);
-      spinner.text = "Downloading image...";
-      await downloadContent(imgURL, `${TMP_DIR}/${item.title}.${imgExt}`);
+      spinner.text = "Downloading Content...";
+      await downloadContent(
+        imgURL,
+        `${TMP_DIR}/${item.title}.${item.id}.${imgExt}`,
+      );
 
       onComplete(item);
     } catch (err: Error | any) {
