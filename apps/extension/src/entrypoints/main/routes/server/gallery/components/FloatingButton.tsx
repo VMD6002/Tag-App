@@ -35,7 +35,7 @@ export default function FloatingButtons() {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 grid gap-1 z-10">
+    <div className="fixed bottom-8 right-8 grid gap-1 z-20">
       {mode === "delete" ? (
         <div className="flex gap-1">
           <Button
