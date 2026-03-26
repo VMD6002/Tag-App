@@ -1,28 +1,22 @@
 import { Button } from "@/components/ui/button";
-import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
 import { Label } from "@/components/ui/label";
 import { Redo2 } from "lucide-react";
+import { useMainContext } from "./Main.Context";
+import { useAtom, useSetAtom } from "jotai";
+import { presetAtom, resetPresetAtom } from "./atom";
 
-export default function PresetsMenu({
-  presets,
-  selectedPreset,
-  setSelectedPreset,
-}: {
-  presets: MultiSelectOption[];
-  selectedPreset: string;
-  setSelectedPreset: (aaa: string) => void;
-}) {
-  const reset = useCallback(() => {
-    const { download } = GetTagAppSiteData();
-    setSelectedPreset(JSON.stringify(download?.defaultPreset));
-  }, []);
+export default function PresetsMenu() {
+  const { presets } = useMainContext();
+  const [selectedPreset, setSelectedPreset] = useAtom(presetAtom);
+
+  const resetPreset = useSetAtom(resetPresetAtom);
   if (!presets.length) return <></>;
   return (
     <>
       <div className="flex justify-between mb-1 items-center">
         <Label>Presets</Label>
         <Button
-          onClick={reset}
+          onClick={resetPreset}
           size="icon"
           variant="outline"
           className="scale-80"
@@ -43,7 +37,7 @@ export default function PresetsMenu({
         onChange={(o) => setSelectedPreset(o.currentTarget.value)}
       >
         <option value={'{"label":"Worst","value":"-f bv*+ba/b"}'}>Best</option>
-        {presets.map((obj) => (
+        {presets.map((obj: any) => (
           <option key={`Select-${obj.label}`} value={JSON.stringify(obj)}>
             {obj.label}
           </option>

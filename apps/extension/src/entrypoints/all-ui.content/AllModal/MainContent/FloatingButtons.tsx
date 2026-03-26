@@ -1,19 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Pen, Plus, Trash } from "lucide-react";
+import { useMainContext } from "./Main.Context";
+import { existsAtom, loadAtom, openModalAtom } from "./atom";
+import { useAtom, useAtomValue } from "jotai";
 
-export default function FloatingButtons({
-  load,
-  openModal,
-  exists,
-  toggleModalFunc,
-  removeContent,
-}: {
-  load: boolean;
-  openModal: boolean;
-  exists: boolean;
-  toggleModalFunc: () => void;
-  removeContent: () => void;
-}) {
+export default function FloatingButtons() {
+  const exists = useAtomValue(existsAtom);
+  const load = useAtomValue(loadAtom);
+  const [openModal, setOpenModal] = useAtom(openModalAtom);
+  const { removeContent } = useMainContext();
+
   return (
     <div
       style={{ zIndex: 2147483647 }}
@@ -23,7 +19,7 @@ export default function FloatingButtons({
         <>
           {!openModal && !exists ? (
             <Button
-              onClick={toggleModalFunc}
+              onClick={() => setOpenModal(true)}
               size="icon"
               className="cursor-pointer scale-150 backdrop-blur-sm"
             >
@@ -42,7 +38,7 @@ export default function FloatingButtons({
                 <Trash />
               </Button>
               <Button
-                onClick={toggleModalFunc}
+                onClick={() => setOpenModal(true)}
                 size="icon"
                 className="cursor-pointer scale-150 backdrop-blur-sm"
               >
