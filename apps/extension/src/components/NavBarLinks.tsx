@@ -26,6 +26,7 @@ const Links2 = [
 const ServerRelatedPageLinks = [
   { Name: "Server Tags", Path: "/server/tags" },
   { Name: "Server Library", Path: "/server" },
+  { Name: "Generate JSON", Path: "/server/generateJsonPage" },
 ];
 
 export default function NavBarLinks() {
@@ -40,9 +41,7 @@ export default function NavBarLinks() {
         ).map((link) => (
           <NavigationMenuItem
             key={`Desktop-Nav-Link-${link.Name}`}
-            className={
-              serverFeatures ? "hidden min-[830px]:block" : "hidden sm:block"
-            }
+            className={serverFeatures ? "hidden" : "hidden sm:block"}
           >
             <NavigationMenuLink
               asChild
@@ -59,17 +58,11 @@ export default function NavBarLinks() {
             </NavigationMenuLink>
           </NavigationMenuItem>
         ))}
-        <div
-          className={
-            serverFeatures ? "hidden min-[830px]:block" : "hidden sm:block"
-          }
-        >
+        <div className={serverFeatures ? "hidden" : "hidden sm:block"}>
           <ModeToggle />
         </div>
         <NavigationMenuItem
-          className={
-            serverFeatures ? "w-32 min-[830px]:hidden" : "w-32 sm:hidden"
-          }
+          className={"w-32 " + (serverFeatures ? "" : "sm:hidden")}
         >
           <NavigationMenuTrigger className="ml-11">Menu</NavigationMenuTrigger>
           <NavigationMenuContent>
@@ -99,11 +92,7 @@ export default function NavBarLinks() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <div
-          className={
-            serverFeatures ? "ml-2 min-[830px]:hidden" : "ml-2 sm:hidden"
-          }
-        >
+        <div className={"ml-2 " + (serverFeatures ? "" : "sm:hidden")}>
           <ModeToggle />
         </div>
       </NavigationMenuList>

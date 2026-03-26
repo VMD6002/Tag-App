@@ -17,6 +17,7 @@ import TextPage from "./routes/server/txt/[id]";
 import ScriptingGuid from "./routes/supported/doc";
 import GalleryPage from "./routes/server/gallery/[id]";
 import AudioPage from "./routes/server/audio/[id]";
+import GenerateJSONPage from "./routes/server/generateJSON";
 
 function App() {
   return (
@@ -46,6 +47,9 @@ function App() {
               </Route>
               <Route path={"/server/tags"}>
                 <ServerTags />
+              </Route>
+              <Route path={"/server/generateJsonPage"}>
+                <GenerateJSONPage />
               </Route>
               <DocProvider>
                 <Route path={"/server/img/:id"}>
