@@ -1,4 +1,4 @@
-import { readFile, writeFile, stat, readdir, rename } from "node:fs/promises";
+import { writeFile, stat, readdir, rename } from "node:fs/promises";
 import { pathExists, readJSON } from "fs-extra/esm";
 import getCtype from "../lib/getCtype.js";
 import { customAlphabet } from "nanoid";
