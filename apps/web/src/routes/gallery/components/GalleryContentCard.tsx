@@ -2,6 +2,11 @@ import { useDoc } from "../../contexts/Doc.Context";
 import { useAtomValue } from "jotai";
 import { autoPlayAtom, type entry } from "./atom";
 import LazyVideo from "@/components/LazyVideo";
+import {
+  contentModalDataAtom,
+  contentModalOpenAtom,
+} from "./GaleryContentModal";
+import { useSetAtom } from "jotai";
 
 const getMediaUrl = (encodedTitle: string, contentPath: string) =>
   `/media/Galleries/${encodedTitle}/${encodeURIComponent(contentPath)}`;
@@ -34,9 +39,17 @@ const ContentMold = ({ data }: { data: entry }) => {
 };
 
 export default function GalleryContentCard({ data }: { data: entry }) {
+  const setContentModalOpen = useSetAtom(contentModalOpenAtom);
+  const setContentModalData = useSetAtom(contentModalDataAtom);
+
+  const handleClick = () => {
+    setContentModalData(data);
+    setContentModalOpen(true);
+  };
+
   return (
     <div className="w-full my-auto hover:cursor-pointer relative ">
-      <button className="size-full">
+      <button className="size-full" onClick={handleClick}>
         <ContentMold data={data} />
         <span className="text-base">{data.name}</span>
       </button>

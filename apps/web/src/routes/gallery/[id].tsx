@@ -24,14 +24,6 @@ export default function GalleryPage() {
     }),
   );
 
-  const refreshGalleryDataMutation = useMutation(
-    orpc.gallery.refreshGalleryData.mutationOptions({
-      onSuccess: (data) => {
-        setGalleryData(data);
-      },
-    }),
-  );
-
   useEffect(() => {
     getGalleryDataMutation.mutate({ name: doc.title, id: doc.id });
   }, [doc.title, doc.id]);
@@ -43,14 +35,8 @@ export default function GalleryPage() {
   return (
     <>
       <GaleryContentModal />
-      <button
-        className="w-fit grid mx-auto hover:cursor-pointer"
-        onClick={() =>
-          refreshGalleryDataMutation.mutate({ name: doc.title, id: doc.id })
-        }
-      >
-        <TitleHeader Title="Gallery" />
-      </button>
+
+      <TitleHeader Title="Gallery" />
       <div className="grid place-items-center sm:place-items-start justify-center sm:flex gap-4 mb-6">
         {coverUrl && (
           <div className="relative w-full sm:w-2/5 rounded-sm bg-input/50 max-h-[max(30vh,25rem)] min-h-30 overflow-hidden">
