@@ -118,7 +118,7 @@ export default function MainContent() {
     }
     const { identifier, site, url, coverUrl, downloader } =
       GetDetailsFromPage();
-    const SiteTag = `Site:${site}`;
+
     const Time = Math.floor(Date.now() / 1000);
     if (coverUrl !== Data.coverUrl)
       Data.setTags((o) => [
@@ -135,13 +135,12 @@ export default function MainContent() {
         return oldVids;
       }
 
+      const SiteTag = `Site:${site}`;
       setTags(async (tmpp) => {
         const oldTags = await tmpp;
         if (!oldTags[SiteTag]) oldTags[SiteTag] = { Count: 1 };
         else oldTags[SiteTag].Count = oldTags[SiteTag].Count + 1;
-        Data.tags.map((tag) => {
-          oldTags[tag.value].Count++;
-        });
+        Data.tags.forEach(tag => (oldTags[tag.value] ??= { Count: 0 }).Count++);
         return oldTags;
       });
 
