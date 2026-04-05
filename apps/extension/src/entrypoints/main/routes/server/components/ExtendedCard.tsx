@@ -25,6 +25,7 @@ import { ContentServerType, CType } from "@tagapp/utils/types";
 import { CTypeDir } from "@tagapp/utils";
 import { useServerActions } from "../contexts/Server.Context";
 import { cn } from "@/lib/utils";
+import { TagParentChildList } from "./DocInfoSection";
 
 function getCoverUrl(Content: ContentServerType) {
   const pathPrefix = `media/${CTypeDir[Content.type]}`;
@@ -61,7 +62,6 @@ const contentTypeColor: Record<CType, ReturnType<typeof Image>> = {
 };
 
 const ExtendedCard = memo(({ Content }: { Content: ContentServerType }) => {
-  // try {
   const serverUrl = useAtomValue(serverUrlAtom);
 
   const { removeContents, isSelected } = useServerActions();
@@ -156,22 +156,10 @@ const ExtendedCard = memo(({ Content }: { Content: ContentServerType }) => {
           )}
         </div>
         <div className="text-sm space-y-1">
-          {[...new Set(Content.tags.map((tag: string) => tag.split(":")[0]))]
-            .sort()
-            .map((parent: string) => (
-              <div key={`${Content.id}-${parent}`}>
-                {parent.replaceAll("_", " ")} :{" "}
-                <span className="text-muted-foreground">
-                  {Content.tags
-                    .filter((tag: string) => tag.startsWith(parent))
-                    .sort()
-                    .map((e: string) =>
-                      e.replace(parent + ":", "").replaceAll("_", " "),
-                    )
-                    .join(", ")}
-                </span>
-              </div>
-            ))}
+          <div>
+            ID: <span className="text-muted-foreground">{Content.id}</span>
+          </div>
+          <TagParentChildList tags={Content.tags} />
         </div>
       </div>
       {selectionOn ? (
@@ -187,10 +175,6 @@ const ExtendedCard = memo(({ Content }: { Content: ContentServerType }) => {
       )}
     </div>
   );
-  // } catch (err) {
-  //   console.error(err);
-  //   return <></>;
-  // }
 });
 
 export default ExtendedCard;

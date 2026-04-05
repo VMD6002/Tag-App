@@ -6,6 +6,27 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { ContentServerType } from "@tagapp/utils/types";
 
+export function TagParentChildList({ tags }: { tags: string[] }) {
+  return (
+    <>
+      {[...new Set([...tags.map((k: string) => k.split(":")[0])])]
+        .sort()
+        .map((parent) => (
+          <div key={parent}>
+            {parent}:{" "}
+            <span className="text-muted-foreground">
+              {tags
+                .filter((k: string) => k.startsWith(parent))
+                .sort()
+                .map((e: string) => e.replace(parent + ":", ""))
+                .join(", ")}
+            </span>
+          </div>
+        ))}
+    </>
+  );
+}
+
 export default function DocInfoSection({
   doc,
   removeContent,
@@ -48,20 +69,7 @@ export default function DocInfoSection({
         <>
           <hr className="my-4" />
           <div className="text-sm space-y-1">
-            {[...new Set([...doc.tags.map((k: string) => k.split(":")[0])])]
-              .sort()
-              .map((parent) => (
-                <div key={parent}>
-                  {parent}:{" "}
-                  <span className="text-muted-foreground">
-                    {doc.tags
-                      .filter((k: string) => k.startsWith(parent))
-                      .sort()
-                      .map((e: string) => e.replace(parent + ":", ""))
-                      .join(", ")}
-                  </span>
-                </div>
-              ))}
+            <TagParentChildList tags={doc.tags} />
           </div>
         </>
       ) : (

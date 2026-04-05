@@ -17,6 +17,7 @@ import {
   updateTitleAtom,
 } from "@/components/craft/UpdateModal";
 import { ContentWebType } from "@tagapp/utils/types";
+import { TagParentChildList } from "../../server/components/DocInfoSection";
 
 const ExtendedCard = memo(
   ({
@@ -118,28 +119,10 @@ const ExtendedCard = memo(
               })}
             </div>
             <div className="text-sm space-y-1">
-              {[
-                ...new Set(
-                  Content.tags.map((tag: string) => tag.split(":")[0]),
-                ),
-              ]
-                .sort()
-                .map((parent) => (
-                  <div key={`${id}-${parent}`}>
-                    {(parent as string).replaceAll("_", " ")} :{" "}
-                    <span className="text-muted-foreground">
-                      {Content.tags
-                        .filter((tag: string) =>
-                          tag.startsWith(parent as string),
-                        )
-                        .sort()
-                        .map((e: string) =>
-                          e.replace(parent + ":", "").replaceAll("_", " "),
-                        )
-                        .join(", ")}
-                    </span>
-                  </div>
-                ))}
+              <div>
+                ID: <span className="text-muted-foreground">{Content.id}</span>
+              </div>
+              <TagParentChildList tags={Content.tags} />
             </div>
           </div>
           {selectionOn ? (
