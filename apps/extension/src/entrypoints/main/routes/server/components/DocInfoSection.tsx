@@ -7,22 +7,25 @@ import rehypeRaw from "rehype-raw";
 import { ContentServerType } from "@tagapp/utils/types";
 
 export function TagParentChildList({ tags }: { tags: string[] }) {
+  const parentTags = useMemo(
+    () => [...new Set([...tags.map((k) => k.split(":")[0])])],
+    [tags],
+  );
+
   return (
     <>
-      {[...new Set([...tags.map((k: string) => k.split(":")[0])])]
-        .sort()
-        .map((parent) => (
-          <div key={parent}>
-            {parent}:{" "}
-            <span className="text-muted-foreground">
-              {tags
-                .filter((k: string) => k.startsWith(parent))
-                .sort()
-                .map((e: string) => e.replace(parent + ":", ""))
-                .join(", ")}
-            </span>
-          </div>
-        ))}
+      {parentTags.sort().map((parent) => (
+        <div key={parent}>
+          {parent}:{" "}
+          <span className="text-muted-foreground">
+            {tags
+              .filter((k) => k.startsWith(parent))
+              .sort()
+              .map((e) => e.replace(parent + ":", "").replaceAll("_", " "))
+              .join(", ")}
+          </span>
+        </div>
+      ))}
     </>
   );
 }
