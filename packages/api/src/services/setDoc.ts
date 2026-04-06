@@ -69,7 +69,7 @@ export async function setDoc(input: DocType) {
           throw new ORPCError("INTERNAL_SERVER_ERROR", {
             message:
               "Failed to rename media files. System attempted to rollback changes.",
-            cause: error, // Keeps the original filesystem error attached
+            cause: error,
           });
         }
         break;

@@ -8,6 +8,7 @@ import { CTypeDir } from "@tagapp/utils";
 
 export async function deleteData(IdList: string[]) {
   const Deleted: ContentServerType[] = [];
+
   for await (const ID of IdList) {
     if (!contentDataDB.data[ID])
       throw new ORPCError("BAD_REQUEST", {
@@ -17,6 +18,7 @@ export async function deleteData(IdList: string[]) {
     Deleted.push(data);
     delete contentDataDB.data[ID];
   }
+
   for (const ContentDeleted of Deleted) {
     // Update Tag Count
     DecrementTagCount(ContentDeleted.tags);
@@ -58,8 +60,11 @@ export async function deleteData(IdList: string[]) {
         break;
     }
   }
+
   await contentDataDB.write();
   await tagDB.write();
+
   console.log("Changes Written TO DB");
+
   return IdList;
 }
