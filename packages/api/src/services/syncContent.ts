@@ -10,8 +10,6 @@ export async function syncContent() {
     const content = Data[id]!;
 
     const { ext, ...data } = content;
-    contentDataDB.data[content.id] = data;
-    IncrementTagCount(content.tags);
     const coverFile = `cover.${content.title}.${content.id}.${content.ext[0]}`;
     const file = `${content.title}.${content.id}.${content.ext[1]}`;
 
@@ -26,13 +24,13 @@ export async function syncContent() {
           `./Sync/${file}`,
           `./media/${CTypeDir[content.type]}/${file}`,
         );
-        if (content.tags.includes("meta:cc"))
+        if (content.tags.includes("meta:cc")) {
+          const captionFile = `caption.${content.title}.${content.id}.vtt`;
           await rename(
-            `./Sync/${content.title}.${content.id}.vtt`,
-            `./media/${CTypeDir[content.type]}/.captions/caption.${
-              content.title
-            }.${content.id}.vtt`,
+            `./Sync/${captionFile}`,
+            `./media/${CTypeDir[content.type]}/.captions/${captionFile}`,
           );
+        }
         break;
       case "gallery":
       case "audio":
@@ -47,9 +45,12 @@ export async function syncContent() {
         continue;
     }
     await rm(`./Sync/${content.title}.${content.id}.json`, { recursive: true });
+
+    contentDataDB.data[content.id] = data;
+    IncrementTagCount(content.tags);
   }
   await contentDataDB.write();
   await tagDB.write();
   console.log("Data Synced");
-  return "Data Synced";
+  return contentDataDB.data;
 }

@@ -171,7 +171,7 @@ export async function getSyncData() {
             const JsonData = await readContentJSONFile(`./Sync/${Name}.json`);
             if (!JsonData) break;
             AddToNewContents(JsonData, fileExts, Ctype);
-            Files.delete(`caption.${Name}.${JsonData.id}.vtt`);
+            Files.delete(`caption.${Name}.vtt`);
             Files.delete(`${Name}.json`);
           } else {
             if (await pathExists(`./Sync/caption.${Name}.vtt`)) {
