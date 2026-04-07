@@ -3,11 +3,16 @@ import { SiteData } from "../main/routes/supported";
 import { decodeHtmlEntities, getMicroData, getOgImage } from "./dom-utils";
 import { clickUpdateOrRefresh, clickRemove } from "./extension-api";
 import { sleep, getUniqueIdFromString } from "./helpers";
+import {
+  SCRIPT_DATA_ELEMENT_ID,
+  SHADOW_ROOT_ID,
+  SITE_DATA_ELEMENT_ID,
+} from "@/lib/CONSTANTS";
 
 export default defineUnlistedScript(async () => {
   const parentDiv = document.createElement("script");
   parentDiv.type = "application/json";
-  parentDiv.id = "tagAppScriptJSONDataFromSite";
+  parentDiv.id = SCRIPT_DATA_ELEMENT_ID;
   parentDiv.style.display = "none";
 
   const ContentData: SiteContentData = {
@@ -52,14 +57,14 @@ export default defineUnlistedScript(async () => {
       clearInterval(interval);
       return;
     }
-    if (document.querySelector("tag-app-ext-overlay") && scriptData.ready) {
+    if (document.querySelector(SHADOW_ROOT_ID) && scriptData.ready) {
       scriptData.clickUpdateOrRefresh([true]);
       clearInterval(interval);
     }
   }, 1000);
 
   const siteData: SiteData = JSON.parse(
-    document.getElementById("tagAppExtSiteData")?.textContent ?? "{}",
+    document.getElementById(SITE_DATA_ELEMENT_ID)?.textContent ?? "{}",
   );
 
   // @ts-ignore

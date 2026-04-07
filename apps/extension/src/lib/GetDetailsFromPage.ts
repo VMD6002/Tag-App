@@ -1,3 +1,5 @@
+import { SCRIPT_DATA_ELEMENT_ID } from "./CONSTANTS";
+
 export default function GetDetailsFromPage() {
   let Data: SiteContentData = {
     downloader: "yt-dlp",
@@ -11,10 +13,11 @@ export default function GetDetailsFromPage() {
     contentUrl: "",
   };
   try {
-    if (document.getElementById("tagAppScriptJSONDataFromSite")) {
-      Data = JSON.parse(
-        document.getElementById("tagAppScriptJSONDataFromSite")!.textContent,
-      );
+    const scriptEle = document.getElementById(
+      SCRIPT_DATA_ELEMENT_ID,
+    ) as HTMLScriptElement | null;
+    if (scriptEle) {
+      Data = JSON.parse(scriptEle.textContent);
     }
   } catch (err) {
     console.error(err);

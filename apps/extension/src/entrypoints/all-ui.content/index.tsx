@@ -3,10 +3,11 @@ import ReactDOM from "react-dom/client";
 import type { ContentScriptContext } from "wxt/utils/content-script-context";
 import type { SiteData } from "../main/routes/supported";
 import App from "./AllModal";
+import { SHADOW_ROOT_ID, SITE_DATA_ELEMENT_ID } from "@/lib/CONSTANTS";
 
 const createOverlayUI = (ctx: ContentScriptContext) =>
   createShadowRootUi(ctx, {
-    name: "tag-app-ext-overlay",
+    name: SHADOW_ROOT_ID,
     position: "overlay",
     anchor: "html",
     onMount: (container) => {
@@ -62,7 +63,7 @@ async function injectSiteDataIntoPage() {
     temp.download!.defaultPreset.cookies = true;
   }
 
-  injectJSONIntoPage("tagAppExtSiteData", JSON.stringify(temp));
+  injectJSONIntoPage(SITE_DATA_ELEMENT_ID, JSON.stringify(temp));
   return true;
 }
 

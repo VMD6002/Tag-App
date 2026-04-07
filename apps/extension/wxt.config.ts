@@ -2,6 +2,7 @@ import { defineConfig } from "wxt";
 import tailwindcss from "@tailwindcss/vite";
 import MarkdownPlugin from "@goodforyou/vite-plugin-markdown-import";
 import path from "path";
+import { EXTENSION_ID } from "./src/lib/CONSTANTS";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -38,7 +39,7 @@ export default defineConfig({
       permissions: ["storage"],
       browser_specific_settings: {
         gecko: {
-          id: "tagAppExtension@dev.com",
+          id: EXTENSION_ID,
         },
       },
       web_accessible_resources: [

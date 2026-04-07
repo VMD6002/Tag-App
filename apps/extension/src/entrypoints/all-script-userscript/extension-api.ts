@@ -1,4 +1,5 @@
 import log from "@/lib/log";
+import { SHADOW_ROOT_ID } from "@/lib/CONSTANTS";
 
 export function clickUpdateOrRefresh(
   parentDiv: HTMLScriptElement,
@@ -14,7 +15,7 @@ export function clickUpdateOrRefresh(
   }
 
   document
-    .querySelector("tag-app-ext-overlay")
+    .querySelector(SHADOW_ROOT_ID)
     ?.shadowRoot?.querySelector<HTMLInputElement>("#loadAndRefresh")
     ?.click();
 }
@@ -22,7 +23,7 @@ export function clickUpdateOrRefresh(
 export function clickRemove() {
   try {
     document
-      .querySelector("tag-app-ext-overlay")
+      .querySelector(SHADOW_ROOT_ID)
       ?.shadowRoot?.querySelector<HTMLInputElement>("#remove")
       ?.click();
   } catch {
