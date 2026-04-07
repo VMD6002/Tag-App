@@ -11,6 +11,7 @@ import z from "zod";
 // TODO: Setup getSyncData for editing functionality before syncing it up
 import { getSyncData as gtSyncData } from "../services/getSyncData.js";
 import { contentDataDB } from "../db/contentData.js";
+import { settingsDB } from "../db/settings.js";
 export const getSyncData = os.handler(gtSyncData);
 
 export const sync = os.handler(syncContent);
@@ -70,4 +71,8 @@ export const getDoc = os
 export const getServerTags = os.handler(async () => {
   const Data = tagDB.data;
   return Data;
+});
+
+export const getSettings = os.handler(async () => {
+  return settingsDB.data;
 });

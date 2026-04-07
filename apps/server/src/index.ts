@@ -6,11 +6,9 @@ import { logger } from "hono/logger";
 
 import { RPCHandler } from "@orpc/server/fetch";
 
-import getDefaults from "./lib/getDefaults.js";
 import createAppDirs from "./lib/createAppDirs.js";
-import { router } from "@tagapp/api";
+import { router, settings } from "@tagapp/api";
 
-const Defaults = getDefaults();
 createAppDirs();
 
 const app = new Hono();
@@ -57,10 +55,10 @@ app.use(
 // 4. The SPA Fallback (The very last thing)
 app.get("*", serveStatic({ path: "./WebUI/index.html" }));
 
-console.log(`Server active on http://0.0.0.0:${Defaults.port}`);
+console.log(`Server active on http://0.0.0.0:${settings.port}`);
 
 export default {
-  port: Defaults.port,
+  port: settings.port,
   fetch: app.fetch,
   hostname: "0.0.0.0",
 };
