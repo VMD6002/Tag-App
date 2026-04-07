@@ -113,7 +113,7 @@ export default function GalleryContentCard({
       {data.cover && currentMode === "view" && (
         <Button
           variant="destructive"
-          className="absolute right-0 rounded-none rounded-bl z-10"
+          className="absolute right-0 rounded-none rounded-bl z-10 backdrop-blur-xs"
           size="icon-lg"
           onClick={() => removeContentCover(data.cover!)}
         >

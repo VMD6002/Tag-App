@@ -86,7 +86,7 @@ export default function AudioPage() {
           <div className="relative w-full sm:w-2/5 rounded-sm bg-input/50 max-h-[max(30vh,25rem)] min-h-30 overflow-hidden">
             <Button
               variant="destructive"
-              className="absolute top-0 right-0 rounded-none rounded-bl"
+              className="absolute top-0 right-0 rounded-none rounded-bl backdrop-blur-xs"
               size="icon-lg"
               onClick={() => setCover()}
             >
