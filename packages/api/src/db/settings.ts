@@ -1,8 +1,7 @@
 import { JSONFilePreset } from "lowdb/node";
 
 const settings_default = {
-  port: 4000,
-  suwaUrl: "http://localhost:4567",
+  port: 5001,
 };
 
 export const settingsDB = await JSONFilePreset(
