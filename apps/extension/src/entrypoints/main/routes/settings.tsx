@@ -296,7 +296,7 @@ const Server = () => {
           type="url"
           value={serverUrlBuffer}
           onChange={(o) => setServerUrlBuffer(o.target.value)}
-          placeholder="server address, eg: http://localhost:3000"
+          placeholder="server address, eg: http://localhost:5001"
         />
       </div>
       <Button
