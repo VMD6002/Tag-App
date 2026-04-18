@@ -1,17 +1,27 @@
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const FNV_OFFSET_64 = BigInt("0xcbf29ce484222325");
-const FNV_PRIME_64 = BigInt("0x100000001b3");
+/**
+ * FNV-1a 32-bit Hash
+ */
+export function getUniqueIdFromString(str: string): string {
+  // Constants for FNV-1a 32-bit
+  const FNV_PRIME_32 = 0x01000193; // 16777619
+  const FNV_OFFSET_32 = 0x811c9dc5; // 2166136261
 
-export function getUniqueIdFromString(str: string) {
+  // Normalize to handle identical characters with different Unicode encodings
   const cleanStr = str.normalize("NFC");
 
-  let hash = FNV_OFFSET_64;
+  let hash = FNV_OFFSET_32;
 
   for (let i = 0; i < cleanStr.length; i++) {
-    hash ^= BigInt(cleanStr.charCodeAt(i));
-    hash = BigInt.asUintN(64, hash * FNV_PRIME_64);
+    // XOR the bottom 8 bits of the character code
+    hash ^= cleanStr.charCodeAt(i);
+
+    // Use Math.imul to perform 32-bit integer multiplication
+    hash = Math.imul(hash, FNV_PRIME_32);
   }
 
-  return hash.toString(36);
+  // >>> 0 converts the signed integer to an unsigned 32-bit integer
+  // .toString(36) creates a compact alphanumeric string (0-9, a-z)
+  return (hash >>> 0).toString(36);
 }
