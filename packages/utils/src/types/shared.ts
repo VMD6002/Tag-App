@@ -13,12 +13,3 @@ export const ContentJsonSchema = z.object({
 
 // Automatically generate the Type from the Schema
 export type ContentJsonType = z.infer<typeof ContentJsonSchema>;
-
-export type FilterDataType = {
-  any?: string[];
-  all?: string[];
-  none?: string[];
-  types?: string[];
-  search?: string;
-  orderByLatest?: boolean;
-};

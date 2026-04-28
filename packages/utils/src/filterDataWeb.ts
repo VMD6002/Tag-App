@@ -1,6 +1,15 @@
 import { ArrayHasAll, ArrayHasAnyModified } from "./HelperFunctions";
 import Fuse from "fuse.js";
-import type { ContentWebDataType, FilterDataType } from "./types";
+import type { ContentWebDataType } from "./types";
+
+type FilterDataType = {
+  any?: string[];
+  all?: string[];
+  none?: string[];
+  types?: string[];
+  search?: string;
+  orderByLatest?: boolean;
+};
 
 type TitleIdObject = {
   id: string;
