@@ -8,6 +8,19 @@ import { RPCHandler } from "@orpc/server/fetch";
 
 import createAppDirs from "./lib/createAppDirs.js";
 import { router, settings } from "@tagapp/api";
+import { parseArgs } from "node:util";
+
+const schema = {
+  port: { type: "string" },
+} as const;
+
+const { values } = parseArgs({
+  args: process.argv.slice(2),
+  options: schema,
+  strict: true,
+});
+
+const { port } = values;
 
 createAppDirs();
 
@@ -58,7 +71,7 @@ app.get("*", serveStatic({ path: "./WebUI/index.html" }));
 console.log(`Server active on http://0.0.0.0:${settings.port}`);
 
 export default {
-  port: settings.port,
+  port: port ?? settings.port,
   fetch: app.fetch,
   hostname: "0.0.0.0",
 };
