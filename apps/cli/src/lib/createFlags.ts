@@ -4,6 +4,7 @@ import { getImageExtensionFromURL } from "./getImageExtensionFromURL";
 import colors from "yoctocolors";
 import type { Ora } from "ora";
 import type { ContentWebType, preset } from "@tagapp/utils/types";
+import { existsSync } from "node:fs";
 
 const DEFAULT_FLAGS = ["--embed-thumbnail", "-R", "3"];
 
@@ -19,8 +20,23 @@ export async function createFlag(item: ContentWebType, spinner: Ora) {
     flags.push(...preset.value.replace(/"|' /g, "").split(" "));
     if (preset.cookies) {
       const siteTag = item.tags.find((tag) => tag.startsWith("Site:"));
-      const siteName = siteTag!.split(":")[1];
-      flags.push("--cookies", `${siteName}.txt`);
+      if (!siteTag) {
+        spinner.stopAndPersist({
+          symbol: colors.red("✗"),
+          text: colors.dim("No site tag found for cookies"),
+        });
+        return false;
+      }
+      const siteName = siteTag.split(":")[1];
+      const fileExists = existsSync(`./cookies/${siteName}.txt`);
+      if (!fileExists) {
+        spinner.stopAndPersist({
+          symbol: colors.red("✗"),
+          text: colors.dim(`No cookies file found for site ${siteName}`),
+        });
+        return false;
+      }
+      flags.push("--cookies", `./cookies/${siteName}.txt`);
     }
   }
   if (!item.tags.includes("Util:Different_Cover"))

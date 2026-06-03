@@ -45,7 +45,7 @@ try {
       },
     ],
   });
-} catch {}
+} catch { }
 
 if (!answer) {
   console.log(colors.bold("Exiting..."));
@@ -69,9 +69,8 @@ async function onComplete(item: ContentWebType, errorMassage?: string) {
       symbol: colors.red("✖"),
       text: `Failed to download "${item.title}"`,
     });
-    const newErrorEntry = `[${new Date().toISOString()}] - ${
-      item.title
-    }:\n${errorMassage}\n`;
+    const newErrorEntry = `[${new Date().toISOString()}] - ${item.title
+      }:\n${errorMassage}\n`;
 
     const prevLog = readFileSync("./error.log", "utf-8");
     writeFileSync(
@@ -144,6 +143,11 @@ async function DownloadContent() {
   }
 
   const flags = await createFlag(item, spinner);
+
+  if (!flags) {
+    onComplete(item, "No site tag found for cookies");
+    return;
+  }
 
   ytDlpWrap
     .exec(flags)
