@@ -10,10 +10,10 @@ export default defineConfig({
   srcDir: "src",
   modules: ["@wxt-dev/auto-icons", "@wxt-dev/module-react"],
   vite: () => ({
-    plugins: [tailwindcss(), MarkdownPlugin()],
+    plugins: [tailwindcss() as any, MarkdownPlugin()],
     resolve: {
       alias: {
-        "@": path.resolve(__dirname, "./src"), // or "./src" if using src directory
+        "@": path.resolve(__dirname, "./src"),
       },
     },
   }),
@@ -36,7 +36,8 @@ export default defineConfig({
       // Apply key only during build
       key: isProd ? key : undefined,
 
-      permissions: ["storage"],
+      permissions: ["storage", "userScripts"],
+      host_permissions: ["<all_urls>"],
       browser_specific_settings: {
         gecko: {
           id: EXTENSION_ID,
