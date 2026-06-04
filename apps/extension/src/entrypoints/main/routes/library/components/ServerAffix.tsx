@@ -16,7 +16,7 @@ import { contentDataAtom } from "@/entrypoints/main/atoms/contentData";
 import { useAtom, useAtomValue } from "jotai";
 import { filteredAtom } from "../atom";
 import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
-import { overwriteAtom, serverFeaturesAtom } from "../../../atoms/settings";
+import { appModeAtom, overwriteAtom } from "../../../atoms/settings";
 import { ContentWebType } from "@tagapp/utils/types";
 
 const queryClient = new QueryClient({
@@ -90,9 +90,9 @@ const ToBeLoaded = () => {
 };
 
 export default function ServerAffix() {
-  const serverFeatures = useAtomValue(serverFeaturesAtom);
+  const mode = useAtomValue(appModeAtom);
 
-  if (!serverFeatures) return <></>;
+  if (mode !== "hybrid") return <></>;
 
   return (
     <QueryClientProvider client={queryClient}>

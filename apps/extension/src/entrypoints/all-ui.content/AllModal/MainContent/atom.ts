@@ -31,16 +31,14 @@ export const resetPresetAtom = atom(null, (get, set) => {
 });
 
 export const resetAllAtom = atom(null, (get, set) => {
-  const { title, coverUrl, url, site } = GetDetailsFromPage();
+  const { title, coverUrl, url, site, defaultTags } = GetDetailsFromPage();
   const { download } = GetTagAppSiteData();
 
   set(presetAtom, JSON.stringify(download?.defaultPreset));
   set(titleAtom, title);
   set(coverUrlAtom, coverUrl);
   set(extraDataAtom, `Web: [${url}](${url})`);
-  set(tagsAtom, [
-    { label: `Site:${site}`, value: `Site:${site}`, fixed: true },
-  ]);
+  set(tagsAtom, defaultTags.map((tag) => ({ label: tag, value: tag })));
 });
 
 // Other

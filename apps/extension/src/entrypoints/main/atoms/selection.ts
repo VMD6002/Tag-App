@@ -35,7 +35,7 @@ export const unSelectAllAtom = atom(null, (get, set) => {
 // Extension Specific
 
 export const syncSelectedTagsAtom = atom(null, async (get, set) => {
-  const contentData = await get(contentDataAtom);
+  const contentData = { ...(await get(contentDataAtom)) };
   const entries = get(selectionEntriesAtom);
 
   if (entries.length === 0) {

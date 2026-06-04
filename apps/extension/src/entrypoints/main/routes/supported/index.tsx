@@ -33,11 +33,12 @@ export type SiteData = z.infer<typeof SiteDataSchema>;
 const defaultSiteScript = `// ContentData.downloader = "curl"; Uncomment for Images
 // ContentData.contentUrl = ""; Uncomment for Content URL, this is to be used in  conjuction with downloader set to curl
 // ContentData.defaultTags = ["<parent>:<tag>"]; Uncomment for Default Tags, eg: ["type:video", "author:John_Doe"]
+// ContentData.extraData = "Hello there";
+
 ContentData.title = document.title;
 ContentData.url = location.href;
 ContentData.identifier = \`someSite_\${SomeID}\`;
 ContentData.coverUrl = scriptData.getOgImage();
-ContentData.extraData = "Hello there";
 scriptData.ready = true;`;
 
 const SiteDataScaffold: Omit<SiteData, "script"> = {
@@ -87,9 +88,9 @@ export default function Supported() {
       tmp.script = siteScript;
       const data = SiteDataSchema.parse(tmp);
       setSupportedSites(async (old) => {
-        const tmp = await old;
-        tmp[data.name] = data;
-        return tmp;
+        const New = { ...(await old) };
+        New[data.name] = data;
+        return New;
       });
       addSupportedHostsToIndex(data.name, data.hosts);
       setSiteDataEditorOpen(false);
@@ -129,17 +130,17 @@ export default function Supported() {
       .then((text: string) => JSON.parse(text))
       .then((data: Record<string, SiteData>) => {
         setSupportedSites(async (old) => {
-          const tmp = await old;
+          const New = { ...(await old) };
           for (const site in data) {
             const siteData = SiteDataSchema.safeParse(data[site]);
             if (!siteData.success) {
               alert(z.prettifyError(siteData.error));
               continue;
             }
-            tmp[siteData.data.name] = siteData.data;
+            New[siteData.data.name] = siteData.data;
           }
-          refreshSupportedHostsIndex(tmp);
-          return tmp;
+          refreshSupportedHostsIndex(New);
+          return New;
         });
       })
       .catch((error: any) => {
@@ -150,10 +151,10 @@ export default function Supported() {
   const removeSite = useCallback((SiteName: string) => {
     setSiteDataEditorOpen(false);
     if (confirm(`U sure u want remove ${SiteName}`))
-      setSupportedSites(async (tmp) => {
-        const old = await tmp;
-        delete old[SiteName];
-        return { ...old };
+      setSupportedSites(async (old) => {
+        const New = { ...(await old) };
+        delete New[SiteName];
+        return New;
       });
   }, []);
 

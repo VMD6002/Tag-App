@@ -60,25 +60,14 @@ function useMainContextCore() {
       log("Already Exists returning");
       const mediaData = contentData[data.identifier];
       setTitle(mediaData.title);
-      const SiteTag = `Site:${data.site}`;
-      setTags([
-        ...mediaData.tags.map((o: any) =>
-          o !== SiteTag
-            ? { label: o, value: o }
-            : { label: o, value: o, fixed: true },
-        ),
-      ]);
+      setTags(mediaData.tags.map((o) => ({ label: o, value: o })));
       setCoverUrl(mediaData.coverUrl!);
       setExtraData(mediaData.extraData || "");
       setPreset(JSON.stringify(mediaData.download?.flags));
       setExists(true);
     } else {
       setTitle(sanitizeStringForFileName(data.title));
-      const SiteTag = `Site:${data.site}`;
-      setTags([
-        { label: SiteTag, value: SiteTag, fixed: true },
-        ...data.defaultTags.map((o: any) => ({ label: o, value: o })),
-      ]);
+      setTags(data.defaultTags.map((o) => ({ label: o, value: o })));
       setCoverUrl(data.coverUrl);
       setExtraData(
         `Web: [${data.url}](${data.url})${data.extraData ? "\n" + data.extraData : ""}`,
@@ -113,27 +102,24 @@ function useMainContextCore() {
       ]);
     }
 
-    setContentData(async (tmp) => {
-      const oldVids = await tmp;
-      if (identifier in oldVids) {
+    setContentData(async (oldContentData) => {
+      const NewContentData = { ...(await oldContentData) };
+      if (identifier in NewContentData) {
         log("Already Exists returning");
         setExists(true);
         setOpenModal(false);
-        return oldVids;
+        return oldContentData;
       }
 
-      const SiteTag = `Site:${site}`;
-      setGlobalTags(async (tmpp) => {
-        const oldTags = await tmpp;
-        if (!oldTags[SiteTag]) oldTags[SiteTag] = { Count: 1 };
-        else oldTags[SiteTag].Count = oldTags[SiteTag].Count + 1;
+      setGlobalTags(async (oldGlobalTags) => {
+        const NewGlobalTags = { ...(await oldGlobalTags) };
         tags.forEach(
-          (tag: any) => (oldTags[tag.value] ??= { Count: 0 }).Count++,
+          (tag: any) => (NewGlobalTags[tag.value] ??= { Count: 0 }).Count++,
         );
-        return oldTags;
+        return NewGlobalTags;
       });
 
-      oldVids[identifier] = {
+      NewContentData[identifier] = {
         id: identifier,
         title: sanitizedVideoTitle,
         coverUrl: coverUrl,
@@ -152,7 +138,8 @@ function useMainContextCore() {
           flags: JSON.parse(preset),
         },
       };
-      return oldVids;
+
+      return NewContentData;
     });
     setTitle(sanitizedVideoTitle);
     setExists(true);
@@ -168,37 +155,40 @@ function useMainContextCore() {
     }
     const { identifier, downloader } = GetDetailsFromPage();
 
-    setContentData(async (tmp1) => {
-      const oldContent = await tmp1;
+    setContentData(async (oldContentData) => {
+      const NewContentData = { ...(await oldContentData) };
       const updatedTags = tags.map((o: any) => o.value);
-      setGlobalTags(async (tmp2) => {
-        const oldTags = await tmp2;
-        const Deleted = oldContent[identifier].tags.filter(
+      setGlobalTags(async (oldGlobalTags) => {
+        const NewGlobalTags = { ...(await oldGlobalTags) };
+        const Deleted = NewContentData[identifier].tags.filter(
           (a: any) => !updatedTags.includes(a),
         );
         Deleted.forEach((tag: any) => {
-          oldTags[tag].Count--;
+          NewGlobalTags[tag].Count--;
         });
 
         const Added = updatedTags.filter(
-          (a: any) => !oldContent[identifier].tags.includes(a),
+          (a: any) => !NewContentData[identifier].tags.includes(a),
         );
         Added.forEach((tag: any) => {
-          oldTags[tag].Count++;
+          NewGlobalTags[tag].Count++;
         });
-        return oldTags;
+        return NewGlobalTags;
       });
 
-      oldContent[identifier].title = sanitizedVideoTitle;
-      oldContent[identifier].coverUrl = coverUrl;
-      oldContent[identifier].tags = tags.map((o: any) => o.value);
-      oldContent[identifier].extraData = extraData;
-      oldContent[identifier].lastUpdated = Math.floor(Date.now() / 1000);
-      oldContent[identifier].download = {
-        type: downloader,
-        flags: JSON.parse(preset),
+      NewContentData[identifier] = {
+        ...NewContentData[identifier],
+        title: sanitizedVideoTitle,
+        coverUrl,
+        tags: tags.map((o: any) => o.value),
+        extraData,
+        lastUpdated: Math.floor(Date.now() / 1000),
+        download: {
+          type: downloader,
+          flags: JSON.parse(preset),
+        },
       };
-      return oldContent;
+      return NewContentData;
     });
     setTitle(sanitizedVideoTitle);
     setExists(true);

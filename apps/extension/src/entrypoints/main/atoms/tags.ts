@@ -1,8 +1,7 @@
 import { atom } from "jotai";
 import { contentDataAtom } from "./contentData";
 import { resetFilterAtom, injectFilterDataIntoURLAtom } from "./filter";
-import { atomWithStorage } from "jotai/utils";
-import { createWxtStorage } from "./storage";
+import { atomWithUserStorage } from "./user";
 
 export const tagDefaultData = {
   "Type:Img": { Count: 0 },
@@ -25,91 +24,62 @@ export const tagDefaultData = {
   },
 };
 
-export const tagsAtom = atomWithStorage<TagType>(
-  "tags",
-  tagDefaultData,
-  createWxtStorage(),
-);
+export const tagsAtom = atomWithUserStorage<TagType>("tags", tagDefaultData);
 
-export const tagParentsAtom = atomWithStorage<string[]>(
-  "parents",
-  ["Type", "Util", "Site"],
-  createWxtStorage(),
-);
+export const tagParentsAtom = atomWithUserStorage<string[]>("parents", [
+  "Type",
+  "Util",
+  "Site",
+]);
 
 export const removeParentAtom = atom(null, async (get, set, parent: string) => {
-  const tagParents = (await get(tagParentsAtom)).filter(
-    (val) => val !== parent,
-  );
+  const tagParents = (await get(tagParentsAtom)).filter((val) => val !== parent);
 
   set(tagParentsAtom, tagParents);
 
-  set(tagsAtom, async (promise) => {
-    const raw = await promise;
-    const tagsData = { ...raw };
-    const deletedTags = new Set<string>();
+  const tagsData = { ...(await get(tagsAtom)) };
+  const deletedTags = new Set<string>();
 
-    Object.keys(tagsData).forEach((tag) => {
-      if (tag.startsWith(parent)) {
-        deletedTags.add(tag);
-        delete tagsData[tag];
-      }
-    });
-
-    set(contentDataAtom, async (cPromise) => {
-      const cRaw = await cPromise;
-      const contentData = { ...cRaw };
-      Object.values(contentData).forEach((entry) => {
-        const originalTagsCount = entry.tags.length;
-        entry.tags = entry.tags.filter((t) => !deletedTags.has(t));
-        if (entry.tags.length !== originalTagsCount) {
-          entry.lastUpdated = Math.floor(Date.now() / 1000);
-        }
-      });
-      return contentData;
-    });
-
-    return tagsData;
+  Object.keys(tagsData).forEach((tag) => {
+    if (tag.startsWith(parent)) {
+      deletedTags.add(tag);
+      delete tagsData[tag];
+    }
   });
+
+  const contentData = { ...(await get(contentDataAtom)) };
+  Object.values(contentData).forEach((entry) => {
+    const originalTagsCount = entry.tags.length;
+    entry.tags = entry.tags.filter((t) => !deletedTags.has(t));
+    if (entry.tags.length !== originalTagsCount) {
+      entry.lastUpdated = Math.floor(Date.now() / 1000);
+    }
+  });
+
+  set(contentDataAtom, contentData);
+  set(tagsAtom, tagsData);
 });
 
 export const removeTagAtom = atom(null, async (get, set, tag: string) => {
-  const isSiteTag = tag.startsWith("Site:");
-  const initialContentData = await get(contentDataAtom);
-  const hasEntries = Object.values(initialContentData).some((entry) =>
-    entry.tags.includes(tag),
-  );
+  const tagsData = { ...(await get(tagsAtom)) };
+  delete tagsData[tag];
+  set(tagsAtom, tagsData);
 
-  if (isSiteTag && hasEntries) {
-    alert(`Entry or Entries with ${tag} exist. Can't remove.`);
-    return;
-  }
-
-  set(tagsAtom, async (promise) => {
-    const raw = await promise;
-    const tagsData = { ...raw };
-    delete tagsData[tag];
-    return tagsData;
+  const contentData = { ...(await get(contentDataAtom)) };
+  Object.values(contentData).forEach((entry) => {
+    if (entry.tags.includes(tag)) {
+      entry.tags = entry.tags.filter((t) => t !== tag);
+      entry.lastUpdated = Math.floor(Date.now() / 1000);
+    }
   });
-
-  set(contentDataAtom, async (promise) => {
-    const raw = await promise;
-    const contentData = { ...raw };
-    Object.values(contentData).forEach((entry) => {
-      if (entry.tags.includes(tag)) {
-        entry.tags = entry.tags.filter((t) => t !== tag);
-        entry.lastUpdated = Math.floor(Date.now() / 1000);
-      }
-    });
-    return contentData;
-  });
+  set(contentDataAtom, contentData);
 });
 
 export const fixTagCountAtom = atom(null, async (get, set) => {
   set(resetFilterAtom);
   set(injectFilterDataIntoURLAtom);
 
-  const contentData = await get(contentDataAtom);
+  const contentData = { ...(await get(contentDataAtom)) };
   const tagsData = structuredClone(await get(tagsAtom));
 
   const CalculatedTags = new Map<string, number>();

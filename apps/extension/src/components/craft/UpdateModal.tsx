@@ -67,13 +67,7 @@ export default function UpdateModal({
           }))}
           className="mb-4"
           placeholder="Tags"
-          value={
-            isServer
-              ? updateTags
-              : updateTags.map((j: any) =>
-                  j.label.startsWith("Site:") ? { ...j, fixed: true } : j,
-                )
-          }
+          value={updateTags}
           onChange={setUpdateTags}
         />
         <SeeMore>

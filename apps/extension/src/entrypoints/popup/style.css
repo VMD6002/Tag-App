@@ -4,17 +4,19 @@
 }
 
 body {
-  display: grid;
-  gap: 0.5rem;
-  padding: 1rem;
+  padding: 0.5rem;
   font-family: Arial, sans-serif;
 }
+
+div {
+  margin: 0;
+  padding: 0;
+}
+
 a {
+  display: block;
+  margin: 0.5rem;
   text-decoration: none;
   color: white;
   text-wrap-mode: nowrap;
-}
-
-hr {
-  width: 100%;
 }

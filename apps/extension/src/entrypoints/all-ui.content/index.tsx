@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import type { ContentScriptContext } from "wxt/utils/content-script-context";
 import type { SiteData } from "../main/routes/supported";
 import App from "./AllModal";
-import { SHADOW_ROOT_ID, SITE_DATA_ELEMENT_ID } from "@/lib/CONSTANTS";
+import { DEFAULT_USER, SHADOW_ROOT_ID, SITE_DATA_ELEMENT_ID } from "@/lib/CONSTANTS";
 
 const createOverlayUI = (ctx: ContentScriptContext) =>
   createShadowRootUi(ctx, {
@@ -45,14 +45,16 @@ function checkMatchPatterns(SiteData: SiteData) {
 }
 
 async function injectSiteDataIntoPage() {
+  const currentUser = await storage.getItem<string>("local:currentUser") ?? DEFAULT_USER;
+
   const supportedHostsIndex: Record<string, string> =
-    (await storage.getItem("local:supportedHostsIndex")) ?? {};
+    (await storage.getItem(`local:${currentUser}:supportedHostsIndex`)) ?? {};
 
   const SiteName = supportedHostsIndex[location.host];
   if (!SiteName) return false;
 
   const SupportedSites: Record<string, SiteData> =
-    (await storage.getItem("local:supportedSites")) ?? {};
+    (await storage.getItem(`local:${currentUser}:supportedSites`)) ?? {};
   if (!checkMatchPatterns(SupportedSites[SiteName])) return false;
 
   const temp = { ...SupportedSites[SiteName] };

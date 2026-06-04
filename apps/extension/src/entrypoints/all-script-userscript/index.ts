@@ -81,6 +81,7 @@ export default defineUnlistedScript(async () => {
   }
 
   ContentData.site = siteData.name;
+  ContentData.defaultTags.push(`Site:${siteData.name}`);
 
   if (siteData.script) {
     new Function("ContentData", "scriptData", siteData.script)(

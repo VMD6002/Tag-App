@@ -1,36 +1,28 @@
-import { atomWithStorage } from "jotai/utils";
-import { createWxtStorage } from "./storage";
+import { atomWithUserStorage } from "./user";
 
-export const themeAtom = atomWithStorage<"dark" | "light" | "system">(
+export const themeAtom = atomWithUserStorage<"dark" | "light" | "system">(
   "theme",
   "system",
-  createWxtStorage(),
 );
 
-export const galleryListWidthAtom = atomWithStorage<number>(
+export const galleryListWidthAtom = atomWithUserStorage<number>(
   "galleryListWidth",
   100,
-  createWxtStorage(),
 );
 
-export const galleryViewModeAtom = atomWithStorage<
+export const galleryViewModeAtom = atomWithUserStorage<
   "list" | "grid-2" | "grid-3" | "grid-4"
->("galleryViewMode", "list", createWxtStorage());
+>("galleryViewMode", "list");
 
-export const serverUrlAtom = atomWithStorage<string>(
-  "serverUrl",
-  "",
-  createWxtStorage(),
-);
+export const serverUrlAtom = atomWithUserStorage<string>("serverUrl", "");
 
-export const serverFeaturesAtom = atomWithStorage<boolean>(
-  "serverFeatures",
-  true,
-  createWxtStorage(),
-);
+type AppModeType = "local" | "hybrid" | "remote";
 
-export const overwriteAtom = atomWithStorage<boolean>(
-  "Overwrite",
-  true,
-  createWxtStorage(),
+export const appModeAtom = atomWithUserStorage<AppModeType>("appMode", "local");
+
+export const overwriteAtom = atomWithUserStorage<boolean>("Overwrite", true);
+
+export const constantsAtom = atomWithUserStorage<Record<string, string>>(
+  "constants",
+  { YT: "https://www.youtube.com" },
 );

@@ -5,8 +5,6 @@ import {
   selectionTagsInitialAtom,
 } from "./selection";
 import { tagsAtom } from "./tags";
-import { atomWithStorage } from "jotai/utils";
-import { createWxtStorage } from "./storage";
 import {
   updateDataAtom,
   updateModalOpenAtom,
@@ -15,11 +13,11 @@ import {
 } from "@/components/craft/UpdateModal";
 import { ContentWebDataType, ContentWebType } from "@tagapp/utils/types";
 import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
+import { atomWithUserStorage } from "./user";
 
-export const contentDataAtom = atomWithStorage<ContentWebDataType>(
+export const contentDataAtom = atomWithUserStorage<ContentWebDataType>(
   "contentData",
   {},
-  createWxtStorage(),
 );
 
 export const updateContentFuncAtom = atom(null, async (get, set) => {

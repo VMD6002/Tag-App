@@ -6,8 +6,8 @@ import { RouterClient } from "@orpc/server";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { serverUrlAtom } from "./settings";
 
-export const orpcAtom = atom(async (get) => {
-  const serverUrl = await get(serverUrlAtom);
+export const orpcAtom = atom((get) => {
+  const serverUrl = get(serverUrlAtom);
   const link = new RPCLink({
     url: `${serverUrl}/rpc`,
     interceptors: [
