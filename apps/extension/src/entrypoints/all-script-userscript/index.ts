@@ -19,7 +19,7 @@ export default defineUnlistedScript(async () => {
     downloader: "yt-dlp",
     site: "",
     title: "",
-    coverUrl: "",
+    cover: "",
     identifier: "",
     url: "",
     defaultTags: [],

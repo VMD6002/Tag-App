@@ -15,10 +15,10 @@ import {
   existsAtom,
   titleAtom,
   tagsAtom,
-  coverUrlAtom,
+  coverAtom,
   extraDataAtom,
   resetTitleAtom,
-  resetCoverUrlAtom,
+  resetCoverAtom,
   resetExtraDataAtom,
   openModalAtom,
 } from "./atom";
@@ -32,11 +32,11 @@ export default function ContentModal() {
   const exists = useAtomValue(existsAtom);
   const [title, setTitle] = useAtom(titleAtom);
   const [tags, setTags] = useAtom(tagsAtom);
-  const [coverUrl, setCoverUrl] = useAtom(coverUrlAtom);
+  const [cover, setCover] = useAtom(coverAtom);
   const [extraData, setExtraData] = useAtom(extraDataAtom);
 
   const resetTitle = useSetAtom(resetTitleAtom);
-  const resetCoverUrl = useSetAtom(resetCoverUrlAtom);
+  const resetCover = useSetAtom(resetCoverAtom);
   const resetExtraData = useSetAtom(resetExtraDataAtom);
 
   const globalTags = useAtomValue(globalTagsAtom);
@@ -94,7 +94,7 @@ export default function ContentModal() {
           <div className="flex justify-between mb-1 items-center">
             <Label>Cover Url</Label>
             <Button
-              onClick={resetCoverUrl}
+              onClick={resetCover}
               size="icon"
               variant="outline"
               className="scale-80"
@@ -103,8 +103,8 @@ export default function ContentModal() {
             </Button>
           </div>
           <Input
-            value={coverUrl}
-            onChange={(e) => setCoverUrl(e.target.value)}
+            value={cover}
+            onChange={(e) => setCover(e.target.value)}
             placeholder="Name"
             className="mb-4"
           />

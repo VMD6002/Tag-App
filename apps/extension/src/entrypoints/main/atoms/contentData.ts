@@ -56,15 +56,10 @@ export const updateContentFuncAtom = atom(null, async (get, set) => {
     else tagsData[tag] = { Count: 1 };
   });
 
-  // Update Content
-  const temp: any = { ...updateData };
-  temp.CoverUrl = temp.Cover;
-  delete temp.Cover;
-
   const newContent: ContentWebType = {
     ...contentData[updateData.id],
-    ...temp,
-    LastUpdated: Math.floor(Date.now() / 1000),
+    ...updateData,
+    lastUpdated: Math.floor(Date.now() / 1000),
   };
 
   contentData[newContent.id] = newContent;

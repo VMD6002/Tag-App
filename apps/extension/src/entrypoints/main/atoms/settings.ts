@@ -22,7 +22,4 @@ export const appModeAtom = atomWithUserStorage<AppModeType>("appMode", "local");
 
 export const overwriteAtom = atomWithUserStorage<boolean>("Overwrite", true);
 
-export const constantsAtom = atomWithUserStorage<Record<string, string>>(
-  "constants",
-  { YT: "https://www.youtube.com" },
-);
+export const sanitizeTitleAtom = atomWithUserStorage<boolean>("Overwrite", true);

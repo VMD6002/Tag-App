@@ -16,7 +16,7 @@ interface SiteContentData {
   downloader: "yt-dlp" | "curl";
   site: string;
   title: string;
-  coverUrl: string;
+  cover: string;
   identifier: string;
   url: string;
   defaultTags: string[];

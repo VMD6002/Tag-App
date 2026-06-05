@@ -119,10 +119,14 @@ async function DownloadContent() {
 
   if (item.download.type !== "yt-dlp") {
     try {
-      const coverExt = getImageExtensionFromURL(item.coverUrl);
+      if (!item.cover) {
+        onComplete(item, "No cover found");
+        return;
+      }
+      const coverExt = getImageExtensionFromURL(item.cover);
       spinner.text = "Downloading Cover...";
       await downloadContent(
-        item.coverUrl,
+        item.cover,
         `${TMP_DIR}/cover.${item.title}.${item.id}.${coverExt}`,
       );
       spinner.text = `Downloaded Cover`;
@@ -144,8 +148,8 @@ async function DownloadContent() {
 
   const flags = await createFlag(item, spinner);
 
-  if (!flags) {
-    onComplete(item, "No site tag found for cookies");
+  if (typeof flags === "string") {
+    onComplete(item, flags);
     return;
   }
 

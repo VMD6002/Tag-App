@@ -7,7 +7,7 @@ import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
 export const presetAtom = atom<string>("");
 export const titleAtom = atom<string>("");
 export const tagsAtom = atom<MultiSelectOption[]>([]);
-export const coverUrlAtom = atom<string>("");
+export const coverAtom = atom<string>("");
 export const extraDataAtom = atom<string>("");
 
 export const resetTitleAtom = atom(null, (get, set) => {
@@ -15,9 +15,9 @@ export const resetTitleAtom = atom(null, (get, set) => {
   set(titleAtom, title);
 });
 
-export const resetCoverUrlAtom = atom(null, (get, set) => {
-  const { coverUrl } = GetDetailsFromPage();
-  set(coverUrlAtom, coverUrl);
+export const resetCoverAtom = atom(null, (get, set) => {
+  const { cover } = GetDetailsFromPage();
+  set(coverAtom, cover);
 });
 
 export const resetExtraDataAtom = atom(null, (get, set) => {
@@ -31,12 +31,12 @@ export const resetPresetAtom = atom(null, (get, set) => {
 });
 
 export const resetAllAtom = atom(null, (get, set) => {
-  const { title, coverUrl, url, site, defaultTags } = GetDetailsFromPage();
+  const { title, cover, url, site, defaultTags } = GetDetailsFromPage();
   const { download } = GetTagAppSiteData();
 
   set(presetAtom, JSON.stringify(download?.defaultPreset));
   set(titleAtom, title);
-  set(coverUrlAtom, coverUrl);
+  set(coverAtom, cover);
   set(extraDataAtom, `Web: [${url}](${url})`);
   set(tagsAtom, defaultTags.map((tag) => ({ label: tag, value: tag })));
 });

@@ -6,6 +6,7 @@ export const ContentJsonSchema = z.object({
   title: z.string(),
   tags: z.array(z.string()),
   extraData: z.string(),
+  cover: z.string().optional(),
   // Unix Timestamps
   added: z.number(),
   lastUpdated: z.number(),

@@ -5,7 +5,7 @@ import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
 import TIMEOUTS from "@/lib/TIMEOUTS";
 import log from "@/lib/log";
 import { sanitizeStringForFileName } from "@tagapp/utils";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   contentDataAtom,
   removeContentsAtom,
@@ -14,15 +14,18 @@ import { tagsAtom as globalTagsAtom } from "@/entrypoints/main/atoms/tags";
 import {
   titleAtom,
   tagsAtom,
-  coverUrlAtom,
+  coverAtom,
   extraDataAtom,
   presetAtom,
   existsAtom,
   loadAtom,
   openModalAtom,
 } from "./atom";
+import { sanitizeTitleAtom } from "@/entrypoints/main/atoms/settings";
 
 function useMainContextCore() {
+  const santizeTitle = useAtomValue(sanitizeTitleAtom)
+
   const setLoad = useSetAtom(loadAtom);
   const setOpenModal = useSetAtom(openModalAtom);
   const count = useRef(0);
@@ -34,7 +37,7 @@ function useMainContextCore() {
 
   const [title, setTitle] = useAtom(titleAtom);
   const [tags, setTags] = useAtom(tagsAtom);
-  const [coverUrl, setCoverUrl] = useAtom(coverUrlAtom);
+  const [cover, setCover] = useAtom(coverAtom);
   const [extraData, setExtraData] = useAtom(extraDataAtom);
   const [preset, setPreset] = useAtom(presetAtom);
 
@@ -61,14 +64,14 @@ function useMainContextCore() {
       const mediaData = contentData[data.identifier];
       setTitle(mediaData.title);
       setTags(mediaData.tags.map((o) => ({ label: o, value: o })));
-      setCoverUrl(mediaData.coverUrl!);
+      setCover(mediaData.cover!);
       setExtraData(mediaData.extraData || "");
       setPreset(JSON.stringify(mediaData.download?.flags));
       setExists(true);
     } else {
-      setTitle(sanitizeStringForFileName(data.title));
+      setTitle(santizeTitle ? sanitizeStringForFileName(data.title) : data.title);
       setTags(data.defaultTags.map((o) => ({ label: o, value: o })));
-      setCoverUrl(data.coverUrl);
+      setCover(data.cover);
       setExtraData(
         `Web: [${data.url}](${data.url})${data.extraData ? "\n" + data.extraData : ""}`,
       );
@@ -85,17 +88,17 @@ function useMainContextCore() {
   }, [contentData]);
 
   const addContentFunc = useCallback(() => {
-    const sanitizedVideoTitle = sanitizeStringForFileName(title);
+    const sanitizedVideoTitle = santizeTitle ? sanitizeStringForFileName(title) : title.trim();
     if (!sanitizedVideoTitle) {
       alert("Title must not be blank");
       setTitle("");
       return;
     }
-    const { identifier, site, url, downloader } = GetDetailsFromPage();
-    const { coverUrl: pageCover } = GetDetailsFromPage();
+    const { identifier, url, downloader } = GetDetailsFromPage();
+    const { cover: pageCover } = GetDetailsFromPage();
 
     const Time = Math.floor(Date.now() / 1000);
-    if (pageCover !== coverUrl) {
+    if (pageCover !== cover) {
       setTags((o) => [
         ...o,
         { label: "Util:Different_Cover", value: "Util:Different_Cover" },
@@ -122,11 +125,11 @@ function useMainContextCore() {
       NewContentData[identifier] = {
         id: identifier,
         title: sanitizedVideoTitle,
-        coverUrl: coverUrl,
+        cover: cover,
         tags: [
           ...new Set([
             ...tags.map((o: any) => o.value),
-            pageCover !== coverUrl ? "Util:Different_Cover" : null,
+            pageCover !== cover ? "Util:Different_Cover" : null,
           ]),
         ].filter((o) => o) as string[],
         url: url,
@@ -144,10 +147,10 @@ function useMainContextCore() {
     setTitle(sanitizedVideoTitle);
     setExists(true);
     setOpenModal(false);
-  }, [title, tags, coverUrl, extraData, preset]);
+  }, [title, tags, cover, extraData, preset]);
 
   const updateContentFunc = useCallback(() => {
-    const sanitizedVideoTitle = sanitizeStringForFileName(title);
+    const sanitizedVideoTitle = santizeTitle ? sanitizeStringForFileName(title) : title.trim();
     if (!sanitizedVideoTitle) {
       alert("Title must not be blank");
       setTitle("");
@@ -179,7 +182,7 @@ function useMainContextCore() {
       NewContentData[identifier] = {
         ...NewContentData[identifier],
         title: sanitizedVideoTitle,
-        coverUrl,
+        cover,
         tags: tags.map((o: any) => o.value),
         extraData,
         lastUpdated: Math.floor(Date.now() / 1000),
@@ -193,7 +196,7 @@ function useMainContextCore() {
     setTitle(sanitizedVideoTitle);
     setExists(true);
     setOpenModal(false);
-  }, [title, tags, coverUrl, extraData, preset]);
+  }, [title, tags, cover, extraData, preset]);
 
   const removeContent = useCallback(() => {
     if (!confirm("Confirm Deletion")) return;

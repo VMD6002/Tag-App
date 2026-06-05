@@ -38,7 +38,7 @@ const defaultSiteScript = `// ContentData.downloader = "curl"; Uncomment for Ima
 ContentData.title = document.title;
 ContentData.url = location.href;
 ContentData.identifier = \`someSite_\${SomeID}\`;
-ContentData.coverUrl = scriptData.getOgImage();
+ContentData.cover = scriptData.getOgImage();
 scriptData.ready = true;`;
 
 const SiteDataScaffold: Omit<SiteData, "script"> = {

@@ -5,7 +5,7 @@ export default function GetDetailsFromPage() {
     downloader: "yt-dlp",
     site: "",
     title: "",
-    coverUrl: "",
+    cover: "",
     identifier: "",
     url: "",
     defaultTags: [],

@@ -21,20 +21,22 @@ export async function createFlag(item: ContentWebType, spinner: Ora) {
     if (preset.cookies) {
       const siteTag = item.tags.find((tag) => tag.startsWith("Site:"));
       if (!siteTag) {
+        const errMsg = "No site tag found for cookies";
         spinner.stopAndPersist({
           symbol: colors.red("✗"),
-          text: colors.dim("No site tag found for cookies"),
+          text: colors.dim(errMsg),
         });
-        return false;
+        return errMsg;
       }
       const siteName = siteTag.split(":")[1];
       const fileExists = existsSync(`./cookies/${siteName}.txt`);
       if (!fileExists) {
+        const errMsg = `No cookies file found for site ${siteName}`;
         spinner.stopAndPersist({
           symbol: colors.red("✗"),
-          text: colors.dim(`No cookies file found for site ${siteName}`),
+          text: colors.dim(errMsg),
         });
-        return false;
+        return errMsg;
       }
       flags.push("--cookies", `./cookies/${siteName}.txt`);
     }
@@ -47,9 +49,17 @@ export async function createFlag(item: ContentWebType, spinner: Ora) {
     );
   else {
     spinner.text = "Downloading custom cover image...";
-    const ext = getImageExtensionFromURL(item.coverUrl);
+    if (!item.cover) {
+      const errMsg = `No cover found`;
+      spinner.stopAndPersist({
+        symbol: colors.red("✗"),
+        text: colors.dim(errMsg),
+      });
+      return errMsg;
+    }
+    const ext = getImageExtensionFromURL(item.cover);
     await downloadContent(
-      item.coverUrl,
+      item.cover,
       `${TMP_DIR}/cover.${item.title}.${item.id}.${ext}`,
     );
     spinner.text = `${colors.green(
