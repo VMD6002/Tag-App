@@ -14,6 +14,8 @@ import {
 import { ContentWebDataType, ContentWebType } from "@tagapp/utils/types";
 import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
 import { atomWithUserStorage } from "./user";
+import { constantsAtom, replaceWithKeyOnUpdateAtom } from "./constants";
+import { replaceWithConstantKey } from "@tagapp/utils";
 
 export const contentDataAtom = atomWithUserStorage<ContentWebDataType>(
   "contentData",
@@ -22,6 +24,8 @@ export const contentDataAtom = atomWithUserStorage<ContentWebDataType>(
 
 export const updateContentFuncAtom = atom(null, async (get, set) => {
   const updateData = get(updateDataAtom);
+  const replaceWithKeyOnUpdate = await get(replaceWithKeyOnUpdateAtom)
+  const constants = await get(constantsAtom)
 
   set(updateInputDisabledAtom, true);
 
@@ -59,6 +63,7 @@ export const updateContentFuncAtom = atom(null, async (get, set) => {
   const newContent: ContentWebType = {
     ...contentData[updateData.id],
     ...updateData,
+    title: replaceWithKeyOnUpdate ? replaceWithConstantKey(updateData.title, constants) : updateData.title,
     lastUpdated: Math.floor(Date.now() / 1000),
   };
 

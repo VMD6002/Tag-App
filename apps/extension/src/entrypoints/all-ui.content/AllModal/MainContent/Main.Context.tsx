@@ -4,7 +4,7 @@ import GetDetailsFromPage from "@/lib/GetDetailsFromPage";
 import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
 import TIMEOUTS from "@/lib/TIMEOUTS";
 import log from "@/lib/log";
-import { sanitizeStringForFileName } from "@tagapp/utils";
+import { sanitizeStringForFileName, replaceWithConstantKey } from "@tagapp/utils";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   contentDataAtom,
@@ -21,10 +21,13 @@ import {
   loadAtom,
   openModalAtom,
 } from "./atom";
+import { constantsAtom, replaceWithKeyOnUpdateAtom } from "@/entrypoints/main/atoms/constants";
 import { sanitizeTitleAtom } from "@/entrypoints/main/atoms/settings";
 
 function useMainContextCore() {
+  const constants = useAtomValue(constantsAtom)
   const santizeTitle = useAtomValue(sanitizeTitleAtom)
+  const replaceWithKeyOnUpdate = useAtomValue(replaceWithKeyOnUpdateAtom)
 
   const setLoad = useSetAtom(loadAtom);
   const setOpenModal = useSetAtom(openModalAtom);
@@ -124,7 +127,7 @@ function useMainContextCore() {
 
       NewContentData[identifier] = {
         id: identifier,
-        title: sanitizedVideoTitle,
+        title: replaceWithKeyOnUpdate ? replaceWithConstantKey(sanitizedVideoTitle, constants) : sanitizedVideoTitle,
         cover: cover,
         tags: [
           ...new Set([
@@ -147,7 +150,7 @@ function useMainContextCore() {
     setTitle(sanitizedVideoTitle);
     setExists(true);
     setOpenModal(false);
-  }, [title, tags, cover, extraData, preset]);
+  }, [title, tags, cover, extraData, preset, constants, replaceWithKeyOnUpdate]);
 
   const updateContentFunc = useCallback(() => {
     const sanitizedVideoTitle = santizeTitle ? sanitizeStringForFileName(title) : title.trim();
@@ -181,7 +184,7 @@ function useMainContextCore() {
 
       NewContentData[identifier] = {
         ...NewContentData[identifier],
-        title: sanitizedVideoTitle,
+        title: replaceWithKeyOnUpdate ? replaceWithConstantKey(sanitizedVideoTitle, constants) : sanitizedVideoTitle,
         cover,
         tags: tags.map((o: any) => o.value),
         extraData,
@@ -196,7 +199,7 @@ function useMainContextCore() {
     setTitle(sanitizedVideoTitle);
     setExists(true);
     setOpenModal(false);
-  }, [title, tags, cover, extraData, preset]);
+  }, [title, tags, cover, extraData, preset, constants, replaceWithKeyOnUpdate]);
 
   const removeContent = useCallback(() => {
     if (!confirm("Confirm Deletion")) return;

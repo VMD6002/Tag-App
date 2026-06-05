@@ -18,7 +18,8 @@ import {
 } from "@/components/craft/UpdateModal";
 import { ContentWebType } from "@tagapp/utils/types";
 import { TagParentChildList } from "../../server/components/DocInfoSection";
-import { applyConstantsAtom } from "@/entrypoints/main/atoms/constants";
+import { constantsAtom } from "@/entrypoints/main/atoms/constants";
+import { applyConstants } from "@tagapp/utils";
 
 const ExtendedCard = memo(
   ({
@@ -30,6 +31,8 @@ const ExtendedCard = memo(
     getContentByID: (id: string) => ContentWebType;
     isSelected: (id: string) => boolean;
   }) => {
+    const constants = useAtomValue(constantsAtom)
+
     const removeContents = useSetAtom(removeContentsAtom);
 
     const setFiltered = useSetAtom(filteredAtom);
@@ -47,14 +50,12 @@ const ExtendedCard = memo(
 
     const Content = getContentByID(id);
 
-    const applyConstants = useAtomValue(applyConstantsAtom);
-
     const memoisedUrls = useMemo(() => {
       return {
-        url: applyConstants(Content.url),
-        cover: applyConstants(Content.cover!),
+        url: applyConstants(Content.url, constants),
+        cover: applyConstants(Content.cover!, constants),
       };
-    }, [Content.url, Content.cover, applyConstants]);
+    }, [Content.url, Content.cover, constants]);
 
     const updateSetupFunc = useCallback(() => {
       setUpdateId(id);

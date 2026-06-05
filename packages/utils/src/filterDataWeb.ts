@@ -1,4 +1,4 @@
-import { ArrayHasAll, ArrayHasAnyModified } from "./HelperFunctions";
+import { ArrayHasAll, ArrayHasAnyModified } from "./ArrayHelperFunctions";
 import Fuse from "fuse.js";
 import type { ContentWebDataType } from "./types";
 
@@ -70,6 +70,6 @@ export const filterDataWeb = (
   return orderByLatest
     ? finalResults.sort((a, b) => contentData[b]!.added - contentData[a]!.added)
     : finalResults.sort(
-        (a, b) => contentData[a]!.added - contentData[b]!.added,
-      );
+      (a, b) => contentData[a]!.added - contentData[b]!.added,
+    );
 };
