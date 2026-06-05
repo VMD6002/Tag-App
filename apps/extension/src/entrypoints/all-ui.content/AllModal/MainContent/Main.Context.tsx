@@ -127,8 +127,8 @@ function useMainContextCore() {
 
       NewContentData[identifier] = {
         id: identifier,
-        title: replaceWithKeyOnUpdate ? replaceWithConstantKey(sanitizedVideoTitle, constants) : sanitizedVideoTitle,
-        cover: cover,
+        title: sanitizedVideoTitle,
+        cover: replaceWithKeyOnUpdate ? replaceWithConstantKey(cover, constants) : cover,
         tags: [
           ...new Set([
             ...tags.map((o: any) => o.value),
@@ -184,8 +184,8 @@ function useMainContextCore() {
 
       NewContentData[identifier] = {
         ...NewContentData[identifier],
-        title: replaceWithKeyOnUpdate ? replaceWithConstantKey(sanitizedVideoTitle, constants) : sanitizedVideoTitle,
-        cover,
+        title: sanitizedVideoTitle,
+        cover: replaceWithKeyOnUpdate ? replaceWithConstantKey(cover, constants) : cover,
         tags: tags.map((o: any) => o.value),
         extraData,
         lastUpdated: Math.floor(Date.now() / 1000),

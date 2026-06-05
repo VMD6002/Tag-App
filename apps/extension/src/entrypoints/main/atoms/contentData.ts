@@ -63,7 +63,7 @@ export const updateContentFuncAtom = atom(null, async (get, set) => {
   const newContent: ContentWebType = {
     ...contentData[updateData.id],
     ...updateData,
-    title: replaceWithKeyOnUpdate ? replaceWithConstantKey(updateData.title, constants) : updateData.title,
+    cover: replaceWithKeyOnUpdate ? replaceWithConstantKey(updateData.cover, constants) : updateData.cover,
     lastUpdated: Math.floor(Date.now() / 1000),
   };
 

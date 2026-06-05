@@ -36,15 +36,20 @@ function customFormatToObject(text: string): Record<string, string> {
 
   for (const line of lines) {
     if (!line.trim()) continue;
-    const [key, value] = line.split(':');
+
+    // This splits ONLY on the first colon it encounters
+    const [key, ...valueParts] = line.split(':');
+
     if (key) {
-      result[key.trim()] = value ? value.trim() : '';
+      // Rejoin the rest of the pieces back with a colon (fixes the URL issue)
+      const value = valueParts.join(':');
+
+      result[key.trim()] = value.trim();
     }
   }
 
   return result;
 }
-
 const validateConstants = (constants: string) => {
   try {
     const parsed = z.record(z.string(), z.string()).safeParse(customFormatToObject(constants));

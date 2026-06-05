@@ -20,7 +20,7 @@ export function applyConstants(rawString: string, constants: Record<string, stri
 export function replaceWithConstantKey(text: string, constants: Record<string, string>) {
     let newText = text;
     for (const [key, value] of Object.entries(constants)) {
-        newText = newText.replaceAll(value, key);
+        newText = newText.replaceAll(value, "$" + key);
     }
     return newText;
 }
