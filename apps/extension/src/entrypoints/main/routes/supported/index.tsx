@@ -1,304 +1,85 @@
 import TitleHeader from "@/components/craft/TitleHeader";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import saveJsonFile from "@/lib/saveJsonFile";
-import CodeEditor from "@uiw/react-textarea-code-editor";
-import { Pencil, Trash } from "lucide-react";
-import z from "zod";
+import { Upload, Download, RefreshCw, BookOpen } from "lucide-react";
+
 import {
-  addSupportedHostsToIndexAtom,
-  refreshSupportedHostsIndexAtom,
-  supportedSitesAtom,
-} from "../../atoms/supportedSites";
-import { useAtom, useSetAtom } from "jotai";
-import { presetSchema } from "@tagapp/utils/types";
+  SupportedSiteProvider,
+  useSupportedSites,
+  useImportExportActions,
+} from "./SupportedSite.Context";
+import SitesSidebar from "./components/SitesSidebar";
+import ScriptEditor from "./components/ScriptEditor";
+import GuideDialog, { guideOpenAtom } from "./components/GuideDialog";
+import { useSetAtom } from "jotai";
 
-const SiteDataSchema = z.object({
-  name: z.string(),
-  hosts: z.array(z.string()).min(1),
-  script: z.string(),
-  begonEvalErrors: z.literal(true).optional(),
-  matchPatterns: z.array(z.string()).optional(),
-  cookies: z.literal(true).optional(),
-  download: z
-    .object({
-      presets: z.array(presetSchema),
-      defaultPreset: presetSchema,
-    })
-    .optional(),
-});
+export type { SiteData } from "./SupportedSite.Context";
 
-export type SiteData = z.infer<typeof SiteDataSchema>;
-
-const defaultSiteScript = `// ContentData.downloader = "curl"; Uncomment for Images
-// ContentData.contentUrl = ""; Uncomment for Content URL, this is to be used in  conjuction with downloader set to curl
-// ContentData.defaultTags = ["<parent>:<tag>"]; Uncomment for Default Tags, eg: ["type:video", "author:John_Doe"]
-// ContentData.extraData = "Hello there";
-
-ContentData.title = document.title;
-ContentData.url = location.href;
-ContentData.identifier = \`someSite_\${SomeID}\`;
-ContentData.cover = scriptData.getOgImage();
-scriptData.ready = true;`;
-
-const SiteDataScaffold: Omit<SiteData, "script"> = {
-  name: "SiteName",
-  hosts: ["www.SiteName.com"],
-  matchPatterns: ["/*"],
-  download: {
-    presets: [
-      {
-        label: "None",
-        value: "",
-      },
-    ],
-    defaultPreset: {
-      label: "None",
-      value: "",
-    },
-  },
-};
-
-const DefaultSiteDataString = JSON.stringify(SiteDataScaffold, null, 2);
-
-export default function Supported() {
-  const { theme } = useTheme();
-  const [siteDataEditorOpen, setSiteDataEditorOpen] = useState(false);
-  const [siteData, setSiteData] = useState<string>(DefaultSiteDataString);
-  const [siteScript, setSiteScript] = useState<string>(defaultSiteScript);
-
-  const toggleSiteDataEditor = useCallback(
-    () => setSiteDataEditorOpen((old) => !old),
-    [],
-  );
-
-  const addSite = useCallback(() => {
-    setSiteData(DefaultSiteDataString);
-    setSiteScript(defaultSiteScript);
-    setSiteDataEditorOpen(true);
-  }, []);
-
-  const [supportedSites, setSupportedSites] = useAtom(supportedSitesAtom);
-  const refreshSupportedHostsIndex = useSetAtom(refreshSupportedHostsIndexAtom);
-  const addSupportedHostsToIndex = useSetAtom(addSupportedHostsToIndexAtom);
-
-  const addOrUpdateScript = useCallback(() => {
-    try {
-      const tmp: SiteData = JSON.parse(siteData);
-      tmp.script = siteScript;
-      const data = SiteDataSchema.parse(tmp);
-      setSupportedSites(async (old) => {
-        const New = { ...(await old) };
-        New[data.name] = data;
-        return New;
-      });
-      addSupportedHostsToIndex(data.name, data.hosts);
-      setSiteDataEditorOpen(false);
-      alert("Script Updated Succlessfully");
-    } catch (error: any) {
-      alert(error?.message ?? "");
-    }
-  }, [siteData, siteScript]);
-
-  const setCurrentSiteData = useCallback((SiteData: SiteData) => {
-    try {
-      const { script, ...otherSiteData } = SiteData;
-      setSiteScript(script);
-      const JsonString = JSON.stringify(otherSiteData, null, 2);
-      setSiteData(JsonString);
-      setSiteDataEditorOpen(true);
-    } catch (error) {
-      console.error("Error during minification:", error);
-    }
-  }, []);
-
-  const exportSiteList = useCallback(() => {
-    saveJsonFile(supportedSites, "TagAppExt Site List");
-  }, [supportedSites]);
-
-  const fileInputRef = useRef(null);
-  const handleFileClick = useCallback(() => {
-    // @ts-ignore
-    fileInputRef.current?.click();
-  }, []);
-  const importSiteList = useCallback((event: any) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    file
-      .text()
-      .then((text: string) => JSON.parse(text))
-      .then((data: Record<string, SiteData>) => {
-        setSupportedSites(async (old) => {
-          const New = { ...(await old) };
-          for (const site in data) {
-            const siteData = SiteDataSchema.safeParse(data[site]);
-            if (!siteData.success) {
-              alert(z.prettifyError(siteData.error));
-              continue;
-            }
-            New[siteData.data.name] = siteData.data;
-          }
-          refreshSupportedHostsIndex(New);
-          return New;
-        });
-      })
-      .catch((error: any) => {
-        console.error("Error reading or parsing the JSON file:", error);
-      });
-  }, []);
-
-  const removeSite = useCallback((SiteName: string) => {
-    setSiteDataEditorOpen(false);
-    if (confirm(`U sure u want remove ${SiteName}`))
-      setSupportedSites(async (old) => {
-        const New = { ...(await old) };
-        delete New[SiteName];
-        return New;
-      });
-  }, []);
+function Toolbar() {
+  const supportedSites = useSupportedSites();
+  const setGuideOpen = useSetAtom(guideOpenAtom);
+  const { exportSiteList, handleFileClick, importSiteList, fileInputRef, refreshSupportedHostsIndex } =
+    useImportExportActions();
 
   return (
-    <>
-      <TitleHeader Title="Suported Sites" />
-      <a href="/main.html#/supported/docs" target="_blank">
-        <Button
-          variant="secondary"
-          className="mx-auto grid mb-2 text-xs"
-          size="sm"
-        >
-          Open Scripting Guide
-        </Button>
-      </a>
-      <div className="flex w-full justify-center gap-2 mb-2">
-        <div className="flex items-center">
-          <Button variant="secondary" onClick={handleFileClick}>
-            Import
-          </Button>
+    <div className="flex flex-col gap-4 border-b border-border pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <TitleHeader Title="Supported Sites" />
+          <span className="text-xs bg-muted text-muted-foreground px-2.5 py-1 rounded-full font-semibold border border-border">
+            {Object.keys(supportedSites).length} Total
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
           <input
-            className="w-full h-full hidden"
+            className="hidden"
             type="file"
             ref={fileInputRef}
             accept=".json,application/json"
             onChange={importSiteList}
           />
-        </div>
-        {siteDataEditorOpen ? (
-          <Button onClick={toggleSiteDataEditor}>Close</Button>
-        ) : (
-          <Button onClick={addSite}>Add</Button>
-        )}
-        <Button variant="secondary" onClick={exportSiteList}>
-          Export
-        </Button>
-      </div>
-      <Button
-        variant="secondary"
-        className="mx-auto grid mb-10 text-xs"
-        size="sm"
-        onClick={() => refreshSupportedHostsIndex()}
-      >
-        Force Refresh Index
-      </Button>
-      {siteDataEditorOpen ? (
-        <>
-          <Button
-            onClick={addOrUpdateScript}
-            className="w-full mb-4"
-            variant="outline"
-          >
-            Save Site Data and Script
+          <Button variant="outline" size="sm" onClick={handleFileClick} className="gap-1.5 h-9">
+            <Upload className="size-4" />
+            <span>Import</span>
           </Button>
-          <div className="grid gap-3 mb-10">
-            <div>
-              <Label className="mb-4 text-lg">Site Data</Label>
-              <div className="max-h-96 overflow-y-auto!">
-                <CodeEditor
-                  minHeight={200}
-                  value={siteData}
-                  language="json"
-                  placeholder="Site Data"
-                  onChange={(evn) => setSiteData(evn.target.value)}
-                  padding={15}
-                  className="text-sm! h-fit"
-                  style={{
-                    fontFamily:
-                      "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-                  }}
-                  data-color-mode={theme === "system" ? "dark" : theme}
-                />
-              </div>
-            </div>
-            <div>
-              <Label className="mb-4 text-lg">Site Script</Label>
-              <div className="max-h-96 overflow-y-auto!">
-                <CodeEditor
-                  value={siteScript}
-                  language="js"
-                  placeholder="Site Data"
-                  onChange={(evn) => setSiteScript(evn.target.value)}
-                  padding={15}
-                  className="text-sm! h-fit"
-                  style={{
-                    fontFamily:
-                      "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-                  }}
-                  data-color-mode={theme === "system" ? "dark" : theme}
-                />
-              </div>
-            </div>
-          </div>
-        </>
-      ) : (
-        <></>
-      )}
-      <div className="grid min-[540px]:grid-cols-2 gap-x-6 gap-y-10 w-fit mx-auto">
-        {Object.keys(supportedSites)
-          .sort()
-          .map((Site, siteIndex) => (
-            <div key={`Section-${Site}`}>
-              <div className="flex justify-between w-full gap-3 mb-4 items-center">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setCurrentSiteData(supportedSites[Site])}
-                >
-                  <Pencil className="mb-0.5" />
-                </Button>
-                <div className="flex w-full items-center">
-                  <h1 className="text-2xl mr-2">{siteIndex + 1}.</h1>
-                  <img
-                    className="h-full aspect-square w-6 rounded bg-muted"
-                    src={`https://www.google.com/s2/favicons?sz=64&domain=${supportedSites[Site].hosts[0]}`}
-                  />
-                  <h1 className="text-2xl ml-2 font-stretch-condensed">
-                    {Site}
-                  </h1>
-                </div>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => removeSite(Site)}
-                >
-                  <Trash className="mb-0.5" />
-                </Button>
-              </div>
-              <ul className="list-decimal ml-8 grid gap-y-1 text-base font-mono font-stretch-ultra-condensed">
-                {supportedSites[Site].hosts.map((host) => (
-                  <li key={`Site-Link-${Site}-${host}`}>
-                    <a
-                      className="block break-all underline underline-offset-1"
-                      href={"https://" + host}
-                      target="_blank"
-                    >
-                      {host}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <Button variant="outline" size="sm" onClick={exportSiteList} className="gap-1.5 h-9">
+            <Download className="size-4" />
+            <span>Export</span>
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => refreshSupportedHostsIndex()} className="gap-1.5 h-9">
+            <RefreshCw className="size-4" />
+            <span>Refresh Index</span>
+          </Button>
+          <Button variant="secondary" size="sm" onClick={() => setGuideOpen(true)} className="gap-1.5 h-9">
+            <BookOpen className="size-4" />
+            <span>Guide</span>
+          </Button>
+        </div>
       </div>
-    </>
+    </div>
+  );
+}
+
+
+function SupportedLayout() {
+  return (
+    <div className="space-y-6">
+      <Toolbar />
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
+        <div className="lg:col-span-3 flex flex-col gap-4">
+          <ScriptEditor />
+        </div>
+        <SitesSidebar />
+      </div>
+      <GuideDialog />
+    </div>
+  );
+}
+
+
+export default function Supported() {
+  return (
+    <SupportedSiteProvider>
+      <SupportedLayout />
+    </SupportedSiteProvider>
   );
 }

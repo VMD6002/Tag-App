@@ -14,7 +14,6 @@ import ServerTags from "./routes/server/tags";
 import ImagePage from "./routes/server/img/[id]";
 import VideoPage from "./routes/server/video/[id]";
 import TextPage from "./routes/server/txt/[id]";
-import ScriptingGuid from "./routes/supported/doc";
 import GalleryPage from "./routes/server/gallery/[id]";
 import AudioPage from "./routes/server/audio/[id]";
 import GenerateJSONPage from "./routes/server/generateJSON";
@@ -35,9 +34,6 @@ function App() {
               </Route>
               <Route path={"/supported"}>
                 <Supported />
-              </Route>
-              <Route path={"/supported/docs"}>
-                <ScriptingGuid />
               </Route>
               <Route path={"/settings"}>
                 <Settings />
