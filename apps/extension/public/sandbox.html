@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sandbox</title>
+  </head>
+  <body>
+    <script>
+      // Listen for the code and data from the parent React window
+      window.addEventListener("message", (event) => {
+        const { siteData, contentDetails, action } = event.data;
+
+        try {
+          // Create a function wrapper so the user code can access the data
+          // and run in its own scope.
+          const runner = new Function(
+            "contentDetails",
+            "siteData",
+            `
+            try {
+              ${action === "add" ? siteData.afterAddScript : siteData.afterRemoveScript}
+            } catch (err) {
+              console.error("Error executing user code:", err);
+            }
+          `,
+          );
+
+          // Execute the code, passing the extension data as an argument
+          runner(contentDetails, siteData);
+        } catch (compileError) {
+          console.error("Compilation Error:", compileError);
+        }
+      });
+    </script>
+  </body>
+</html>
