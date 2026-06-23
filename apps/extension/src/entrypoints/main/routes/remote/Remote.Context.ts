@@ -1,0 +1,185 @@
+import constate from "constate";
+import { useRef, useEffect } from "react";
+import log from "@/lib/log";
+import { atom, useAtomValue, useSetAtom } from "jotai";
+import {
+  updateTitleAtom,
+  updatePresetAtom,
+  updateModalOpenAtom,
+  updateIdAtom,
+  updateDataAtom,
+} from "@/components/craft/UpdateModal/atom";
+import { useMutation } from "@tanstack/react-query";
+import { supportedSitesAtom } from "../../atoms/supportedSites";
+import {
+  selectionEntriesAtom,
+  selectionOnAtom,
+  selectionTagsAtom,
+  selectionTagsInitialAtom,
+} from "../../atoms/selection";
+import {
+  FilterQueryAtom,
+  initializeFilterDataFromURLAtom,
+} from "../../atoms/filter";
+import type { ContentWebType } from "@tagapp/utils/types";
+import { orpcAtom } from "../../atoms/orpc";
+import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
+
+export const filteredAtom = atom<ContentWebType[]>([]);
+
+function useRemoteContextCore() {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [tags, setTags] = useState<Record<string, number>>({});
+
+  const orpc = useAtomValue(orpcAtom);
+
+  // 1. Get ONLY the setters/actions (These never trigger re-renders when state changes)
+  const initializeFilterDataFromURL = useSetAtom(
+    initializeFilterDataFromURLAtom,
+  );
+  const setFiltered = useSetAtom(filteredAtom);
+  const setOpenModal = useSetAtom(updateModalOpenAtom);
+  const setBulkUpdateModalOpen = useSetAtom(bulkUpdateModalOpenAtom);
+  const setTitle = useSetAtom(updateTitleAtom);
+
+  // 2. Read ONLY static/rarely changed configuration data here if absolutely necessary
+  const supportedSiteData = useAtomValue(supportedSitesAtom);
+
+  const getServerTagsMutation = useMutation(
+    orpc.main.getServerTags.mutationOptions({
+      onSuccess: (res) => {
+        setTags(res);
+      },
+    }),
+  );
+
+  // 3. Setup TanStack Mutations (These references are stable)
+  const getContentDetailsMutation = useMutation(
+    orpc.main.getContent.mutationOptions(),
+  );
+  const getFilteredDataMutation = useMutation(
+    orpc.main.getFilteredData.mutationOptions({
+      onSuccess: (res) => {
+        setFiltered(res);
+        getServerTagsMutation.mutate({});
+      },
+    }),
+  );
+
+  const filterData = useSetAtom(
+    atom(null, (get, set, dontOffSelection = false) => {
+      const query = get(FilterQueryAtom);
+      if (!dontOffSelection) {
+        set(selectionEntriesAtom, []);
+        set(selectionOnAtom, false);
+        set(selectionTagsAtom, []);
+        set(selectionTagsInitialAtom, []);
+      }
+      getFilteredDataMutation.mutate(query);
+    }),
+  );
+
+  const setContentMutation = useMutation(
+    orpc.main.setContent.mutationOptions({
+      onSuccess: (res) => {
+        log(`${res.id} Updated`);
+        setTitle(res.title);
+        setFiltered((old) => old.map((o) => (o.id === res.id ? res : o)));
+        setOpenModal(false);
+        setTags((old) => {
+          res.tags.forEach((tag) => {
+            if (!old[tag]) {
+              old[tag] = 1;
+            }
+          });
+          return { ...old };
+        });
+      },
+    }),
+  );
+
+  // 4. Read dynamic/rapidly changing state inside an ATOM on-demand, NOT in React
+  // This is the core trick. The functions read the state at the exact moment they execute.
+  const setContentFunc = useSetAtom(
+    atom(null, async (get, set) => {
+      const updateId = get(updateIdAtom)!;
+      const updateData = get(updateDataAtom);
+      const preset = get(updatePresetAtom);
+
+      const contentDetails = await getContentDetailsMutation.mutateAsync({
+        id: updateId,
+      });
+
+      const newContent = {
+        ...contentDetails,
+        ...updateData,
+        download: contentDetails.download?.type
+          ? { type: contentDetails.download?.type, flags: preset }
+          : undefined,
+      };
+
+      setContentMutation.mutate(newContent);
+    }),
+  );
+
+  const removeContentsMutation = useMutation(
+    orpc.main.removeContents.mutationOptions({
+      onSuccess: (res) => {
+        log(`${res.length} contents removed`);
+        setFiltered((old) => old.filter((o) => !res.includes(o)));
+      },
+    }),
+  );
+  // Inside your component or custom hook
+  const removeContents = useCallback(
+    (ids: string[]) => {
+      removeContentsMutation.mutate({ ids });
+    },
+    [removeContentsMutation],
+  );
+
+  const bulkUpdateTagsMuation = useMutation(
+    orpc.main.bulkUpdateContentTags.mutationOptions({
+      onSuccess: () => {
+        filterData(true);
+        setBulkUpdateModalOpen(false);
+      },
+    }),
+  );
+  const bulkUpdateTags = useSetAtom(
+    atom(null, (get) => {
+      const selectionEntries = get(selectionEntriesAtom);
+      const selectionTags = get(selectionTagsAtom);
+      const selectionTagsInitial = get(selectionTagsInitialAtom);
+
+      const updatedTags = selectionTags.map((o) => o.value);
+      const added = updatedTags.filter(
+        (o) => !selectionTagsInitial.includes(o),
+      );
+      const removed = selectionTagsInitial.filter(
+        (o) => !updatedTags.includes(o),
+      );
+
+      bulkUpdateTagsMuation.mutate({ ids: selectionEntries, added, removed });
+    }),
+  );
+
+  // 5. Initial load sequence
+  useEffect(() => {
+    const initialFilterQuery = initializeFilterDataFromURL();
+    getFilteredDataMutation.mutate(initialFilterQuery);
+  }, [orpc]);
+
+  return {
+    tags,
+    iframeRef,
+    supportedSiteData,
+    setContentFunc,
+    bulkUpdateTags,
+    removeContents,
+    filterData,
+  };
+}
+
+export const [RemoteProvider, useRemoteContext] =
+  constate(useRemoteContextCore);

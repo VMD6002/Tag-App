@@ -1,0 +1,22 @@
+:root {
+  color-scheme: dark;
+  width: fit-content;
+}
+
+body {
+  padding: 0.5rem;
+  font-family: Arial, sans-serif;
+}
+
+div {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  display: block;
+  margin: 0.5rem;
+  text-decoration: none;
+  color: white;
+  text-wrap-mode: nowrap;
+}

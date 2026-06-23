@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Popup</title>
+    <meta name="manifest.type" content="browser_action" />
+    <link rel="stylesheet" href="./style.css" />
+    <script type="module">
+      import { storage } from "#imports";
+      import { DEFAULT_USER } from "../../lib/CONSTANTS.ts";
+      const currentUser =
+        (await storage.getItem("local:currentUser")) ?? DEFAULT_USER;
+      const appMode =
+        (await storage.getItem(`local:${currentUser}:appMode`)) ?? "local";
+
+      if (appMode === "remote") {
+        document.getElementById("dynamicLinks").insertAdjacentHTML(
+          "beforeend",
+          `
+    <a href="/main.html#/remote/tags" target="_blank">Server Tags</a>`,
+        );
+      }
+    </script>
+  </head>
+
+  <body>
+    <a href="/main.html" target="_blank">Library</a>
+    <a href="/main.html#/tags" target="_blank">Tags</a>
+    <a href="/main.html#/settings" target="_blank">Settings</a>
+    <a href="/main.html#/supported" target="_blank">Supprted Sites</a>
+    <div id="dynamicLinks"></div>
+  </body>
+</html>

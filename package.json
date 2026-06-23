@@ -1,0 +1,30 @@
+{
+  "name": "tagapp6.0",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "bun@1.3.5",
+  "scripts": {
+    "prepare": "bun --cwd apps/extension wxt prepare",
+    "dev:ext": "bun --cwd apps/extension dev",
+    "dev:server": "bun --cwd apps/server dev",
+    "dev:web": "bun --cwd apps/web dev",
+    "build:ext": "bun --cwd apps/extension build",
+    "build:server": "bun --cwd apps/server build",
+    "build:web": "bun --cwd apps/web build",
+    "build:serverFull": "rm -rf apps/server/dist && bun build:server && bun build:web",
+    "type:check": "bun run -r type:check",
+    "update:all": "bun -r update"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.2"
+  },
+  "overrides": {
+    "vite": "^6.2.1",
+    "@vitejs/plugin-react": "^5.1.4"
+  }
+}
