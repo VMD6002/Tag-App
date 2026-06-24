@@ -31,10 +31,10 @@ export type SiteData = z.infer<typeof SiteDataSchema>;
 
 // ─── Defaults ─────────────────────────────────────────────────────────────────
 
-export const defaultSiteScript = `contentDetails.title = document.title
-contentDetails.url = location.href
-contentDetails.identifier = \`someSite_\${SomeID}\`
-contentDetails.cover = sh.getOgImage()
+export const defaultSiteScript = `ctdls.title = document.title
+ctdls.url = location.href
+ctdls.identifier = \`someSite_\${SomeID}\`
+ctdls.cover = sh.getOgImage()
 sh.ready = true`;
 
 const SiteDataScaffold: Omit<SiteData, "script"> = {

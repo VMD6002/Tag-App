@@ -30,6 +30,7 @@ export default defineUnlistedScript(async () => {
 
   const isMounted = { value: false };
 
+  // Script Helpers
   const sh = {
     ready: false,
     sleep,
@@ -80,11 +81,7 @@ export default defineUnlistedScript(async () => {
   contentDetails.defaultTags.push(`Site:${siteData.name}`);
 
   if (siteData.script) {
-    const scriptFunction = new Function(
-      "contentDetails",
-      "sh",
-      siteData.script,
-    );
+    const scriptFunction = new Function("ctdls", "sh", siteData.script);
     scriptFunction(contentDetails, sh);
   }
 });
