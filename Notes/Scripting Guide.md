@@ -1,4 +1,4 @@
-## Properties you can interact from the scriptData
+## Properties you can interact from the sh
 
 ```ts
 interface SiteContentDetails {
@@ -19,7 +19,7 @@ interface SiteContentDetails {
 1. Always use built in variables if available.
 
    You can check this by printing out window vairable in console and checking for any variable that stands out.
-   Some sites have linked json files for seo and these can be helpful aswell, you can get it using the getMicroData helper function in scriptData.
+   Some sites have linked json files for seo and these can be helpful aswell, you can get it using the getMicroData helper function in sh (short for script Helpers).
 
 2. Use low res thumbnail, don't just get the main cover and check for ways to get lower res thumbnail.
 

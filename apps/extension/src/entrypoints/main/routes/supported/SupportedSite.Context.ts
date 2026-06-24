@@ -31,11 +31,11 @@ export type SiteData = z.infer<typeof SiteDataSchema>;
 
 // ─── Defaults ─────────────────────────────────────────────────────────────────
 
-export const defaultSiteScript = `contentDetails.title = document.title;
-contentDetails.url = location.href;
-contentDetails.identifier = \`someSite_\${SomeID}\`;
-contentDetails.cover = scriptData.getOgImage();
-scriptData.ready = true;`;
+export const defaultSiteScript = `contentDetails.title = document.title
+contentDetails.url = location.href
+contentDetails.identifier = \`someSite_\${SomeID}\`
+contentDetails.cover = sh.getOgImage()
+sh.ready = true`;
 
 const SiteDataScaffold: Omit<SiteData, "script"> = {
   name: "SiteName",
@@ -101,11 +101,18 @@ function useSupportedSite() {
     } catch (error: any) {
       alert(error?.message ?? "");
     }
-  }, [siteData, siteScript, editingSiteName, afterAddScript, afterRemoveScript]);
+  }, [
+    siteData,
+    siteScript,
+    editingSiteName,
+    afterAddScript,
+    afterRemoveScript,
+  ]);
 
   const selectSite = useCallback((site: SiteData) => {
     try {
-      const { script, afterAddScript, afterRemoveScript, ...otherSiteData } = site;
+      const { script, afterAddScript, afterRemoveScript, ...otherSiteData } =
+        site;
       setSiteScript(script);
       setAfterAddScript(afterAddScript ?? "");
       setAfterRemoveScript(afterRemoveScript ?? "");
@@ -143,31 +150,34 @@ function useSupportedSite() {
     saveJsonFile(supportedSites, "TagAppExt Site List");
   }, [supportedSites]);
 
-  const importSiteList = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    file
-      .text()
-      .then((text) => JSON.parse(text))
-      .then((data: Record<string, SiteData>) => {
-        setSupportedSites(async (old) => {
-          const New = { ...(await old) };
-          for (const site in data) {
-            const parsed = SiteDataSchema.safeParse(data[site]);
-            if (!parsed.success) {
-              alert(z.prettifyError(parsed.error));
-              continue;
+  const importSiteList = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      file
+        .text()
+        .then((text) => JSON.parse(text))
+        .then((data: Record<string, SiteData>) => {
+          setSupportedSites(async (old) => {
+            const New = { ...(await old) };
+            for (const site in data) {
+              const parsed = SiteDataSchema.safeParse(data[site]);
+              if (!parsed.success) {
+                alert(z.prettifyError(parsed.error));
+                continue;
+              }
+              New[parsed.data.name] = parsed.data;
             }
-            New[parsed.data.name] = parsed.data;
-          }
-          refreshSupportedHostsIndex(New);
-          return New;
+            refreshSupportedHostsIndex(New);
+            return New;
+          });
+        })
+        .catch((error: any) => {
+          console.error("Error reading or parsing the JSON file:", error);
         });
-      })
-      .catch((error: any) => {
-        console.error("Error reading or parsing the JSON file:", error);
-      });
-  }, []);
+    },
+    [],
+  );
 
   return {
     // State
@@ -211,7 +221,18 @@ export const [
 ] = constate(
   useSupportedSite,
   ({ supportedSites }) => supportedSites,
-  ({ siteDataEditorOpen, siteData, setSiteData, siteScript, setSiteScript, afterAddScript, setAfterAddScript, afterRemoveScript, setAfterRemoveScript, editingSiteName }) => ({
+  ({
+    siteDataEditorOpen,
+    siteData,
+    setSiteData,
+    siteScript,
+    setSiteScript,
+    afterAddScript,
+    setAfterAddScript,
+    afterRemoveScript,
+    setAfterRemoveScript,
+    editingSiteName,
+  }) => ({
     siteDataEditorOpen,
     siteData,
     setSiteData,
@@ -230,7 +251,13 @@ export const [
     removeSite,
     closeEditor,
   }),
-  ({ exportSiteList, importSiteList, handleFileClick, fileInputRef, refreshSupportedHostsIndex }) => ({
+  ({
+    exportSiteList,
+    importSiteList,
+    handleFileClick,
+    fileInputRef,
+    refreshSupportedHostsIndex,
+  }) => ({
     exportSiteList,
     importSiteList,
     handleFileClick,
