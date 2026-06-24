@@ -1,5 +1,7 @@
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+export const toBase36 = (num: number | string) => Number(num).toString(36);
+
 /**
  * FNV-1a 32-bit Hash
  */

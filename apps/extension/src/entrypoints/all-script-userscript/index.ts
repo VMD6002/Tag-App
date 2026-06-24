@@ -2,7 +2,7 @@ import log from "@/lib/log";
 import { SiteData } from "../main/routes/supported";
 import { decodeHtmlEntities, getMicroData, getOgImage } from "./dom-utils";
 import { clickUpdateOrRefresh, clickRemove } from "./extension-api";
-import { sleep, getUniqueIdFromString } from "./helpers";
+import { sleep, getUniqueIdFromString, toBase36 } from "./helpers";
 import {
   SHADOW_ROOT_ID,
   CONTENT_DETAILS_ELEMENT_ID,
@@ -41,6 +41,7 @@ export default defineUnlistedScript(async () => {
         firstRun,
       ),
     clickRemove,
+    toBase36,
     getMicroData,
     getOgImage,
     getUniqueIdFromString,
