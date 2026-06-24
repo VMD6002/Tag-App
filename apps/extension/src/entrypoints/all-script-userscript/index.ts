@@ -17,21 +17,29 @@ export default defineUnlistedScript(async () => {
     identifier: "",
     url: "",
     defaultTags: [],
-    downloader: undefined,
+    downloadType: undefined,
     cover: undefined,
     contentUrl: undefined,
-    extraData: undefined
+    extraData: undefined,
   };
 
-  const contentDetailsScriptEle = generateJsonScriptElement(CONTENT_DETAILS_ELEMENT_ID, contentDetails);
+  const contentDetailsScriptEle = generateJsonScriptElement(
+    CONTENT_DETAILS_ELEMENT_ID,
+    contentDetails,
+  );
 
   const isMounted = { value: false };
 
-  const scriptData = {
+  const sh = {
     ready: false,
     sleep,
     clickUpdateOrRefresh: (firstRun?: [boolean]) =>
-      clickUpdateOrRefresh(contentDetailsScriptEle, contentDetails, isMounted, firstRun),
+      clickUpdateOrRefresh(
+        contentDetailsScriptEle,
+        contentDetails,
+        isMounted,
+        firstRun,
+      ),
     clickRemove,
     getMicroData,
     getOgImage,
@@ -41,10 +49,10 @@ export default defineUnlistedScript(async () => {
     SPAContentRefresh(firstRun = [false]) {
       try {
         this.clickUpdateOrRefresh(firstRun as [boolean]);
-        scriptData.ready = true; // mark as initialized successfully
+        sh.ready = true; // mark as initialized successfully
       } catch {
         log("SPAContentRefresh failed");
-        scriptData.ready = false; // stays unready on error
+        sh.ready = false; // stays unready on error
       }
     },
   };
@@ -57,8 +65,8 @@ export default defineUnlistedScript(async () => {
       clearInterval(interval);
       return;
     }
-    if (document.querySelector(SHADOW_ROOT_ID) && scriptData.ready) {
-      scriptData.clickUpdateOrRefresh([true]);
+    if (document.querySelector(SHADOW_ROOT_ID) && sh.ready) {
+      sh.clickUpdateOrRefresh([true]);
       clearInterval(interval);
     }
   }, 1000);
@@ -71,7 +79,11 @@ export default defineUnlistedScript(async () => {
   contentDetails.defaultTags.push(`Site:${siteData.name}`);
 
   if (siteData.script) {
-    const scriptFunction = new Function("contentDetails", "scriptData", siteData.script)
-    scriptFunction(contentDetails, scriptData)
+    const scriptFunction = new Function(
+      "contentDetails",
+      "sh",
+      siteData.script,
+    );
+    scriptFunction(contentDetails, sh);
   }
 });
