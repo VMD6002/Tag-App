@@ -1,6 +1,6 @@
 import { BookOpen } from "lucide-react";
 import Markdown from "react-markdown";
-import ScriptingGuidMD from "@/../../../Notes/Scripting Guid.md";
+import ScriptingGuidMD from "@/../../../Notes/Scripting Guide.md";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { atom, useAtom } from "jotai";
 
-export const guideOpenAtom = atom(false)
+export const guideOpenAtom = atom(false);
 
 export default function GuideDialog() {
   const [guideOpen, setGuideOpen] = useAtom(guideOpenAtom);
@@ -19,7 +19,12 @@ export default function GuideDialog() {
     <Dialog open={guideOpen} onOpenChange={setGuideOpen}>
       <DialogContent
         className="flex flex-col p-8"
-        style={{ width: "95vw", maxWidth: "95vw", height: "95vh", maxHeight: "95vh" }}
+        style={{
+          width: "95vw",
+          maxWidth: "95vw",
+          height: "95vh",
+          maxHeight: "95vh",
+        }}
       >
         <DialogHeader className="border-b border-border pb-4 shrink-0">
           <DialogTitle className="text-2xl flex items-center gap-2">
@@ -27,7 +32,8 @@ export default function GuideDialog() {
             Scripting Guide
           </DialogTitle>
           <DialogDescription className="text-sm">
-            Learn how to write custom userscripts and configure JSON metadata for supported sites.
+            Learn how to write custom userscripts and configure JSON metadata
+            for supported sites.
           </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto py-6 pr-2">
