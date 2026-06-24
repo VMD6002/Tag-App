@@ -1,24 +1,15 @@
-## Extra ScriptData Properties
-
-1. `"begonEvalErrors": true`, use this for sites that throw eval errors. ( Like YouTube )
-
-2. `"cookies": true`, use this for sites that require cookies,
-
-   **Note:** you must add the cookies file in the server at **Download/Cookies** folder. The filename must be of the format `<SiteName>.txt`.
-   eg: If you want cookies for "YouTube" add "YouTube.txt" **Download/Cookies**
-
 ## Properties you can interact from the scriptData
 
 ```ts
 interface SiteContentDetails {
-  downloader: "yt-dlp" | "curl";
+  downloadType?: string;
   site: string;
   title: string;
-  cover: string;
+  cover?: string;
   identifier: string;
   url: string;
   defaultTags: string[];
-  ogImage?: string;
+  contentUrl?: string;
   extraData?: string;
 }
 ```
@@ -42,13 +33,13 @@ interface SiteContentDetails {
    - someSite.com/video?v=10000&j=sdasdd&sdasdad
    - someSite.com/video?v=10000
 
-4. Compress the ID with `.toString(36)` if its an integer
+4. Compress the ID with `toBase36()` helper function if its an integer
 
 5. Use the built in helper functions
 
 ## Builtin helper Functions
 
-TagAppExt comes with some build helper functions for that can be accessed by `scriptData.<function>`
+TagAppExt comes with some build helper functions for that can be accessed by `sh.<function>`
 
 - `clickUpdateOrRefresh()`
   Update the contentData in page and calls extension to check if said data already exist.
@@ -74,3 +65,6 @@ TagAppExt comes with some build helper functions for that can be accessed by `sc
 
 - `decodeHtmlEntities(str: string)`
   Decode's html entieties. eg: decodeHtmlEntities("\&lt;") // returns "<"
+
+- `toBase36(num: Number)`
+  Converts a number to base 36 string. eg: toBase36(1000) // returns "ks"
