@@ -32,7 +32,7 @@ const createOverlayUI = (ctx: ContentScriptContext) =>
 
 function checkMatchPatterns(SiteData: SiteData) {
   if (!SiteData.matchPatterns) return true;
-  const matchPatternPrefix = `${location.protocol}//${location.host}`;
+  const matchPatternPrefix = `${location.protocol}//${location.hostname}`;
   if (
     SiteData.matchPatterns.some((pattern) =>
       new MatchPattern(`${matchPatternPrefix}${pattern}`).includes(location),
