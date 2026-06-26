@@ -7,7 +7,7 @@ import {
   DEFAULT_USER,
   SHADOW_ROOT_ID,
   SITE_DATA_ELEMENT_ID,
-  HOST_NAME_ELEMENT_ID
+  HOST_NAME_ELEMENT_ID,
 } from "@/lib/CONSTANTS";
 import { generateJsonScriptElement } from "@/lib/generateJsonScriptElement";
 
@@ -32,7 +32,7 @@ const createOverlayUI = (ctx: ContentScriptContext) =>
 
 function checkMatchPatterns(SiteData: SiteData) {
   if (!SiteData.matchPatterns) return true;
-  const matchPatternPrefix = `${location.protocol}//${location.hostname}`;
+  const matchPatternPrefix = `${location.protocol}//${location.host}`;
   if (
     SiteData.matchPatterns.some((pattern) =>
       new MatchPattern(`${matchPatternPrefix}${pattern}`).includes(location),
