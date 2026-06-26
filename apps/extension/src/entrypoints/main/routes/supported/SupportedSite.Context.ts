@@ -42,8 +42,24 @@ const SiteDataScaffold: Omit<SiteData, "script"> = {
   hosts: ["www.SiteName.com"],
   matchPatterns: ["/*"],
   download: {
-    presets: [{ label: "None", value: "" }],
-    defaultPreset: { label: "None", value: "" },
+    presets: [
+      {
+        label: "720p",
+        value: "-f b[height<=720]",
+      },
+      {
+        label: "480p",
+        value: "-f b[height<=480]",
+      },
+      {
+        label: "360p",
+        value: "-f b[height<=360]",
+      },
+    ],
+    defaultPreset: {
+      label: "480p",
+      value: "-f b[height<=480]",
+    },
   },
 };
 
