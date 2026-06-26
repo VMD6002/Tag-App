@@ -22,9 +22,5 @@
   },
   "devDependencies": {
     "@types/node": "^24.13.2"
-  },
-  "overrides": {
-    "vite": "^6.2.1",
-    "@vitejs/plugin-react": "^5.1.4"
   }
 }
