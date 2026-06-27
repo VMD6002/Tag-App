@@ -54,7 +54,7 @@ function useLocalContextCore() {
       onSuccess: (res) => {
         const { download } = siteData;
         const extractedContentDetails = GetDetailsFromPage();
-        setDownloadType(extractedContentDetails.downloader);
+        setDownloadType(extractedContentDetails.downloadType);
         if (res) {
           log("Already Exists returning");
           setTitle(res.title);
@@ -132,7 +132,7 @@ function useLocalContextCore() {
   const setContentFunc = useCallback(() => {
     const {
       identifier,
-      downloader,
+      downloadType,
       url,
       site,
       cover: pageCover,
@@ -158,9 +158,9 @@ function useLocalContextCore() {
       cover,
       tags: contentTags,
       extraData,
-      download: downloader
+      download: downloadType
         ? {
-            type: downloader,
+            type: downloadType,
             flags: preset,
           }
         : undefined,
