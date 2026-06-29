@@ -1,11 +1,11 @@
 import constate from "constate";
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef, useEffect, useMemo } from "react";
 import GetDetailsFromPage from "@/lib/GetDetailsFromPage";
 import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
 import TIMEOUTS from "@/lib/TIMEOUTS";
 import log from "@/lib/log";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { contentDataAtom } from "@/entrypoints/main/atoms";
+import { contentDataAtom, setContentAtom, removeContentsAtom, getContentAtom } from "@/entrypoints/main/atoms";
 import {
   updateTitleAtom,
   updateTagsAtom,
@@ -19,7 +19,6 @@ import {
   updateDownloadTypeAtom,
 } from "@/components/craft/UpdateModal/atom";
 import { constantsAtom } from "@/entrypoints/main/atoms/constants";
-import { localOrpc } from "@/lib/localOrpc";
 import { useMutation } from "@tanstack/react-query";
 import { loadAtom } from "..";
 
@@ -33,6 +32,10 @@ function useLocalContextCore() {
   const countRef = useRef(0);
 
   const contentData = useAtomValue(contentDataAtom);
+  
+  const setContentAction = useSetAtom(setContentAtom);
+  const removeContentsAction = useSetAtom(removeContentsAtom);
+  const getContentAction = useSetAtom(getContentAtom);
 
   const setPresetOptions = useSetAtom(updatePresetOptionsAtom);
 
@@ -49,8 +52,8 @@ function useLocalContextCore() {
 
   const siteData = useMemo(() => GetTagAppSiteData(), []);
 
-  const getContentDetailsMutation = useMutation(
-    localOrpc.main.getContent.mutationOptions({
+  const getContentDetailsMutation = useMutation({
+      mutationFn: async (vars: { id: string }) => await getContentAction(vars),
       onSuccess: (res) => {
         const { download } = siteData;
         const extractedContentDetails = GetDetailsFromPage();
@@ -87,8 +90,7 @@ function useLocalContextCore() {
 
         setLoad(true);
       },
-    }),
-  );
+  });
   const checkExistance = useCallback(() => {
     setExists(false);
     const { identifier: id } = GetDetailsFromPage();
@@ -107,8 +109,8 @@ function useLocalContextCore() {
     getContentDetailsMutation.mutate({ id });
   }, [contentData, siteData]);
 
-  const setContentMutation = useMutation(
-    localOrpc.main.setContent.mutationOptions({
+  const setContentMutation = useMutation({
+      mutationFn: async (vars: any) => await setContentAction(vars),
       onSuccess: (res) => {
         if (exists) log(`${res.id} Updated`);
         else {
@@ -127,8 +129,7 @@ function useLocalContextCore() {
         setExists(true);
         setOpenModal(false);
       },
-    }),
-  );
+  });
   const setContentFunc = useCallback(() => {
     const {
       identifier,
@@ -180,8 +181,8 @@ function useLocalContextCore() {
     siteData,
   ]);
 
-  const removeContentsMutation = useMutation(
-    localOrpc.main.removeContents.mutationOptions({
+  const removeContentsMutation = useMutation({
+      mutationFn: async (vars: { ids: string[] }) => await removeContentsAction(vars),
       onSuccess: (res) => {
         if (siteData.afterRemoveScript) {
           iframeRef.current?.contentWindow?.postMessage(
@@ -198,8 +199,7 @@ function useLocalContextCore() {
         setTags([]);
         setTitle(title);
       },
-    }),
-  );
+  });
   const removeContent = useCallback(async () => {
     if (!confirm("Confirm Deletion")) return;
     const { identifier } = GetDetailsFromPage();
