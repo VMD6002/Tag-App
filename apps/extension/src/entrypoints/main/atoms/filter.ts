@@ -1,4 +1,6 @@
-import { atom } from "jotai";
+import { atom, Getter, Setter } from "jotai";
+import { useCallback } from "react";
+import { useAtomCallback } from "jotai/utils";
 
 export const searchAtom = atom("");
 export const allAtom = atom<MultiSelectOption[]>([]);
@@ -15,7 +17,7 @@ export const FilterQueryAtom = atom((get) => ({
   orderByLatest: get(orderByLatestAtom),
 }));
 
-export const injectFilterDataIntoURLAtom = atom(null, (get) => {
+export const injectFilterDataIntoURLCallback = (get: Getter, set: Setter) => {
   const fd = get(FilterQueryAtom);
   const url = new URL(location.href);
   const params = url.searchParams;
@@ -36,9 +38,11 @@ export const injectFilterDataIntoURLAtom = atom(null, (get) => {
   else params.delete("orderByLatest");
 
   history.pushState({}, "", url.toString());
-});
+};
 
-export const initializeFilterDataFromURLAtom = atom(null, (get, set) => {
+export const useInjectFilterDataIntoURL = () => useAtomCallback(useCallback(injectFilterDataIntoURLCallback, []));
+
+const initializeFilterDataFromURLCallback = (get: Getter, set: Setter) => {
   const url = new URL(location.href);
   const params = url.searchParams;
 
@@ -84,13 +88,17 @@ export const initializeFilterDataFromURLAtom = atom(null, (get, set) => {
     types: get(typesAtom).map((o) => o.value),
     orderByLatest: get(orderByLatestAtom),
   };
-});
+};
 
-export const resetFilterAtom = atom(null, (get, set) => {
+export const useInitializeFilterDataFromURL = () => useAtomCallback(useCallback(initializeFilterDataFromURLCallback, []));
+
+export const resetFilterCallback = (get: Getter, set: Setter) => {
   set(searchAtom, "");
   set(allAtom, []);
   set(anyAtom, []);
   set(noneAtom, []);
   set(typesAtom, []);
   set(orderByLatestAtom, true);
-});
+};
+
+export const useResetFilter = () => useAtomCallback(useCallback(resetFilterCallback, []));

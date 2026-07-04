@@ -1,13 +1,15 @@
-import { atom } from "jotai";
+import { atom, Getter, Setter } from "jotai";
 import { contentDataAtom } from ".";
 import { ContentWebType } from "@tagapp/utils/types";
+import { useCallback } from "react";
+import { useAtomCallback } from "jotai/utils";
 
 export const selectionOnAtom = atom(false);
 export const selectionEntriesAtom = atom<string[]>([]);
 export const selectionTagsAtom = atom<MultiSelectOption[]>([]);
 export const selectionTagsInitialAtom = atom<string[]>([]);
 
-export const selectEntryAtom = atom(null, (get, set, key: string) => {
+const selectEntryCallback = (get: Getter, set: Setter, key: string) => {
   const entries = get(selectionEntriesAtom);
   if (entries.includes(key)) {
     set(
@@ -17,43 +19,46 @@ export const selectEntryAtom = atom(null, (get, set, key: string) => {
   } else {
     set(selectionEntriesAtom, [...entries, key]);
   }
-});
+};
 
-export const toggleSelectionModeAtom = atom(null, (get, set) => {
+export const useSelectEntry = () => useAtomCallback(useCallback(selectEntryCallback, []));
+
+const toggleSelectionModeCallback = (get: Getter, set: Setter) => {
   const on = get(selectionOnAtom);
   if (on) set(selectionEntriesAtom, []);
   set(selectionOnAtom, !on);
-});
+};
+
+export const useToggleSelectionMode = () => useAtomCallback(useCallback(toggleSelectionModeCallback, []));
 
 // Extension Specific
 
-export const syncSelectedTagsAtom = atom(
-  null,
-  async (get, set, remoteContentData?: ContentWebType[]) => {
-    const contentData = remoteContentData
-      ? Object.fromEntries(
-          remoteContentData.map((contentDetails) => [
-            contentDetails.id,
-            contentDetails,
-          ]),
-        )
-      : { ...(await get(contentDataAtom)) };
-    const entries = get(selectionEntriesAtom);
+const syncSelectedTagsCallback = async (get: Getter, set: Setter, remoteContentData?: ContentWebType[]) => {
+  const contentData = remoteContentData
+    ? Object.fromEntries(
+        remoteContentData.map((contentDetails) => [
+          contentDetails.id,
+          contentDetails,
+        ]),
+      )
+    : { ...(await get(contentDataAtom)) };
+  const entries = get(selectionEntriesAtom);
 
-    if (entries.length === 0) {
-      set(selectionTagsInitialAtom, []);
-      set(selectionTagsAtom, []);
-      return;
-    }
+  if (entries.length === 0) {
+    set(selectionTagsInitialAtom, []);
+    set(selectionTagsAtom, []);
+    return;
+  }
 
-    const tagsArray = entries.map((key) => contentData[key].tags);
+  const tagsArray = entries.map((key) => contentData[key].tags);
 
-    const data = tagsArray.reduce((a, b) => a.filter((c) => b.includes(c)));
+  const data = tagsArray.reduce((a, b) => a.filter((c) => b.includes(c)));
 
-    set(selectionTagsInitialAtom, data);
-    set(
-      selectionTagsAtom,
-      data.map((o) => ({ label: o, value: o })),
-    );
-  },
-);
+  set(selectionTagsInitialAtom, data);
+  set(
+    selectionTagsAtom,
+    data.map((o) => ({ label: o, value: o })),
+  );
+};
+
+export const useSyncSelectedTags = () => useAtomCallback(useCallback(syncSelectedTagsCallback, []));

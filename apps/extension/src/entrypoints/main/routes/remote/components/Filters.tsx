@@ -6,21 +6,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import MultipleSelector from "@/components/ui/multiple-selector";
 import { useMemo, useCallback } from "react"; // Fixed: Added missing imports
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { tagParentsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
+import { useAtomCallback } from "jotai/utils";
 import {
   allAtom,
   anyAtom,
-  injectFilterDataIntoURLAtom,
   noneAtom,
   orderByLatestAtom,
-  resetFilterAtom,
   searchAtom,
+  useInjectFilterDataIntoURL,
+  useResetFilter,
 } from "@/entrypoints/main/atoms/filter";
 import {
   selectionEntriesAtom,
   selectionOnAtom,
-  toggleSelectionModeAtom,
-  syncSelectedTagsAtom,
+  useToggleSelectionMode,
+  useSyncSelectedTags,
 } from "@/entrypoints/main/atoms/selection";
 
 import { filteredAtom } from "../Remote.Context";
@@ -42,48 +42,59 @@ export default function Filters() {
   const [none, setNone] = useAtom(noneAtom);
   const [orderByLatest, setOrderByLatest] = useAtom(orderByLatestAtom);
 
-  const reset = useSetAtom(resetFilterAtom);
-  const injectFilterDataIntoURL = useSetAtom(injectFilterDataIntoURLAtom);
+  const reset = useResetFilter();
+  const injectFilterDataIntoURL = useInjectFilterDataIntoURL();
 
   const selectedEntries = useAtomValue(selectionEntriesAtom);
   const selectionOn = useAtomValue(selectionOnAtom);
-  const toggleSelectionMode = useSetAtom(toggleSelectionModeAtom);
+  const toggleSelectionMode = useToggleSelectionMode();
+  const syncSelectedTags = useSyncSelectedTags();
 
   // Wired code but the set here actually runs a function for syncSelectTagsAtom
-  const toggleBulkUpdateModal = useSetAtom(
-    atom(null, (get, set) => {
-      set(syncSelectedTagsAtom, get(filteredAtom));
-      set(bulkUpdateModalOpenAtom, true);
-    }),
+  const toggleBulkUpdateModal = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        const filtered = get(filteredAtom);
+        await syncSelectedTags(filtered);
+        set(bulkUpdateModalOpenAtom, true);
+      },
+      [syncSelectedTags],
+    ),
   );
 
   // Performance Fix: Read current filtered items atomically on-demand instead of mapping over rendering dependencies
-  const handleSelectAllChange = useSetAtom(
-    atom(null, (get, set, checked: boolean) => {
-      if (checked) {
-        const currentFiltered = get(filteredAtom);
-        set(
-          selectionEntriesAtom,
-          currentFiltered.map((o) => o.id),
-        );
-      } else {
-        set(selectionEntriesAtom, []);
-      }
-    }),
+  const handleSelectAllChange = useAtomCallback(
+    useCallback(
+      async (get, set, checked: boolean) => {
+        if (checked) {
+          const currentFiltered = get(filteredAtom);
+          set(
+            selectionEntriesAtom,
+            currentFiltered.map((o) => o.id),
+          );
+        } else {
+          set(selectionEntriesAtom, []);
+        }
+      },
+      [filteredAtom, selectionEntriesAtom],
+    ),
   );
 
-  const removeSelected = useSetAtom(
-    atom(null, (get, set) => {
-      const selectedEntries = get(selectionEntriesAtom);
-      if (
-        !confirm(
-          `Are you sure you want to remove ${selectedEntries.length} items?`,
+  const removeSelected = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        const selectedEntries = get(selectionEntriesAtom);
+        if (
+          !confirm(
+            `Are you sure you want to remove ${selectedEntries.length} items?`,
+          )
         )
-      )
-        return;
-      removeContents(selectedEntries);
-      set(selectionEntriesAtom, []);
-    }),
+          return;
+        removeContents(selectedEntries);
+        set(selectionEntriesAtom, []);
+      },
+      [removeContents, selectionEntriesAtom],
+    ),
   );
 
   const allTagsForMultiSelectComponent = useMemo(

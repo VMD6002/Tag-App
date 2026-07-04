@@ -19,11 +19,12 @@ import {
 } from "../../atoms/selection";
 import {
   FilterQueryAtom,
-  initializeFilterDataFromURLAtom,
+  useInitializeFilterDataFromURL,
 } from "../../atoms/filter";
 import type { ContentWebType } from "@tagapp/utils/types";
 import { orpcAtom } from "../../atoms/orpc";
 import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
+import { useAtomCallback } from "jotai/utils";
 
 export const filteredAtom = atom<ContentWebType[]>([]);
 
@@ -33,10 +34,7 @@ function useRemoteContextCore() {
 
   const orpc = useAtomValue(orpcAtom);
 
-  // 1. Get ONLY the setters/actions (These never trigger re-renders when state changes)
-  const initializeFilterDataFromURL = useSetAtom(
-    initializeFilterDataFromURLAtom,
-  );
+  const initializeFilterDataFromURL = useInitializeFilterDataFromURL();
   const setFiltered = useSetAtom(filteredAtom);
   const setOpenModal = useSetAtom(updateModalOpenAtom);
   const setBulkUpdateModalOpen = useSetAtom(bulkUpdateModalOpenAtom);
@@ -66,17 +64,27 @@ function useRemoteContextCore() {
     }),
   );
 
-  const filterData = useSetAtom(
-    atom(null, (get, set, dontOffSelection = false) => {
-      const query = get(FilterQueryAtom);
-      if (!dontOffSelection) {
-        set(selectionEntriesAtom, []);
-        set(selectionOnAtom, false);
-        set(selectionTagsAtom, []);
-        set(selectionTagsInitialAtom, []);
-      }
-      getFilteredDataMutation.mutate(query);
-    }),
+  const filterData = useAtomCallback(
+    useCallback(
+      async (get, set, dontOffSelection = false) => {
+        const query = get(FilterQueryAtom);
+        if (!dontOffSelection) {
+          set(selectionEntriesAtom, []);
+          set(selectionOnAtom, false);
+          set(selectionTagsAtom, []);
+          set(selectionTagsInitialAtom, []);
+        }
+        getFilteredDataMutation.mutate(query);
+      },
+      [
+        FilterQueryAtom,
+        getFilteredDataMutation,
+        selectionEntriesAtom,
+        selectionOnAtom,
+        selectionTagsAtom,
+        selectionTagsInitialAtom,
+      ],
+    ),
   );
 
   const setContentMutation = useMutation(
@@ -100,26 +108,35 @@ function useRemoteContextCore() {
 
   // 4. Read dynamic/rapidly changing state inside an ATOM on-demand, NOT in React
   // This is the core trick. The functions read the state at the exact moment they execute.
-  const setContentFunc = useSetAtom(
-    atom(null, async (get, set) => {
-      const updateId = get(updateIdAtom)!;
-      const updateData = get(updateDataAtom);
-      const preset = get(updatePresetAtom);
+  const setContentFunc = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        const updateId = get(updateIdAtom)!;
+        const updateData = get(updateDataAtom);
+        const preset = get(updatePresetAtom);
 
-      const contentDetails = await getContentDetailsMutation.mutateAsync({
-        id: updateId,
-      });
+        const contentDetails = await getContentDetailsMutation.mutateAsync({
+          id: updateId,
+        });
 
-      const newContent = {
-        ...contentDetails,
-        ...updateData,
-        download: contentDetails.download?.type
-          ? { type: contentDetails.download?.type, flags: preset }
-          : undefined,
-      };
+        const newContent = {
+          ...contentDetails,
+          ...updateData,
+          download: contentDetails.download?.type
+            ? { type: contentDetails.download?.type, flags: preset }
+            : undefined,
+        };
 
-      setContentMutation.mutate(newContent);
-    }),
+        setContentMutation.mutate(newContent);
+      },
+      [
+        updateIdAtom,
+        updateDataAtom,
+        updatePresetAtom,
+        getContentDetailsMutation,
+        setContentMutation,
+      ],
+    ),
   );
 
   const removeContentsMutation = useMutation(
@@ -146,22 +163,30 @@ function useRemoteContextCore() {
       },
     }),
   );
-  const bulkUpdateTags = useSetAtom(
-    atom(null, (get) => {
-      const selectionEntries = get(selectionEntriesAtom);
-      const selectionTags = get(selectionTagsAtom);
-      const selectionTagsInitial = get(selectionTagsInitialAtom);
+  const bulkUpdateTags = useAtomCallback(
+    useCallback(
+      async (get) => {
+        const selectionEntries = get(selectionEntriesAtom);
+        const selectionTags = get(selectionTagsAtom);
+        const selectionTagsInitial = get(selectionTagsInitialAtom);
 
-      const updatedTags = selectionTags.map((o) => o.value);
-      const added = updatedTags.filter(
-        (o) => !selectionTagsInitial.includes(o),
-      );
-      const removed = selectionTagsInitial.filter(
-        (o) => !updatedTags.includes(o),
-      );
+        const updatedTags = selectionTags.map((o) => o.value);
+        const added = updatedTags.filter(
+          (o) => !selectionTagsInitial.includes(o),
+        );
+        const removed = selectionTagsInitial.filter(
+          (o) => !updatedTags.includes(o),
+        );
 
-      bulkUpdateTagsMuation.mutate({ ids: selectionEntries, added, removed });
-    }),
+        bulkUpdateTagsMuation.mutate({ ids: selectionEntries, added, removed });
+      },
+      [
+        selectionEntriesAtom,
+        selectionTagsAtom,
+        selectionTagsInitialAtom,
+        bulkUpdateTagsMuation,
+      ],
+    ),
   );
 
   // 5. Initial load sequence

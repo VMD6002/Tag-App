@@ -1,10 +1,11 @@
 import constate from "constate";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { atom, useSetAtom } from "jotai";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ContentWebType } from "@tagapp/utils/types";
 import { FilterQueryAtom, initializeFilterDataFromURLAtom } from "@/atom";
 import { orpc } from "@/lib/orpc";
+import { useAtomCallback } from "jotai/utils";
 
 export const filteredAtom = atom<ContentWebType[]>([]);
 
@@ -36,11 +37,14 @@ function useRemoteContextCore() {
     }),
   );
 
-  const filterData = useSetAtom(
-    atom(null, (get, _) => {
-      const query = get(FilterQueryAtom);
-      getFilteredDataMutation.mutate(query);
-    }),
+  const filterData = useAtomCallback(
+    useCallback(
+      async (get) => {
+        const query = get(FilterQueryAtom);
+        getFilteredDataMutation.mutate(query);
+      },
+      [getFilteredDataMutation, FilterQueryAtom],
+    ),
   );
 
   // 5. Initial load sequence

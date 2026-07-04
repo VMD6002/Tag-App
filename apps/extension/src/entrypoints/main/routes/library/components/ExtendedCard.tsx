@@ -4,9 +4,9 @@ import { memo, useMemo, useCallback } from "react"; // Fixed: Added missing impo
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { filteredAtom } from "../Library.Context";
 import {
-  selectEntryAtom,
   selectionEntriesAtom, // Added for atomic selection check
   selectionOnAtom,
+  useSelectEntry,
 } from "@/entrypoints/main/atoms/selection";
 import {
   updateCoverAtom,
@@ -66,7 +66,7 @@ const ExtendedCard = memo(
 
     // Selection Atoms
     const selectionOn = useAtomValue(selectionOnAtom);
-    const selectEntry = useSetAtom(selectEntryAtom);
+    const selectEntry = useSelectEntry();
 
     // Performance Fix: Pinpoint subscription ensures ONLY this card re-renders when its selection status shifts
     const selectedTrue = useAtomValue(

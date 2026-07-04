@@ -1,7 +1,9 @@
-import { atom } from "jotai";
+import { atom, Getter, Setter } from "jotai";
 import { contentDataAtom } from ".";
-import { resetFilterAtom, injectFilterDataIntoURLAtom } from "./filter";
+import { resetFilterCallback, injectFilterDataIntoURLCallback } from "./filter";
 import { atomWithUserStorage } from "./user";
+import { useCallback } from "react";
+import { useAtomCallback } from "jotai/utils";
 
 export const tagDefaultData = {
   "Type:Img": { Count: 0 },
@@ -35,7 +37,7 @@ export const tagParentsAtom = atomWithUserStorage<Record<string, string>>(
   },
 );
 
-export const removeParentAtom = atom(null, async (get, set, parent: string) => {
+const removeParentCallback = async (get: Getter, set: Setter, parent: string) => {
   const tagParents = await get(tagParentsAtom);
   delete tagParents[parent];
 
@@ -51,9 +53,11 @@ export const removeParentAtom = atom(null, async (get, set, parent: string) => {
 
   set(tagsAtom, tagsData);
   set(tagParentsAtom, tagParents);
-});
+};
 
-export const removeTagAtom = atom(null, async (get, set, tag: string) => {
+export const useRemoveParent = () => useAtomCallback(useCallback(removeParentCallback, []));
+
+const removeTagCallback = async (get: Getter, set: Setter, tag: string) => {
   const tagsData = { ...(await get(tagsAtom)) };
   delete tagsData[tag];
   set(tagsAtom, tagsData);
@@ -66,11 +70,13 @@ export const removeTagAtom = atom(null, async (get, set, tag: string) => {
     }
   });
   set(contentDataAtom, contentData);
-});
+};
 
-export const fixTagCountAtom = atom(null, async (get, set) => {
-  set(resetFilterAtom);
-  set(injectFilterDataIntoURLAtom);
+export const useRemoveTag = () => useAtomCallback(useCallback(removeTagCallback, []));
+
+const fixTagCountCallback = async (get: Getter, set: Setter) => {
+  resetFilterCallback(get, set);
+  injectFilterDataIntoURLCallback(get, set);
 
   const contentData = { ...(await get(contentDataAtom)) };
   const tagsData = structuredClone(await get(tagsAtom));
@@ -103,4 +109,6 @@ export const fixTagCountAtom = atom(null, async (get, set) => {
   });
 
   set(tagsAtom, newTagsData);
-});
+};
+
+export const useFixTagCount = () => useAtomCallback(useCallback(fixTagCountCallback, []));

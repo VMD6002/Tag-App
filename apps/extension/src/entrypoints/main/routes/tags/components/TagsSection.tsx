@@ -11,16 +11,16 @@ import {
 } from "@/components/ui/select";
 import TagGroup from "./TagGroup";
 import {
-  fixTagCountAtom,
-  removeTagAtom,
+  useFixTagCount,
+  useRemoveTag,
   tagParentsAtom,
   tagsAtom,
 } from "@/entrypoints/main/atoms/tags";
-import { useAtom, useSetAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 export default function TagsSection() {
-  const removeTag = useSetAtom(removeTagAtom);
-  const fixTagCount = useSetAtom(fixTagCountAtom);
+  const removeTag = useRemoveTag();
+  const fixTagCount = useFixTagCount();
   const tagParents = useAtomValue(tagParentsAtom);
   const [tags, setTags] = useAtom(tagsAtom);
 

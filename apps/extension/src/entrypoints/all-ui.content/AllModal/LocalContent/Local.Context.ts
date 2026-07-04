@@ -5,7 +5,7 @@ import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
 import TIMEOUTS from "@/lib/TIMEOUTS";
 import log from "@/lib/log";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { contentDataAtom, setContentAtom, removeContentsAtom, getContentAtom } from "@/entrypoints/main/atoms";
+import { contentDataAtom, useSetContent, useRemoveContents, useGetContent } from "@/entrypoints/main/atoms";
 import {
   updateTitleAtom,
   updateTagsAtom,
@@ -32,10 +32,9 @@ function useLocalContextCore() {
   const countRef = useRef(0);
 
   const contentData = useAtomValue(contentDataAtom);
-  
-  const setContentAction = useSetAtom(setContentAtom);
-  const removeContentsAction = useSetAtom(removeContentsAtom);
-  const getContentAction = useSetAtom(getContentAtom);
+  const setContentAction = useSetContent();
+  const removeContentsAction = useRemoveContents();
+  const getContentAction = useGetContent();
 
   const setPresetOptions = useSetAtom(updatePresetOptionsAtom);
 

@@ -4,8 +4,8 @@ import z from "zod";
 import { useAtom, useSetAtom } from "jotai";
 import { presetSchema } from "@tagapp/utils/types";
 import {
-  addSupportedHostsToIndexAtom,
-  refreshSupportedHostsIndexAtom,
+  useAddSupportedHostsToIndex,
+  useRefreshSupportedHostsIndex,
   supportedSitesAtom,
 } from "../../atoms/supportedSites";
 import saveJsonFile from "@/lib/saveJsonFile";
@@ -78,8 +78,8 @@ function useSupportedSite() {
 
   // Jotai atoms
   const [supportedSites, setSupportedSites] = useAtom(supportedSitesAtom);
-  const refreshSupportedHostsIndex = useSetAtom(refreshSupportedHostsIndexAtom);
-  const addSupportedHostsToIndex = useSetAtom(addSupportedHostsToIndexAtom);
+  const refreshSupportedHostsIndex = useRefreshSupportedHostsIndex();
+  const addSupportedHostsToIndex = useAddSupportedHostsToIndex();
 
   // File input ref for import
   const fileInputRef = useRef<HTMLInputElement>(null);

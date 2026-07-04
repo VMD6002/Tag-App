@@ -5,7 +5,7 @@ import ExtendedCard from "./components/ExtendedCard";
 import UpdateModal from "@/components/craft/UpdateModal";
 import BulkUpdateModal from "@/components/craft/BulkUpdateModal";
 import { useSetAtom, useAtomValue } from "jotai";
-import { resetFilterAtom } from "@/entrypoints/main/atoms/filter";
+import { useResetFilter } from "@/entrypoints/main/atoms/filter";
 import {
   filteredAtom,
   RemoteProvider,
@@ -17,7 +17,7 @@ function Remote() {
     useRemoteContext();
 
   const filtered = useAtomValue(filteredAtom);
-  const reset = useSetAtom(resetFilterAtom);
+  const reset = useResetFilter();
 
   return (
     <>
