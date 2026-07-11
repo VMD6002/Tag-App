@@ -34,7 +34,7 @@ export default defineUnlistedScript(async () => {
   const sh = {
     ready: false,
     sleep,
-    clickUpdateOrRefresh: (firstRun: [boolean]) =>
+    clickUpdateOrRefresh: (firstRun: [boolean] = [true]) =>
       clickUpdateOrRefresh(
         contentDetailsScriptEle,
         contentDetails,
@@ -68,7 +68,7 @@ export default defineUnlistedScript(async () => {
       return;
     }
     if (document.querySelector(SHADOW_ROOT_ID) && sh.ready) {
-      sh.clickUpdateOrRefresh([true]);
+      sh.clickUpdateOrRefresh();
       clearInterval(interval);
     }
   }, 1000);
