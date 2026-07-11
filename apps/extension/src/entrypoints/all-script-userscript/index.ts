@@ -34,7 +34,7 @@ export default defineUnlistedScript(async () => {
   const sh = {
     ready: false,
     sleep,
-    clickUpdateOrRefresh: (firstRun?: [boolean]) =>
+    clickUpdateOrRefresh: (firstRun: [boolean]) =>
       clickUpdateOrRefresh(
         contentDetailsScriptEle,
         contentDetails,
@@ -48,7 +48,7 @@ export default defineUnlistedScript(async () => {
     getUniqueIdFromString,
     log,
     decodeHtmlEntities,
-    SPAContentRefresh(firstRun = [false]) {
+    SPAContentRefresh(firstRun = [true]) {
       try {
         this.clickUpdateOrRefresh(firstRun as [boolean]);
         sh.ready = true; // mark as initialized successfully

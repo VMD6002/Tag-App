@@ -5,7 +5,7 @@ export function clickUpdateOrRefresh(
   parentDiv: HTMLScriptElement,
   contentDetails: object,
   isMounted: { value: boolean },
-  firstRun = [false],
+  firstRun: [boolean],
 ) {
   parentDiv.textContent = JSON.stringify(contentDetails);
   if (firstRun[0] || !isMounted.value) {
