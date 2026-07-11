@@ -16,7 +16,6 @@ export default function HiddenForms({
       <form
         style={{ display: "none" }}
         onSubmit={(e) => {
-          alert("I was clicked");
           e.preventDefault();
           countRef.current = 0;
           checkExistance();
