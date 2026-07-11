@@ -81,7 +81,10 @@ export default defineUnlistedScript(async () => {
   contentDetails.defaultTags.push(`Site:${siteData.name}`);
 
   if (siteData.script) {
-    const scriptFunction = new Function("ctdls", "sh", siteData.script);
+    const AsyncFunction = Object.getPrototypeOf(
+      async function () {},
+    ).constructor;
+    const scriptFunction = new AsyncFunction("ctdls", "sh", siteData.script);
     scriptFunction(contentDetails, sh);
   }
 });

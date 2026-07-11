@@ -1,4 +1,4 @@
-## Properties you can interact from the sh
+## Properties you can read/invole from script with sh
 
 ```ts
 interface SiteContentDetails {
@@ -36,6 +36,8 @@ interface SiteContentDetails {
 4. Compress the ID with `toBase36()` helper function if its an integer
 
 5. Use the built in helper functions
+
+6. Use await functions directly no need to wrap it with async
 
 ## Builtin helper Functions
 
