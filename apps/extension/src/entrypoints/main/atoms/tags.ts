@@ -1,4 +1,4 @@
-import { atom, Getter, Setter } from "jotai";
+import { Getter, Setter } from "jotai";
 import { contentDataAtom } from ".";
 import { resetFilterCallback, injectFilterDataIntoURLCallback } from "./filter";
 import { atomWithUserStorage } from "./user";
@@ -6,22 +6,14 @@ import { useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
 
 export const tagDefaultData = {
-  "Type:Img": { Count: 0 },
   "Type:GIF": { Count: 0 },
-  "Type:Animation": {
-    Count: 0,
-  },
-  "Type:3D": {
-    Count: 0,
-  },
   "Type:Short_Clip": {
     Count: 0,
   },
-  "Util:Downloaded": {
+  "Tag:Watched": {
     Count: 0,
-    CoverUrl: "https://www.svgrepo.com/show/501864/disk.svg",
   },
-  "Util:Different_Cover": {
+  "Tag:To-Watch": {
     Count: 0,
   },
 };
@@ -32,12 +24,16 @@ export const tagParentsAtom = atomWithUserStorage<Record<string, string>>(
   "parents",
   {
     Type: "",
-    Util: "",
+    Tag: "",
     Site: "",
   },
 );
 
-const removeParentCallback = async (get: Getter, set: Setter, parent: string) => {
+const removeParentCallback = async (
+  get: Getter,
+  set: Setter,
+  parent: string,
+) => {
   const tagParents = await get(tagParentsAtom);
   delete tagParents[parent];
 
@@ -55,7 +51,8 @@ const removeParentCallback = async (get: Getter, set: Setter, parent: string) =>
   set(tagParentsAtom, tagParents);
 };
 
-export const useRemoveParent = () => useAtomCallback(useCallback(removeParentCallback, []));
+export const useRemoveParent = () =>
+  useAtomCallback(useCallback(removeParentCallback, []));
 
 const removeTagCallback = async (get: Getter, set: Setter, tag: string) => {
   const tagsData = { ...(await get(tagsAtom)) };
@@ -72,7 +69,8 @@ const removeTagCallback = async (get: Getter, set: Setter, tag: string) => {
   set(contentDataAtom, contentData);
 };
 
-export const useRemoveTag = () => useAtomCallback(useCallback(removeTagCallback, []));
+export const useRemoveTag = () =>
+  useAtomCallback(useCallback(removeTagCallback, []));
 
 const fixTagCountCallback = async (get: Getter, set: Setter) => {
   resetFilterCallback(get, set);
@@ -111,4 +109,5 @@ const fixTagCountCallback = async (get: Getter, set: Setter) => {
   set(tagsAtom, newTagsData);
 };
 
-export const useFixTagCount = () => useAtomCallback(useCallback(fixTagCountCallback, []));
+export const useFixTagCount = () =>
+  useAtomCallback(useCallback(fixTagCountCallback, []));
