@@ -27,7 +27,7 @@ The latest evolution of TagApp, shifting from a monolithic-adjacent architecture
 
 ## Key Features in 6.0
 
-- **oRPC Background Engine**: Most CRUD operations on `contentData` are now routed through an oRPC setup directly inside the extension's background script, ensuring type safety and lightning-fast execution.
+- ~~oRPC Background Engine: Most CRUD operations on `contentData` are now routed through an oRPC setup directly inside the extension's background script, ensuring type safety and lightning-fast execution.~~ ( Didn't work due to MV3 killing the background script immediatly, still using the same context setup but now by calling the jotai functions directly )
 - **Decoupled Vault (`TagAppVault`)**: The old media server has been completely extracted into its own dedicated project. It connects to the extension to seamlessly ingest user data, tags, and saved states.
 - **Lean Remote DB**: The Hono server has been rewritten and streamlined to act purely as a remote database backup and sync layer for the extension.
 - **Lifecycle Hook Support**: Introduced `AfterAddScripts` and `AfterRemoveScripts` to trigger automated workflows whenever data is added or removed.
@@ -44,7 +44,3 @@ The latest evolution of TagApp, shifting from a monolithic-adjacent architecture
 
 - [oRPC Documentation & Monorepo Reference](https://github.com/middleapi/orpc-multiservice-monorepo-playground/tree/main)
 - [WXT Next-gen Web Extension Framework](https://wxt.dev/)
-
----
-
-Does this capture all the structural updates accurately, or should we add specific configuration details for the new lifecycle hooks?
