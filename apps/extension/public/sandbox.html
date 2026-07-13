@@ -6,6 +6,9 @@
   </head>
   <body>
     <script>
+      const AsyncFunction = Object.getPrototypeOf(
+        async function () {},
+      ).constructor;
       // Listen for the code and data from the parent React window
       window.addEventListener("message", (event) => {
         const { script, data } = event.data;
@@ -13,7 +16,7 @@
         try {
           // Create a function wrapper so the user code can access the data
           // and run in its own scope.
-          const runner = new Function(
+          const runner = new AsyncFunction(
             "data",
             `
             try {
