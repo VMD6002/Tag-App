@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useSetAtom } from "jotai";
 import z from "zod";
 import { contentDataAtom } from "@/entrypoints/main/atoms";
-import { tagsAtom } from "@/entrypoints/main/atoms/tags";
+import { tagParentsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
 import { ContentWebSchema } from "@tagapp/utils/types";
 
 const TagTypeSchema = z.record(
@@ -25,6 +25,7 @@ export default function Restore() {
   const [overwrite, setOverwrite] = useState(false);
   const setContentData = useSetAtom(contentDataAtom);
   const setTags = useSetAtom(tagsAtom);
+  const setParentTags = useSetAtom(tagParentsAtom);
 
   const restoreAll = useCallback(
     (event: any) => {
@@ -89,9 +90,23 @@ export default function Restore() {
             return;
           }
           const data = validator.data;
+          const parentTags: Record<string, string> = Object.keys(
+            data.tags,
+          ).reduce(
+            (acc, currentKey) => {
+              const [parent, tag] = currentKey.split(":");
+              acc[parent] = tag;
+              return acc;
+            },
+            {} as Record<string, string>,
+          );
           if (overwrite) {
             setTags(data.tags);
-          } else setTags((old) => ({ ...old, ...data.tags }));
+            setParentTags(parentTags);
+          } else {
+            setTags((old) => ({ ...old, ...data.tags }));
+            setParentTags((old) => ({ ...old, ...parentTags }));
+          }
           alert(
             `Successfully restored Tags by ${
               overwrite ? "Overwriting" : "Merging"
