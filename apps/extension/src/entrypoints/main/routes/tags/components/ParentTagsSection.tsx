@@ -2,10 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
-import {
-  tagParentsAtom,
-  useRemoveParent,
-} from "@/entrypoints/main/atoms/tags";
+import { tagParentsAtom, useRemoveParent } from "@/entrypoints/main/atoms/tags";
 import { useAtom } from "jotai";
 
 export default function ParentTagsSection() {
@@ -16,7 +13,9 @@ export default function ParentTagsSection() {
   const addParentFunc = useCallback(() => {
     setTagParents(async (tmp) => {
       const old = await tmp;
-      parentString.split(" ").map((tag) => (old[tag.trim()] = ""));
+      for (const tag of parentString.trim().split(/\s+/)) {
+        old[tag] = "";
+      }
       return { ...old };
     });
     setTimeout(() => setParentString(""), 0);
