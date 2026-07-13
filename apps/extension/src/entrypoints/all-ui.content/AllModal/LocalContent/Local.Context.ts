@@ -5,7 +5,12 @@ import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
 import TIMEOUTS from "@/lib/TIMEOUTS";
 import log from "@/lib/log";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { contentDataAtom, useSetContent, useRemoveContents, useGetContent } from "@/entrypoints/main/atoms";
+import {
+  contentDataAtom,
+  useSetContent,
+  useRemoveContents,
+  useGetContent,
+} from "@/entrypoints/main/atoms";
 import {
   updateTitleAtom,
   updateTagsAtom,
@@ -18,13 +23,18 @@ import {
   updatePresetOptionsAtom,
   updateDownloadTypeAtom,
 } from "@/components/craft/UpdateModal/atom";
-import { constantsAtom } from "@/entrypoints/main/atoms/constants";
+import {
+  constantsAtom,
+  replaceWithKeyOnUpdateAtom,
+} from "@/entrypoints/main/atoms/constants";
 import { useMutation } from "@tanstack/react-query";
 import { loadAtom } from "..";
+import { applyConstants } from "@tagapp/utils";
 
 function useLocalContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  const replaceWithKeyOnUpdate = useAtomValue(replaceWithKeyOnUpdateAtom);
   const constants = useAtomValue(constantsAtom);
 
   const setLoad = useSetAtom(loadAtom);
@@ -52,43 +62,43 @@ function useLocalContextCore() {
   const siteData = useMemo(() => GetTagAppSiteData(), []);
 
   const getContentDetailsMutation = useMutation({
-      mutationFn: async (vars: { id: string }) => await getContentAction(vars),
-      onSuccess: (res) => {
-        const { download } = siteData;
-        const extractedContentDetails = GetDetailsFromPage();
-        setDownloadType(extractedContentDetails.downloadType);
-        if (res) {
-          log("Already Exists returning");
-          setTitle(res.title);
-          setTags(res.tags.map((o) => ({ label: o, value: o })));
-          setCover(res.cover || "");
-          setExtraData(res.extraData || "");
-          setPreset(res.download?.flags);
-          setContentUrl(res.contentUrl);
+    mutationFn: async (vars: { id: string }) => await getContentAction(vars),
+    onSuccess: (res) => {
+      const { download } = siteData;
+      const extractedContentDetails = GetDetailsFromPage();
+      setDownloadType(extractedContentDetails.downloadType);
+      if (res) {
+        log("Already Exists returning");
+        setTitle(res.title);
+        setTags(res.tags.map((o) => ({ label: o, value: o })));
+        setCover(res.cover || "");
+        setExtraData(res.extraData || "");
+        setPreset(res.download?.flags);
+        setContentUrl(res.contentUrl);
 
-          setExists(true);
-        } else {
-          setTitle(extractedContentDetails.title);
-          setTags(
-            extractedContentDetails.defaultTags.map((o) => ({
-              label: o,
-              value: o,
-            })),
-          );
-          setCover(extractedContentDetails.cover || "");
-          setExtraData(
-            `Web: [${extractedContentDetails.url}](${extractedContentDetails.url})${extractedContentDetails.extraData ? "\n" + extractedContentDetails.extraData : ""}`,
-          );
-          extractedContentDetails.contentUrl &&
-            setContentUrl(extractedContentDetails.contentUrl);
-          siteData.download?.defaultPreset &&
-            setPreset(siteData.download.defaultPreset);
-          setExists(false);
-        }
-        setPresetOptions(download?.presets);
+        setExists(true);
+      } else {
+        setTitle(extractedContentDetails.title);
+        setTags(
+          extractedContentDetails.defaultTags.map((o) => ({
+            label: o,
+            value: o,
+          })),
+        );
+        setCover(extractedContentDetails.cover || "");
+        setExtraData(
+          `Web: [${extractedContentDetails.url}](${extractedContentDetails.url})${extractedContentDetails.extraData ? "\n" + extractedContentDetails.extraData : ""}`,
+        );
+        extractedContentDetails.contentUrl &&
+          setContentUrl(extractedContentDetails.contentUrl);
+        siteData.download?.defaultPreset &&
+          setPreset(siteData.download.defaultPreset);
+        setExists(false);
+      }
+      setPresetOptions(download?.presets);
 
-        setLoad(true);
-      },
+      setLoad(true);
+    },
   });
   const checkExistance = useCallback(() => {
     setExists(false);
@@ -109,25 +119,29 @@ function useLocalContextCore() {
   }, [contentData, siteData]);
 
   const setContentMutation = useMutation({
-      mutationFn: async (vars: any) => await setContentAction(vars),
-      onSuccess: (res) => {
-        if (exists) log(`${res.id} Updated`);
-        else {
-          if (!exists && siteData.afterAddScript)
-            iframeRef.current?.contentWindow?.postMessage(
-              {
-                script: siteData.afterAddScript,
-                data: { siteData, contentDetails: res },
-              },
-              "*",
-            );
-          log(`${res.id} Added`);
-        }
+    mutationFn: async (vars: any) => await setContentAction(vars),
+    onSuccess: (res) => {
+      if (exists) log(`${res.id} Updated`);
+      else {
+        if (!exists && siteData.afterAddScript)
+          iframeRef.current?.contentWindow?.postMessage(
+            {
+              script: replaceWithKeyOnUpdate
+                ? applyConstants(siteData.afterAddScript, constants)
+                : siteData.afterAddScript,
+              data: { siteData, contentDetails: res },
+            },
+            "*",
+          );
+        log(`${res.id} Added`);
+      }
 
-        setTitle(res.title);
-        setExists(true);
-        setOpenModal(false);
-      },
+      setTitle(res.title);
+      setCover(res.cover);
+      setContentUrl(res.contentUrl);
+      setExists(true);
+      setOpenModal(false);
+    },
   });
   const setContentFunc = useCallback(() => {
     const {
@@ -168,36 +182,29 @@ function useLocalContextCore() {
     };
 
     setContentMutation.mutate(newContent);
-  }, [
-    title,
-    tags,
-    cover,
-    extraData,
-    preset,
-    constants,
-    contentUrl,
-    exists,
-    siteData,
-  ]);
+  }, [title, tags, cover, extraData, preset, contentUrl, exists, siteData]);
 
   const removeContentsMutation = useMutation({
-      mutationFn: async (vars: { ids: string[] }) => await removeContentsAction(vars),
-      onSuccess: (res) => {
-        if (siteData.afterRemoveScript) {
-          iframeRef.current?.contentWindow?.postMessage(
-            {
-              script: siteData.afterRemoveScript,
-              data: { siteData, contentDetails: res[0] },
-            },
-            "*",
-          );
-        }
+    mutationFn: async (vars: { ids: string[] }) =>
+      await removeContentsAction(vars),
+    onSuccess: (res) => {
+      if (siteData.afterRemoveScript) {
+        iframeRef.current?.contentWindow?.postMessage(
+          {
+            script: replaceWithKeyOnUpdate
+              ? applyConstants(siteData.afterRemoveScript, constants)
+              : siteData.afterRemoveScript,
+            data: { siteData, contentDetails: res[0] },
+          },
+          "*",
+        );
+      }
 
-        const { title } = GetDetailsFromPage();
-        setExists(false);
-        setTags([]);
-        setTitle(title);
-      },
+      const { title } = GetDetailsFromPage();
+      setExists(false);
+      setTags([]);
+      setTitle(title);
+    },
   });
   const removeContent = useCallback(async () => {
     if (!confirm("Confirm Deletion")) return;

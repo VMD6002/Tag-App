@@ -30,8 +30,12 @@ import {
 } from "../../atoms/filter";
 import type { ContentWebType } from "@tagapp/utils/types";
 import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
-import { tagsAtom } from "../../atoms/tags";
 import { useAtomCallback } from "jotai/utils";
+import {
+  constantsAtom,
+  replaceWithKeyOnUpdateAtom,
+} from "../../atoms/constants";
+import { applyConstants } from "@tagapp/utils";
 
 export const filteredAtom = atom<ContentWebType[]>([]);
 
@@ -39,15 +43,15 @@ function useLibraryContextCore() {
   const contentData = useAtomValue(contentDataAtom);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // 1. Get ONLY the setters/actions (These never trigger re-renders when state changes)
   const initializeFilterDataFromURL = useInitializeFilterDataFromURL();
   const setFiltered = useSetAtom(filteredAtom);
   const setOpenModal = useSetAtom(updateModalOpenAtom);
   const setBulkUpdateModalOpen = useSetAtom(bulkUpdateModalOpenAtom);
   const setTitle = useSetAtom(updateTitleAtom);
 
-  // 2. Read ONLY static/rarely changed configuration data here if absolutely necessary
   const supportedSiteData = useAtomValue(supportedSitesAtom);
+  const replaceWithKeyOnUpdate = useAtomValue(replaceWithKeyOnUpdateAtom);
+  const constants = useAtomValue(constantsAtom);
 
   const getContentAction = useGetContent();
   const getFilteredDataAction = useGetFilteredData();
@@ -55,7 +59,6 @@ function useLibraryContextCore() {
   const removeContentsAction = useRemoveContents();
   const bulkUpdateContentTagsAction = useBulkUpdateContentTags();
 
-  // 3. Setup TanStack Mutations (These references are stable)
   const getContentDetailsMutation = useMutation({
     mutationFn: async (vars: { id: string }) => await getContentAction(vars),
   });
@@ -123,6 +126,20 @@ function useLibraryContextCore() {
       await removeContentsAction(vars),
     onSuccess: (res) => {
       log(`${res.length} contents removed`);
+      for (const content of res) {
+        const siteData = supportedSiteData[content.scraper];
+        if (siteData.afterRemoveScript) {
+          iframeRef.current?.contentWindow?.postMessage(
+            {
+              script: replaceWithKeyOnUpdate
+                ? applyConstants(siteData.afterRemoveScript, constants)
+                : siteData.afterRemoveScript,
+              data: { siteData, contentDetails: res[0] },
+            },
+            "*",
+          );
+        }
+      }
       setFiltered((old) => old.filter((o) => !res.includes(o)));
     },
   });

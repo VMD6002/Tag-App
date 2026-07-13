@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { memo, useMemo, useCallback } from "react"; // Fixed: Added missing imports
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { filteredAtom } from "../Library.Context";
 import {
   selectionEntriesAtom, // Added for atomic selection check
   selectionOnAtom,
@@ -50,10 +49,9 @@ function TagParentChildList({ tags }: { tags: string[] }) {
 const ExtendedCard = memo(
   ({ contentDetails }: { contentDetails: ContentWebType }) => {
     // Grab iframe reference from context
-    const { iframeRef, removeContents } = useLibraryContext();
+    const { removeContents } = useLibraryContext();
 
     const constants = useAtomValue(constantsAtom);
-    const setFiltered = useSetAtom(filteredAtom);
 
     // Modal Setters
     const setUpdateModalOpen = useSetAtom(updateModalOpenAtom);
@@ -120,19 +118,7 @@ const ExtendedCard = memo(
     const removeContent = useCallback(async () => {
       if (!confirm("Confirm Deletion")) return;
       removeContents([contentDetails.id]);
-
-      if (siteData?.afterRemoveScript) {
-        iframeRef.current?.contentWindow?.postMessage(
-          { siteData, contentDetails, action: "remove" },
-          "*",
-        );
-      }
-
-      // Fixed: 'old' is an array of objects, not strings!
-      setFiltered((old: ContentWebType[]) =>
-        old.filter((val) => val.id !== contentDetails.id),
-      );
-    }, [contentDetails, siteData, iframeRef, removeContents, setFiltered]);
+    }, [contentDetails, removeContents]);
 
     return (
       <div

@@ -25,6 +25,11 @@ import type { ContentWebType } from "@tagapp/utils/types";
 import { orpcAtom } from "../../atoms/orpc";
 import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
 import { useAtomCallback } from "jotai/utils";
+import {
+  constantsAtom,
+  replaceWithKeyOnUpdateAtom,
+} from "../../atoms/constants";
+import { applyConstants } from "@tagapp/utils";
 
 export const filteredAtom = atom<ContentWebType[]>([]);
 
@@ -40,8 +45,9 @@ function useRemoteContextCore() {
   const setBulkUpdateModalOpen = useSetAtom(bulkUpdateModalOpenAtom);
   const setTitle = useSetAtom(updateTitleAtom);
 
-  // 2. Read ONLY static/rarely changed configuration data here if absolutely necessary
   const supportedSiteData = useAtomValue(supportedSitesAtom);
+  const replaceWithKeyOnUpdate = useAtomValue(replaceWithKeyOnUpdateAtom);
+  const constants = useAtomValue(constantsAtom);
 
   const getServerTagsMutation = useMutation(
     orpc.main.getServerTags.mutationOptions({
@@ -51,7 +57,6 @@ function useRemoteContextCore() {
     }),
   );
 
-  // 3. Setup TanStack Mutations (These references are stable)
   const getContentDetailsMutation = useMutation(
     orpc.main.getContent.mutationOptions(),
   );
@@ -143,6 +148,20 @@ function useRemoteContextCore() {
     orpc.main.removeContents.mutationOptions({
       onSuccess: (res) => {
         log(`${res.length} contents removed`);
+        for (const content of res) {
+          const siteData = supportedSiteData[content.scraper];
+          if (siteData.afterRemoveScript) {
+            iframeRef.current?.contentWindow?.postMessage(
+              {
+                script: replaceWithKeyOnUpdate
+                  ? applyConstants(siteData.afterRemoveScript, constants)
+                  : siteData.afterRemoveScript,
+                data: { siteData, contentDetails: res[0] },
+              },
+              "*",
+            );
+          }
+        }
         setFiltered((old) => old.filter((o) => !res.includes(o)));
       },
     }),

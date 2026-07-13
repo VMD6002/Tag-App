@@ -18,11 +18,15 @@ import {
   updatePresetOptionsAtom,
   updateDownloadTypeAtom,
 } from "@/components/craft/UpdateModal/atom";
-import { constantsAtom } from "@/entrypoints/main/atoms/constants";
+import {
+  constantsAtom,
+  replaceWithKeyOnUpdateAtom,
+} from "@/entrypoints/main/atoms/constants";
 import { useMutation } from "@tanstack/react-query";
 import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
 import { loadAtom } from "..";
 import { tagsAtom } from "@/entrypoints/main/atoms/tags";
+import { applyConstants } from "@tagapp/utils";
 
 function useRemoteContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -31,6 +35,7 @@ function useRemoteContextCore() {
 
   const orpc = useAtomValue(orpcAtom);
 
+  const replaceWithKeyOnUpdate = useAtomValue(replaceWithKeyOnUpdateAtom);
   const constants = useAtomValue(constantsAtom);
 
   const setLoad = useSetAtom(loadAtom);
@@ -128,7 +133,9 @@ function useRemoteContextCore() {
           if (!exists && siteData.afterAddScript)
             iframeRef.current?.contentWindow?.postMessage(
               {
-                script: siteData.afterAddScript,
+                script: replaceWithKeyOnUpdate
+                  ? applyConstants(siteData.afterAddScript, constants)
+                  : siteData.afterAddScript,
                 data: { siteData, contentDetails: res },
               },
               "*",
@@ -137,6 +144,8 @@ function useRemoteContextCore() {
         }
 
         setTitle(res.title);
+        setCover(res.cover);
+        setContentUrl(res.contentUrl);
         setExists(true);
         setOpenModal(false);
       },
@@ -181,17 +190,7 @@ function useRemoteContextCore() {
     };
 
     setContentMutation.mutate(newContent);
-  }, [
-    title,
-    tags,
-    cover,
-    extraData,
-    preset,
-    constants,
-    contentUrl,
-    exists,
-    siteData,
-  ]);
+  }, [title, tags, cover, extraData, preset, contentUrl, exists, siteData]);
 
   const removeContentsMutation = useMutation(
     orpc.main.removeContents.mutationOptions({
@@ -199,7 +198,9 @@ function useRemoteContextCore() {
         if (siteData.afterRemoveScript) {
           iframeRef.current?.contentWindow?.postMessage(
             {
-              script: siteData.afterRemoveScript,
+              script: replaceWithKeyOnUpdate
+                ? applyConstants(siteData.afterRemoveScript, constants)
+                : siteData.afterRemoveScript,
               data: { siteData, contentDetails: res[0] },
             },
             "*",
