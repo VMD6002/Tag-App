@@ -1,16 +1,16 @@
 import TitleHeader from "@/components/craft/TitleHeader";
 import Filters from "./components/Filters";
-import ServerAffix from "./components/ServerAffix";
 import ExtendedCard from "./components/ExtendedCard";
 import UpdateModal from "@/components/craft/UpdateModal";
 import BulkUpdateModal from "@/components/craft/BulkUpdateModal";
-import { useSetAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { useResetFilter } from "@/entrypoints/main/atoms/filter";
 import {
   filteredAtom,
   RemoteProvider,
   useRemoteContext,
 } from "./Remote.Context";
+import ServerAffix from "@/components/craft/ServerAffix";
 
 function Remote() {
   const { iframeRef, filterData, setContentFunc, bulkUpdateTags } =
@@ -55,7 +55,7 @@ function Remote() {
         ))}
       </div>
 
-      <ServerAffix iframeRef={iframeRef} />
+      <ServerAffix iframeRef={iframeRef} filtered={filtered} />
     </>
   );
 }

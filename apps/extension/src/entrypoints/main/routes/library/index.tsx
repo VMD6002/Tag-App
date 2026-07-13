@@ -1,6 +1,5 @@
 import TitleHeader from "@/components/craft/TitleHeader";
 import Filters from "./components/Filters";
-import ServerAffix from "./components/ServerAffix";
 import ExtendedCard from "./components/ExtendedCard";
 import UpdateModal from "@/components/craft/UpdateModal";
 import BulkUpdateModal from "@/components/craft/BulkUpdateModal";
@@ -11,6 +10,7 @@ import {
   LibraryProvider,
   useLibraryContext,
 } from "./Library.Context";
+import ServerAffix from "@/components/craft/ServerAffix";
 
 function Library() {
   const { iframeRef, filterData, setContentFunc, bulkUpdateTags } =
@@ -55,7 +55,7 @@ function Library() {
         ))}
       </div>
 
-      <ServerAffix iframeRef={iframeRef} />
+      <ServerAffix iframeRef={iframeRef} filtered={filtered} />
     </>
   );
 }

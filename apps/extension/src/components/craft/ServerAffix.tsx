@@ -1,16 +1,17 @@
 import { ServerIcon } from "lucide-react";
 import { useAtomValue } from "jotai";
-import { filteredAtom } from "../Remote.Context";
 import { Button } from "@/components/ui/button";
 import { contentDataOptionalScriptAtom } from "@/entrypoints/main/atoms/settings";
+import type { ContentWebType } from "@tagapp/utils/types";
 
 export default function ServerAffix({
   iframeRef,
+  filtered,
 }: {
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
+  filtered: ContentWebType[];
 }) {
   const contentDataOptionalScript = useAtomValue(contentDataOptionalScriptAtom);
-  const filtered = useAtomValue(filteredAtom);
 
   if (!contentDataOptionalScript) return null;
 
