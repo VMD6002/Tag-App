@@ -1,12 +1,13 @@
 import { useState, useCallback, useRef } from "react";
 import constate from "constate";
 import z from "zod";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { presetSchema } from "@tagapp/utils/types";
 import {
   useAddSupportedHostsToIndex,
   useRefreshSupportedHostsIndex,
   supportedSitesAtom,
+  supportedHostsIndexAtom,
 } from "../../atoms/supportedSites";
 import saveJsonFile from "@/lib/saveJsonFile";
 
@@ -79,7 +80,9 @@ function useSupportedSite() {
   // Jotai atoms
   const [supportedSites, setSupportedSites] = useAtom(supportedSitesAtom);
   const refreshSupportedHostsIndex = useRefreshSupportedHostsIndex();
-  const addSupportedHostsToIndex = useAddSupportedHostsToIndex();
+  const supportedHostsIndex = useAtomValue(supportedHostsIndexAtom);
+  const addSupportedHostsToIndex =
+    useAddSupportedHostsToIndex(supportedHostsIndex);
 
   // File input ref for import
   const fileInputRef = useRef<HTMLInputElement>(null);

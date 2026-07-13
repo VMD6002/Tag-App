@@ -15,17 +15,27 @@ export const supportedHostsIndexAtom = atomWithUserStorage<
   Record<string, string>
 >("supportedHostsIndex", {});
 
-const addSupportedHostsToIndexCallback = (get: Getter, set: Setter, SiteName: string, supportedSitesList: string[]) => {
-  set(supportedHostsIndexAtom, async (old) => {
-    const tmp = { ...(await old) };
-    supportedSitesList.forEach((site) => (tmp[site] = SiteName));
-    return tmp;
-  });
+const addSupportedHostsToIndexCallback = async (
+  get: Getter,
+  set: Setter,
+  siteName: string,
+  supportedSitesList: string[],
+) => {
+  const oldHostsIndex = await get(supportedHostsIndexAtom);
+  supportedSitesList.forEach((site) => (oldHostsIndex[site] = siteName));
+  set(supportedHostsIndexAtom, oldHostsIndex);
 };
 
-export const useAddSupportedHostsToIndex = () => useAtomCallback(useCallback(addSupportedHostsToIndexCallback, []));
+export const useAddSupportedHostsToIndex = (supportedHostsIndex: any) =>
+  useAtomCallback(
+    useCallback(addSupportedHostsToIndexCallback, [supportedHostsIndex]),
+  );
 
-const refreshSupportedHostsIndexCallback = async (get: Getter, set: Setter, supportSSites?: SupportedSitesType) => {
+const refreshSupportedHostsIndexCallback = async (
+  get: Getter,
+  set: Setter,
+  supportSSites?: SupportedSitesType,
+) => {
   const index: Record<string, string> = {};
   if (supportSSites) {
     for (const Site in supportSSites) {
@@ -40,4 +50,5 @@ const refreshSupportedHostsIndexCallback = async (get: Getter, set: Setter, supp
   set(supportedHostsIndexAtom, index);
 };
 
-export const useRefreshSupportedHostsIndex = () => useAtomCallback(useCallback(refreshSupportedHostsIndexCallback, []));
+export const useRefreshSupportedHostsIndex = () =>
+  useAtomCallback(useCallback(refreshSupportedHostsIndexCallback, []));
