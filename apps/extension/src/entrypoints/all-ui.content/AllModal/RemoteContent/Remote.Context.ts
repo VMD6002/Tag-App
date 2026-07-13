@@ -22,9 +22,12 @@ import { constantsAtom } from "@/entrypoints/main/atoms/constants";
 import { useMutation } from "@tanstack/react-query";
 import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
 import { loadAtom } from "..";
+import { tagsAtom } from "@/entrypoints/main/atoms/tags";
 
 function useRemoteContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const setGlobalTags = useSetAtom(tagsAtom);
 
   const orpc = useAtomValue(orpcAtom);
 
@@ -114,6 +117,14 @@ function useRemoteContextCore() {
       onSuccess: (res) => {
         if (exists) log(`${res.id} Updated`);
         else {
+          const { defaultTags } = GetDetailsFromPage();
+          setGlobalTags(async (oldTags) => {
+            const newTags = await oldTags;
+            defaultTags.forEach(
+              (tag) => !newTags[tag] && (newTags[tag] = { Count: 0 }),
+            );
+            return newTags;
+          });
           if (!exists && siteData.afterAddScript)
             iframeRef.current?.contentWindow?.postMessage(
               {
