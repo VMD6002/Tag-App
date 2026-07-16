@@ -5,15 +5,15 @@ import constate from "constate";
 export function useTag() {
   const [open, setOpen] = useState(false);
   const [cover, setCover] = useState("");
-  const [tag, setTag] = useState("");
+  const [currentTag, setCurrentTag] = useState("");
   const [tags, setTags] = useAtom(tagsAtom);
 
   const toggleModal = useCallback(() => setOpen((old) => !old), []);
 
   const openCoverModal = useCallback(
     (tag: string) => {
-      setTag(tag);
-      setCover(tags[tag].CoverUrl ?? "");
+      setCurrentTag(tag);
+      setCover(tags[tag].cover ?? "");
       setOpen(true);
     },
     [tags],
@@ -27,20 +27,20 @@ export function useTag() {
     }
     setTags(async (old) => {
       const temp = await old;
-      temp[tag].CoverUrl = cover;
+      temp[currentTag].cover = cover;
       return temp;
     });
     setOpen(false);
-  }, [tag, cover]);
+  }, [currentTag, cover]);
 
   const removeCover = useCallback(() => {
     setTags(async (old) => {
       const temp = await old;
-      delete temp[tag].CoverUrl;
+      delete temp[currentTag].cover;
       return temp;
     });
     setOpen(false);
-  }, [tag]);
+  }, [currentTag]);
 
   return {
     open,
@@ -49,7 +49,7 @@ export function useTag() {
     removeCover,
     toggleModal,
     setTagCover,
-    openCoverModal
+    openCoverModal,
   };
 }
 

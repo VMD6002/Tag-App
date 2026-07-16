@@ -1,4 +1,4 @@
-type TagType = Record<string, { Count: number; CoverUrl?: string }>;
+type TagType = Record<string, { count: number; cover?: string }>;
 
 interface MultiSelectOption {
   value: string;

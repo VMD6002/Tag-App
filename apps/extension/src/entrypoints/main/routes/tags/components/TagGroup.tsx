@@ -31,12 +31,8 @@ export default function TagGroup({
       <div className="grid gap-y-3 text-sm">
         {Children.map((tag) => (
           <div key={`${parent}-${tag}`} className="break-inside-avoid-column">
-            {tags[tag].CoverUrl ? (
-              <img
-                loading="lazy"
-                className="w-full"
-                src={tags[tag].CoverUrl}
-              />
+            {tags[tag].cover ? (
+              <img loading="lazy" className="w-full" src={tags[tag].cover} />
             ) : (
               <></>
             )}
@@ -45,7 +41,7 @@ export default function TagGroup({
                 <Image />
               </Button>
               <span className="mx-3 w-full">
-                {String(tags[tag].Count).padStart(3, "0")} |{" "}
+                {String(tags[tag].count).padStart(3, "0")} |{" "}
                 {tag.replace(parent + ":", "").replaceAll("_", " ")}
               </span>
               <Button size={"icon"} onClick={() => removeTagFunc(tag)}>

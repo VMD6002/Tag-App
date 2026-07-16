@@ -44,7 +44,7 @@ export default function TagsSection() {
       const temp = await oldTags;
       newTags.map((tag) => {
         if (tag in temp) return;
-        temp[tag] = { Count: 0 };
+        temp[tag] = { count: 0 };
       });
       return { ...temp };
     });

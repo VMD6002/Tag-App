@@ -6,15 +6,15 @@ import { useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
 
 export const tagDefaultData = {
-  "Type:GIF": { Count: 0 },
+  "Type:GIF": { count: 0 },
   "Type:Short_Clip": {
-    Count: 0,
+    count: 0,
   },
   "Tag:Watched": {
-    Count: 0,
+    count: 0,
   },
   "Tag:To-Watch": {
-    Count: 0,
+    count: 0,
   },
 };
 
@@ -92,16 +92,16 @@ const fixTagCountCallback = async (get: Getter, set: Setter) => {
 
   CalculatedTags.forEach((count, tag) => {
     if (tagsData[tag]) {
-      newTagsData[tag] = { ...tagsData[tag], Count: count };
+      newTagsData[tag] = { ...tagsData[tag], count: count };
     } else {
-      newTagsData[tag] = { Count: count };
+      newTagsData[tag] = { count: count };
     }
   });
 
   AllTags.forEach((tag) => {
     if (!CalculatedTags.has(tag)) {
       if (!newTagsData[tag]) {
-        newTagsData[tag] = { ...tagsData[tag], Count: 0 };
+        newTagsData[tag] = { ...tagsData[tag], count: 0 };
       }
     }
   });
