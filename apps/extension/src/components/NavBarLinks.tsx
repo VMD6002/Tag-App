@@ -10,8 +10,17 @@ import {
 import { ModeToggle } from "./mode-toggle";
 import { Link } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { appModeAtom } from "../entrypoints/main/atoms/settings";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { currentUserAtom, userListAtom } from "@/entrypoints/main/atoms/user";
 
 const local = {
   Library: "/",
@@ -30,6 +39,28 @@ const LINKS = {
   remote,
 };
 
+function SelectActiveUser() {
+  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
+  const userList = useAtomValue(userListAtom);
+
+  return (
+    <Select value={currentUser} onValueChange={(val) => setCurrentUser(val)}>
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Select active user" />
+      </SelectTrigger>
+      <SelectContent className="max-w-sm min-w-0">
+        <SelectGroup>
+          {userList.map((user) => (
+            <SelectItem key={`user-select-${user}`} value={user}>
+              {user}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+
 export default function NavBarLinks() {
   const mode = useAtomValue(appModeAtom);
   const currentUrl = useHashLocation()[0];
@@ -38,11 +69,11 @@ export default function NavBarLinks() {
 
   return (
     <NavigationMenu>
-      <NavigationMenuList>
+      <NavigationMenuList className="space-x-2">
         {NameAndPath.map(([name, path]) => (
           <NavigationMenuItem
             key={`Desktop-Nav-Link-${name}`}
-            className={"hidden sm:block"}
+            className={"hidden min-[55rem]:block"}
           >
             <NavigationMenuLink
               asChild
@@ -59,10 +90,7 @@ export default function NavBarLinks() {
             </NavigationMenuLink>
           </NavigationMenuItem>
         ))}
-        <div className={"hidden sm:block"}>
-          <ModeToggle />
-        </div>
-        <NavigationMenuItem className={"w-32 sm:hidden"}>
+        <NavigationMenuItem className={"w-32 min-[55rem]:hidden"}>
           <NavigationMenuTrigger className="ml-11">Menu</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-4">
@@ -85,9 +113,8 @@ export default function NavBarLinks() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <div className={"ml-2 sm:hidden"}>
-          <ModeToggle />
-        </div>
+        <SelectActiveUser />
+        <ModeToggle />
       </NavigationMenuList>
     </NavigationMenu>
   );
