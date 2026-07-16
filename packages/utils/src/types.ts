@@ -1,15 +1,15 @@
 import { z } from "zod";
 
-// ContentDaTA
+// ContentData
 
-export const presetSchema = z.object({
+export const PresetSchema = z.object({
   label: z.string(),
   value: z.string(),
 });
-export type PresetType = z.infer<typeof presetSchema>;
+export type PresetType = z.infer<typeof PresetSchema>;
 export const ContentDownloadSchema = z.object({
   type: z.string(),
-  flags: presetSchema.optional(),
+  flags: PresetSchema.optional(),
 });
 export type ContentDownloadType = z.infer<typeof ContentDownloadSchema>;
 
@@ -46,3 +46,16 @@ export const FilterQuerySchema = z.object({
 });
 
 export type FilterDataType = z.infer<typeof FilterQuerySchema>;
+
+// Tag - ParentTag Types
+
+export const TagSchema = z.object({
+  count: z.number(),
+  cover: z.string().optional(),
+});
+export type TagsType = Record<string, z.infer<typeof TagSchema>>;
+
+export const ParentTagSchema = z.object({
+  cover: z.string().optional(),
+});
+export type ParentTagsType = Record<string, z.infer<typeof ParentTagSchema>>;

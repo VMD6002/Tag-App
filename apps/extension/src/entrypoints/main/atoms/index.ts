@@ -1,10 +1,19 @@
-import { ContentWebBaseType, ContentWebDataType, ContentWebType, FilterDataType } from "@tagapp/utils/types";
+import {
+  ContentWebBaseType,
+  ContentWebDataType,
+  ContentWebType,
+  FilterDataType,
+} from "@tagapp/utils/types";
 import { atomWithUserStorage } from "./user";
 import { Getter, Setter } from "jotai";
 import { constantsAtom, replaceWithKeyOnUpdateAtom } from "./constants";
 import { tagsAtom } from "./tags";
 import { sanitizeTitleAtom } from "./settings";
-import { filterData, replaceWithConstantKey, sanitizeStringForFileName } from "@tagapp/utils";
+import {
+  filterData,
+  replaceWithConstantKey,
+  sanitizeStringForFileName,
+} from "@tagapp/utils";
 import { useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
 
@@ -13,7 +22,11 @@ export const contentDataAtom = atomWithUserStorage<ContentWebDataType>(
   {},
 );
 
-const setContentCallback = async (get: Getter, set: Setter, input: ContentWebBaseType) => {
+const setContentCallback = async (
+  get: Getter,
+  set: Setter,
+  input: ContentWebBaseType,
+) => {
   const santizeTitle = await get(sanitizeTitleAtom);
   const replaceWithKeyOnUpdate = await get(replaceWithKeyOnUpdateAtom);
   const constants = await get(constantsAtom);
@@ -36,8 +49,8 @@ const setContentCallback = async (get: Getter, set: Setter, input: ContentWebBas
   let newContent: ContentWebType;
   if (!oldDetails) {
     input.tags.forEach((tag) => {
-      tagsData[tag] ??= { Count: 0 };
-      tagsData[tag].Count++;
+      tagsData[tag] ??= { count: 0 };
+      tagsData[tag].count++;
     });
     newContent = {
       ...input,
@@ -55,14 +68,14 @@ const setContentCallback = async (get: Getter, set: Setter, input: ContentWebBas
   // Handle Removed Tags
   const deletedTags = oldDetails.tags.filter((a) => !input.tags.includes(a));
   deletedTags.forEach((tag) => {
-    if (tagsData[tag]) tagsData[tag].Count--;
+    if (tagsData[tag]) tagsData[tag].count--;
   });
 
   // Handle Added Tags
   const addedTags = input.tags.filter((a) => !oldDetails.tags.includes(a));
   addedTags.forEach((tag) => {
-    tagsData[tag] ??= { Count: 0 };
-    tagsData[tag].Count++;
+    tagsData[tag] ??= { count: 0 };
+    tagsData[tag].count++;
   });
 
   newContent = {
@@ -80,9 +93,14 @@ const setContentCallback = async (get: Getter, set: Setter, input: ContentWebBas
   return newContent;
 };
 
-export const useSetContent = () => useAtomCallback(useCallback(setContentCallback, []));
+export const useSetContent = () =>
+  useAtomCallback(useCallback(setContentCallback, []));
 
-const removeContentsCallback = async (get: Getter, set: Setter, input: { ids: string[] }) => {
+const removeContentsCallback = async (
+  get: Getter,
+  set: Setter,
+  input: { ids: string[] },
+) => {
   const contentData = structuredClone(await get(contentDataAtom));
   const tagsData = structuredClone(await get(tagsAtom));
 
@@ -93,7 +111,7 @@ const removeContentsCallback = async (get: Getter, set: Setter, input: { ids: st
     if (!contentDetails) return;
     removed.push(contentDetails);
     contentDetails.tags.forEach((tag) => {
-      if (tagsData[tag]) tagsData[tag].Count--;
+      if (tagsData[tag]) tagsData[tag].count--;
     });
     delete contentData[id];
   });
@@ -103,12 +121,13 @@ const removeContentsCallback = async (get: Getter, set: Setter, input: { ids: st
   return removed;
 };
 
-export const useRemoveContents = () => useAtomCallback(useCallback(removeContentsCallback, []));
+export const useRemoveContents = () =>
+  useAtomCallback(useCallback(removeContentsCallback, []));
 
 const bulkUpdateContentTagsCallback = async (
   get: Getter,
   set: Setter,
-  input: { ids: string[]; added: string[]; removed: string[] }
+  input: { ids: string[]; added: string[]; removed: string[] },
 ) => {
   const contentData = structuredClone(await get(contentDataAtom));
   const tagsData = structuredClone(await get(tagsAtom));
@@ -116,19 +135,18 @@ const bulkUpdateContentTagsCallback = async (
   input.ids.forEach((id) => {
     const contentDetails = contentData[id];
 
-    if (!contentDetails)
-      throw new Error(`Content with id ${id} doesn't exist`);
+    if (!contentDetails) throw new Error(`Content with id ${id} doesn't exist`);
 
     input.removed.forEach((tag) => {
-      if (tagsData[tag]) tagsData[tag].Count--;
+      if (tagsData[tag]) tagsData[tag].count--;
     });
     contentDetails.tags = contentDetails.tags.filter(
       (tag) => !input.removed.includes(tag),
     );
 
     input.added.forEach((tag) => {
-      tagsData[tag] ??= { Count: 0 };
-      tagsData[tag].Count++;
+      tagsData[tag] ??= { count: 0 };
+      tagsData[tag].count++;
     });
     contentDetails.tags = [
       ...new Set([...contentDetails.tags, ...input.added]),
@@ -140,18 +158,29 @@ const bulkUpdateContentTagsCallback = async (
   return input;
 };
 
-export const useBulkUpdateContentTags = () => useAtomCallback(useCallback(bulkUpdateContentTagsCallback, []));
+export const useBulkUpdateContentTags = () =>
+  useAtomCallback(useCallback(bulkUpdateContentTagsCallback, []));
 
-const getContentCallback = async (get: Getter, set: Setter, input: { id: string }) => {
+const getContentCallback = async (
+  get: Getter,
+  set: Setter,
+  input: { id: string },
+) => {
   const contentData = await get(contentDataAtom);
   return contentData[input.id];
 };
 
-export const useGetContent = () => useAtomCallback(useCallback(getContentCallback, []));
+export const useGetContent = () =>
+  useAtomCallback(useCallback(getContentCallback, []));
 
-const getFilteredDataCallback = async (get: Getter, set: Setter, input: FilterDataType) => {
+const getFilteredDataCallback = async (
+  get: Getter,
+  set: Setter,
+  input: FilterDataType,
+) => {
   const contentData = await get(contentDataAtom);
   return filterData(input, contentData);
 };
 
-export const useGetFilteredData = () => useAtomCallback(useCallback(getFilteredDataCallback, []));
+export const useGetFilteredData = () =>
+  useAtomCallback(useCallback(getFilteredDataCallback, []));

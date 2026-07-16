@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useSetAtom } from "jotai";
 import z from "zod";
 import { contentDataAtom } from "@/entrypoints/main/atoms";
-import { tagParentsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
+import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
 import { ContentWebSchema } from "@tagapp/utils/types";
 
 const TagTypeSchema = z.record(
@@ -25,7 +25,7 @@ export default function Restore() {
   const [overwrite, setOverwrite] = useState(false);
   const setContentData = useSetAtom(contentDataAtom);
   const setTags = useSetAtom(tagsAtom);
-  const setParentTags = useSetAtom(tagParentsAtom);
+  const setParentTags = useSetAtom(parentTagsAtom);
 
   const restoreAll = useCallback(
     (event: any) => {

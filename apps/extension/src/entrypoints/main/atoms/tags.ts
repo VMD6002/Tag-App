@@ -4,6 +4,7 @@ import { resetFilterCallback, injectFilterDataIntoURLCallback } from "./filter";
 import { atomWithUserStorage } from "./user";
 import { useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
+import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
 
 export const tagDefaultData = {
   "Type:GIF": { count: 0 },
@@ -18,24 +19,21 @@ export const tagDefaultData = {
   },
 };
 
-export const tagsAtom = atomWithUserStorage<TagType>("tags", tagDefaultData);
+export const tagsAtom = atomWithUserStorage<TagsType>("tags", tagDefaultData);
 
-export const tagParentsAtom = atomWithUserStorage<Record<string, string>>(
-  "parents",
-  {
-    Type: "",
-    Tag: "",
-    Site: "",
-  },
-);
+export const parentTagsAtom = atomWithUserStorage<ParentTagsType>("parents", {
+  Type: {},
+  Tag: {},
+  Site: {},
+});
 
 const removeParentCallback = async (
   get: Getter,
   set: Setter,
   parent: string,
 ) => {
-  const tagParents = await get(tagParentsAtom);
-  delete tagParents[parent];
+  const parentTags = await get(parentTagsAtom);
+  delete parentTags[parent];
 
   const tagsData = { ...(await get(tagsAtom)) };
   const deletedTags = new Set<string>();
@@ -48,7 +46,7 @@ const removeParentCallback = async (
   });
 
   set(tagsAtom, tagsData);
-  set(tagParentsAtom, tagParents);
+  set(parentTagsAtom, parentTags);
 };
 
 export const useRemoveParent = () =>
@@ -88,7 +86,7 @@ const fixTagCountCallback = async (get: Getter, set: Setter) => {
     });
   });
 
-  const newTagsData: TagType = {};
+  const newTagsData: TagsType = {};
 
   CalculatedTags.forEach((count, tag) => {
     if (tagsData[tag]) {

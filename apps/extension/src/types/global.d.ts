@@ -1,5 +1,3 @@
-type TagType = Record<string, { count: number; cover?: string }>;
-
 interface MultiSelectOption {
   value: string;
   label: string;

@@ -7,7 +7,7 @@ import MultipleSelector from "@/components/ui/multiple-selector";
 import { useMemo, useCallback } from "react"; // Fixed: Added missing imports
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { tagParentsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
+import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
 import {
   allAtom,
   anyAtom,
@@ -29,7 +29,7 @@ import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
 import { useLibraryContext } from "../Library.Context";
 
 export default function Filters() {
-  const tagParents = useAtomValue(tagParentsAtom);
+  const parentTags = useAtomValue(parentTagsAtom);
   const tags = useAtomValue(tagsAtom);
 
   const { removeContents, filterData } = useLibraryContext();
@@ -110,7 +110,7 @@ export default function Filters() {
   );
 
   const anyAndNoneTagsForMuliSelectComponent = useMemo(() => {
-    const tagParentsConverted = Object.keys(tagParents).map((o: string) => ({
+    const parentTagsConverted = Object.keys(parentTags).map((o: string) => ({
       label: o + ":*",
       value: o + ":*",
     }));
@@ -121,9 +121,9 @@ export default function Filters() {
         label: "*",
         value: "*",
       },
-      ...tagParentsConverted,
+      ...parentTagsConverted,
     ];
-  }, [allTagsForMultiSelectComponent, tagParents]);
+  }, [allTagsForMultiSelectComponent, parentTags]);
 
   // Is selection fully complete? Check atomically.
   const isAllSelected = useAtomValue(

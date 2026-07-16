@@ -35,7 +35,7 @@ export const filteredAtom = atom<ContentWebType[]>([]);
 
 function useRemoteContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [tags, setTags] = useState<Record<string, number>>({});
+  const [tags, setTags] = useState<Record<string, any>>({});
 
   const orpc = useAtomValue(orpcAtom);
 
@@ -52,7 +52,7 @@ function useRemoteContextCore() {
   const getServerTagsMutation = useMutation(
     orpc.main.getServerTags.mutationOptions({
       onSuccess: (res) => {
-        setTags(res);
+        setTags(res.tags);
       },
     }),
   );

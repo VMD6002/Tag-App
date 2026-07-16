@@ -13,7 +13,7 @@ import TagGroup from "./TagGroup";
 import {
   useFixTagCount,
   useRemoveTag,
-  tagParentsAtom,
+  parentTagsAtom,
   tagsAtom,
 } from "@/entrypoints/main/atoms/tags";
 import { useAtom, useAtomValue } from "jotai";
@@ -21,7 +21,7 @@ import { useAtom, useAtomValue } from "jotai";
 export default function TagsSection() {
   const removeTag = useRemoveTag();
   const fixTagCount = useFixTagCount();
-  const tagParents = useAtomValue(tagParentsAtom);
+  const parentTags = useAtomValue(parentTagsAtom);
   const [tags, setTags] = useAtom(tagsAtom);
 
   const [selectedParent, setSelectedParent] = useState("");
@@ -60,7 +60,6 @@ export default function TagsSection() {
   );
 
   const tagsStringArray = Object.keys(tags);
-  const parentTags = Object.keys(tagParents);
 
   return (
     <div className="grid gap-6">
@@ -89,7 +88,7 @@ export default function TagsSection() {
             </SelectTrigger>
             <SelectContent className="data-[side=bottom]:translate-y-0 data-[side=left]:translate-x-0 data-[side=right]:translate-x-0 data-[side=top]:translate-y-0 rounded-t-none max-w-sm min-w-0">
               <SelectGroup>
-                {parentTags.map((parent) => (
+                {Object.keys(parentTags).map((parent) => (
                   <SelectItem key={`Select-${parent}`} value={parent}>
                     {parent}
                   </SelectItem>
