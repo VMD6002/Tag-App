@@ -35,7 +35,7 @@ export default function Filters() {
 
   const allTagsForMultiSelectComponent = useMemo(
     () =>
-      Object.keys(tags).map((o: string) => ({
+      tags.map((o: string) => ({
         label: o,
         value: o,
       })),
@@ -44,7 +44,7 @@ export default function Filters() {
 
   const anyAndNoneTagsForMuliSelectComponent = useMemo(() => {
     const parentTags = Array.from(
-      new Set(Object.keys(tags).map((tag) => tag.split(":")[0])),
+      new Set(tags.map((tag) => tag.split(":")[0])),
     );
     const tagParentsConverted = parentTags.map((o: string) => ({
       label: o + ":*",

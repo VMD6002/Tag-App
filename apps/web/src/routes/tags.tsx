@@ -3,36 +3,42 @@ import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { orpc } from "@/lib/orpc";
-
-type ServerTagType = Record<string, number>;
+import type { TagsType } from "@tagapp/utils/types";
 
 function TagGroup({
   tags,
+  tagsArray,
   parent,
-  taags,
 }: {
-  tags: ServerTagType;
+  tags: TagsType;
+  tagsArray: string[];
   parent: string;
-  taags: string[];
 }) {
   const Children = useMemo(
-    () => taags.filter((k) => k.startsWith(parent)).sort(),
-    [taags, parent],
+    () => tagsArray.filter((k) => k.startsWith(parent)).sort(),
+    [tagsArray, parent],
   );
+
   return (
-    <div key={`Section-${parent}`} className="mb-3">
-      <h2 className="text-xl mb-3 text-foreground">
+    <div key={parent} className="mb-3">
+      <h1 className="text-xl mb-3 text-foreground">
         {parent.replaceAll("_", " ")} ({Children.length})
-      </h2>
-      <div className="grid gap-y-1">
+      </h1>
+      <div className="grid gap-y-3 text-sm">
         {Children.map((tag) => (
-          <span
-            key={tag}
-            className="bg-secondary text-secondary-foreground rounded-md text-sm shadow-xs px-4 py-2"
-          >
-            {String(tags[tag]).padStart(3, "0")} |{" "}
-            {tag.replace(parent + ":", "").replaceAll("_", " ")}
-          </span>
+          <div key={`${parent}-${tag}`} className="break-inside-avoid-column">
+            {tags[tag].cover ? (
+              <img loading="lazy" className="w-full" src={tags[tag].cover} />
+            ) : (
+              <></>
+            )}
+            <div className="bg-secondary flex place-items-center justify-between">
+              <span className="mx-3 w-full">
+                {String(tags[tag].count).padStart(3, "0")} |{" "}
+                {tag.replace(parent + ":", "").replaceAll("_", " ")}
+              </span>
+            </div>
+          </div>
         ))}
       </div>
     </div>
@@ -40,30 +46,22 @@ function TagGroup({
 }
 
 export default function RemoteTags() {
-  const [tags, setTags] = useState<ServerTagType>({});
+  const [tags, setTags] = useState<TagsType>({});
 
-  const GetTagsFromServerMutation = useMutation(
-    orpc.main.getServerTags.mutationOptions({
+  const getTagsMutation = useMutation(
+    orpc.tags.getTagData.mutationOptions({
       onSuccess: (res) => {
-        setTags(res);
+        setTags(res.tags);
       },
     }),
   );
 
-  const FixServerTagsMutation = useMutation(
-    orpc.fix.hardResetTagCount.mutationOptions(),
-  );
-
-  const RemoveUnusedServerTagsMutation = useMutation(
-    orpc.fix.softResetTagCount.mutationOptions({
-      onSuccess: (res) => {
-        setTags(res);
-      },
-    }),
+  const fixTagCountMutation = useMutation(
+    orpc.tags.fixTagCount.mutationOptions(),
   );
 
   useEffect(() => {
-    GetTagsFromServerMutation.mutate({});
+    getTagsMutation.mutate({});
   }, [orpc]);
 
   const taags = useMemo(() => Object.keys(tags), [tags]);
@@ -71,27 +69,24 @@ export default function RemoteTags() {
   return (
     <>
       <TitleHeader Title="Server Tags" />
-      <div className="grid sm:grid-cols-2 max-w-sm mx-auto mb-20 rounded-md overflow-hidden">
-        <Button
-          className="rounded-none"
-          onClick={() => RemoveUnusedServerTagsMutation.mutate({})}
-        >
-          Remove Unused Tags
-        </Button>
-        <Button
-          variant="secondary"
-          className="rounded-none"
-          onClick={() => FixServerTagsMutation.mutate({})}
-        >
-          Fix Count
-        </Button>
-      </div>
+      <Button
+        variant="secondary"
+        className="rounded-none"
+        onClick={() => fixTagCountMutation.mutate({})}
+      >
+        Fix Count
+      </Button>
       <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 mb-10 rounded">
         <h1 className="text-3xl mb-5 text-foreground">Tags ({taags.length})</h1>
         {[...new Set(taags.map((tag) => tag.split(":")[0]))]
           .sort()
           .map((parent: string) => (
-            <TagGroup key={parent} parent={parent} tags={tags} taags={taags} />
+            <TagGroup
+              key={parent}
+              parent={parent}
+              tags={tags}
+              tagsArray={taags}
+            />
           ))}
       </div>
     </>

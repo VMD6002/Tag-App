@@ -9,7 +9,7 @@ import {
 } from "./Remote.Context";
 import { resetFilterAtom } from "@/atom";
 
-function Remote() {
+function Library() {
   const { filterData } = useRemoteContext();
 
   const filtered = useAtomValue(filteredAtom);
@@ -39,10 +39,10 @@ function Remote() {
   );
 }
 
-export default function WrappedRemote() {
+export default function WrappedLibray() {
   return (
     <RemoteProvider>
-      <Remote />
+      <Library />
     </RemoteProvider>
   );
 }

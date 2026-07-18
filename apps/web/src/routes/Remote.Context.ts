@@ -10,7 +10,7 @@ import { useAtomCallback } from "jotai/utils";
 export const filteredAtom = atom<ContentWebType[]>([]);
 
 function useRemoteContextCore() {
-  const [tags, setTags] = useState<Record<string, number>>({});
+  const [tags, setTags] = useState<string[]>([]);
 
   const { data } = useQuery(orpc.main.getSettings.queryOptions());
   const constants = data?.constants || {};
@@ -20,10 +20,13 @@ function useRemoteContextCore() {
   );
   const setFiltered = useSetAtom(filteredAtom);
 
-  const getServerTagsMutation = useMutation(
-    orpc.main.getServerTags.mutationOptions({
+  const getTagsMutation = useMutation(
+    orpc.tags.getTagData.mutationOptions({
       onSuccess: (res) => {
-        setTags(res);
+        const activeTags = Object.entries(res.tags)
+          .filter(([, tagData]) => tagData.count > 0)
+          .map(([key]) => key);
+        setTags(activeTags);
       },
     }),
   );
@@ -32,7 +35,7 @@ function useRemoteContextCore() {
     orpc.main.getFilteredData.mutationOptions({
       onSuccess: (res) => {
         setFiltered(res);
-        getServerTagsMutation.mutate({});
+        getTagsMutation.mutate({});
       },
     }),
   );

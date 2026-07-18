@@ -9,7 +9,7 @@ type props = {
   parent: string;
   removeTagFunc: any;
 };
-``;
+
 export default function TagGroup({ tagsArray, parent, removeTagFunc }: props) {
   const { openCoverModal } = useTagContext();
   const tags = useAtomValue(tagsAtom);
