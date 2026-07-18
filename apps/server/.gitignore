@@ -25,10 +25,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 dist/
-UnSyncable/
-Sync/
 Download/
-webSync/
 WebUI/
-media/
 DB/
+setttings.json
