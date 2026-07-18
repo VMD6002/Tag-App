@@ -10,10 +10,13 @@ export const bulkUpdateModalOpenAtom = atom(false);
 
 export default function BlukUpdateModal({
   bulkUpdateContentFunc,
+  tags,
 }: {
   bulkUpdateContentFunc: () => void;
+  tags?: string[];
 }) {
-  const tags = useAtomValue(tagsAtom);
+  const localTags = useAtomValue(tagsAtom);
+  const tagsArray = tags ?? Object.keys(localTags);
 
   const [modalOpen, setModalOpen] = useAtom(bulkUpdateModalOpenAtom);
 
@@ -33,7 +36,7 @@ export default function BlukUpdateModal({
       <div className="max-w-md absolute w-full grid bg-secondary rounded shadow px-8 py-10">
         <Label className="mb-2">Tags</Label>
         <MultipleSelector
-          options={Object.keys(tags).map((o) => ({
+          options={tagsArray.map((o) => ({
             label: o,
             value: o,
           }))}

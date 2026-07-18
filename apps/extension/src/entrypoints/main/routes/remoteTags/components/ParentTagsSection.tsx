@@ -2,23 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
-import { parentTagsAtom, useRemoveParent } from "@/entrypoints/main/atoms/tags";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
+import { parentTagStringAtom, remoteParentTagsAtom } from "../atom";
+import { useRemoteTagContext } from "../Remote.Tags.Context";
 
 export default function ParentTagsSection() {
-  const [parentString, setParentString] = useState("");
-  const [parentTags, setParentTags] = useAtom(parentTagsAtom);
-  const removeParent = useRemoveParent();
+  const [parentString, setParentString] = useAtom(parentTagStringAtom);
+  const parentTags = useAtomValue(remoteParentTagsAtom);
+  const { addParentTags, removeParentTags } = useRemoteTagContext();
 
   const addParentFunc = useCallback(() => {
-    setParentTags(async (tmp) => {
-      const old = await tmp;
-      for (const tag of parentString.trim().split(/\s+/)) {
-        old[tag] = {};
-      }
-      return { ...old };
-    });
-    setTimeout(() => setParentString(""), 0);
+    addParentTags(parentString.split(" "));
   }, [parentString]);
 
   const removeParentFunc = useCallback(
@@ -29,9 +23,9 @@ export default function ParentTagsSection() {
         )
       )
         return;
-      removeParent(parent);
+      removeParentTags([parent]);
     },
-    [removeParent],
+    [removeParentTags],
   );
 
   const parentTagsArray = Object.keys(parentTags);
@@ -58,16 +52,16 @@ export default function ParentTagsSection() {
       </form>
       <div className="flex w-fit gap-2 flex-wrap mx-auto">
         {parentTagsArray
-          .filter((parent) => parent !== "Site")
+          .filter((parentTag) => parentTag !== "Site")
           .toSorted()
-          .map((parent) => (
+          .map((parentTag) => (
             <Button
               variant={"secondary"}
-              key={`List-item-${parent}`}
+              key={`List-item-${parentTag}`}
               size="sm"
-              onClick={removeParentFunc(parent)}
+              onClick={removeParentFunc(parentTag)}
             >
-              {parent.replaceAll("_", " ")}
+              {parentTag.replaceAll("_", " ")}
               <X />
             </Button>
           ))}

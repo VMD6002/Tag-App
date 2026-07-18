@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import constate from "constate";
 import z from "zod";
 import { useAtom, useAtomValue } from "jotai";
-import { presetSchema } from "@tagapp/utils/types";
+import { PresetSchema } from "@tagapp/utils/types";
 import {
   useAddSupportedHostsToIndex,
   useRefreshSupportedHostsIndex,
@@ -22,8 +22,8 @@ export const SiteDataSchema = z.object({
   matchPatterns: z.array(z.string()).optional(),
   download: z
     .object({
-      presets: z.array(presetSchema),
-      defaultPreset: presetSchema,
+      presets: z.array(PresetSchema),
+      defaultPreset: PresetSchema,
     })
     .optional(),
 });

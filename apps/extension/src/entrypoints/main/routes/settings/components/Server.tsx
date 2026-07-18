@@ -13,11 +13,6 @@ export default function Server() {
     setServerUrlBuffer(serverUrl);
   }, [serverUrl]);
 
-  const appMode = useAtomValue(appModeAtom);
-  if (appMode === "local") {
-    return null;
-  }
-
   return (
     <section className="max-w-xs w-full">
       <div className="grid w-full items-center">

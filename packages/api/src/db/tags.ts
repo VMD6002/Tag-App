@@ -1,30 +1,23 @@
-import errorLog from "../lib/errorLog.js";
+import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
+import errorLog from "../lib/errorLog";
 import { JSONFilePreset } from "lowdb/node";
-import z from "zod";
 
-const tagDBValidator = z.record(z.string(), z.number().min(0));
-type tagDBType = z.infer<typeof tagDBValidator>;
-const tagDB_DefaultData: tagDBType = {};
-const tagDB = await JSONFilePreset<tagDBType>(
-  "./DB/tags.json",
-  tagDB_DefaultData,
-);
+const tagDB_DefaultData = {
+  parentTags: {} as ParentTagsType,
+  tags: {} as TagsType,
+};
+const tagDB = await JSONFilePreset("./DB/tags.json", tagDB_DefaultData);
 
 const DecrementTagCount = (tags: string[] | Set<string>) => {
   try {
     const tagsArray = Array.from(tags);
     tagsArray.forEach((tag) => {
-      if (isNaN(tagDB.data[tag]!)) {
+      if (!tagDB.data.tags[tag]) {
         console.log(`Tag "${tag}" not found. No update performed.`);
         return;
       }
-      const newCount = tagDB.data[tag]! - 1;
-      if (newCount < 1) {
-        delete tagDB.data[tag];
-        console.log(`Decrement: Deleted tag ${tag}`);
-        return;
-      }
-      tagDB.data[tag] = newCount;
+      const newCount = tagDB.data.tags[tag]!.count - 1;
+      tagDB.data.tags[tag]!.count = newCount;
       console.log(`Decrement: New Count = ${newCount}, Tag = ${tag}`);
     });
     tagsArray.length && console.log("All tag decrement operations completed.");
@@ -37,9 +30,14 @@ const IncrementTagCount = (tags: string[] | Set<string>) => {
   try {
     const tagsArray = Array.from(tags);
     tagsArray.forEach((tag) => {
-      const newCount = (tagDB.data[tag] ?? 0) + 1;
-      tagDB.data[tag] = newCount;
-      console.log(`Increment: New Count = ${newCount}, Tag = ${tag}`);
+      const newCount = (tagDB.data.tags[tag]?.count ?? 0) + 1;
+      if (!tagDB.data.tags[tag]) {
+        tagDB.data.tags[tag] = { count: newCount };
+        console.log(`New tag created: ${tag}`);
+      } else {
+        tagDB.data.tags[tag]!.count = newCount;
+        console.log(`Increment: New Count = ${newCount}, Tag = ${tag}`);
+      }
     });
     tagsArray.length && console.log("All tag decrement operations completed.");
   } catch (batchError) {

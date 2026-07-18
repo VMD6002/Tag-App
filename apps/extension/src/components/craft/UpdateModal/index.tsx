@@ -24,11 +24,14 @@ import { cn } from "@/lib/utils";
 export default function UpdateModal({
   className = "",
   updateContentFunc,
+  tags,
 }: {
   updateContentFunc: () => void;
   className?: string;
+  tags?: string[];
 }) {
-  const tags = useAtomValue(tagsAtom);
+  const localTags = useAtomValue(tagsAtom);
+  const tagsArray = tags ?? Object.keys(localTags);
   const { theme } = useTheme();
   const [modalOpen, setModalOpen] = useAtom(updateModalOpenAtom);
   const [title, setTitle] = useAtom(updateTitleAtom);
@@ -90,7 +93,7 @@ export default function UpdateModal({
           )}
         </div>
         <MultipleSelector
-          options={Object.keys(tags).map((o) => ({
+          options={tagsArray.map((o) => ({
             label: o,
             value: o,
           }))}

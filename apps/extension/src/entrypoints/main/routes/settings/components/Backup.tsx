@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useAtomValue } from "jotai";
 import saveJsonFile from "@/lib/saveJsonFile";
 import { contentDataAtom } from "@/entrypoints/main/atoms";
-import { tagsAtom } from "@/entrypoints/main/atoms/tags";
+import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
+import { BackUpType } from "@tagapp/utils/types";
 
 function getLocalDateStringWithTime() {
   const date = new Date();
@@ -18,37 +19,45 @@ function getLocalDateStringWithTime() {
   return `${year} ${month} ${day} ${hour}h ${minute}m ${seconds}s`;
 }
 
+const saveBackUpFile = (data: BackUpType, fileName: string) => {
+  saveJsonFile(data, fileName);
+};
+
 export default function Backup() {
   const contentData = useAtomValue(contentDataAtom);
   const tags = useAtomValue(tagsAtom);
+  const parentTags = useAtomValue(parentTagsAtom);
 
   const handleAll = useCallback(() => {
-    saveJsonFile(
+    saveBackUpFile(
       {
         contentData,
         tags,
+        parentTags,
       },
-      `Tags And ContentData Backup.${getLocalDateStringWithTime()}.json`,
+      `Tags And ContentData Backup.${getLocalDateStringWithTime()}`,
     );
-  }, [contentData, tags]);
+  }, [contentData, tags, parentTags]);
 
   const handleTags = useCallback(() => {
-    saveJsonFile(
+    saveBackUpFile(
       {
         contentData: {},
         tags,
+        parentTags,
       },
-      `Tags Only Backup.${getLocalDateStringWithTime()}.json`,
+      `Tags Only Backup.${getLocalDateStringWithTime()}`,
     );
-  }, [tags]);
+  }, [tags, parentTags]);
 
   const handleContentData = useCallback(() => {
-    saveJsonFile(
+    saveBackUpFile(
       {
         contentData,
         tags: {},
+        parentTags: {},
       },
-      `ContentData Only Backup.${getLocalDateStringWithTime()}.json`,
+      `ContentData Only Backup.${getLocalDateStringWithTime()}`,
     );
   }, [contentData]);
 

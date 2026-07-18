@@ -9,7 +9,7 @@ import RemoteLibrary from "./routes/remote";
 import Supported from "./routes/supported";
 import Settings from "./routes/settings";
 import TagPage from "./routes/tags";
-import RemoteTagPage from "./routes/remote/tags";
+import RemoteTagPage from "./routes/remoteTags";
 import MyQueryProvider from "@/components/MyQueryProvider";
 import { appModeAtom } from "./atoms/settings";
 import { useAtomValue } from "jotai";
@@ -28,16 +28,13 @@ function App() {
                   {appMode === "local" ? <Library /> : <RemoteLibrary />}
                 </Route>
                 <Route path={"/tags"}>
-                  <TagPage />
+                  {appMode === "local" ? <TagPage /> : <RemoteTagPage />}
                 </Route>
                 <Route path={"/supported"}>
                   <Supported />
                 </Route>
                 <Route path={"/settings"}>
                   <Settings />
-                </Route>
-                <Route path={"/remote/tags"}>
-                  <RemoteTagPage />
                 </Route>
                 <Route>
                   <PageNotFound />

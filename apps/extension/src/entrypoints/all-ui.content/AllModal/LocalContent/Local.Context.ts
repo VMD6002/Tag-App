@@ -225,6 +225,7 @@ function useLocalContextCore() {
     checkExistance,
     setContentFunc,
     removeContent,
+    tags: undefined,
   };
 }
 

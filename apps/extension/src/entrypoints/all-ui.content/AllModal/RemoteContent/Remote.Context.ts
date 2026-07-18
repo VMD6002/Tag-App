@@ -25,13 +25,10 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
 import { loadAtom } from "..";
-import { tagsAtom } from "@/entrypoints/main/atoms/tags";
 import { applyConstants } from "@tagapp/utils";
 
 function useRemoteContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  const setGlobalTags = useSetAtom(tagsAtom);
 
   const orpc = useAtomValue(orpcAtom);
 
@@ -58,6 +55,16 @@ function useRemoteContextCore() {
   const [exists, setExists] = useAtom(updateExistsAtom);
 
   const siteData = useMemo(() => GetTagAppSiteData(), []);
+
+  const [remoteTags, setRemoteTags] = useState<string[]>([]);
+  const getTagsMutation = useMutation(
+    orpc.tags.getTagData.mutationOptions({
+      onSuccess: (res) => {
+        console.log("Active Tags", res);
+        setRemoteTags(Object.keys(res.tags));
+      },
+    }),
+  );
 
   const getContentDetailsMutation = useMutation(
     orpc.main.getContent.mutationOptions({
@@ -123,12 +130,8 @@ function useRemoteContextCore() {
         if (exists) log(`${res.id} Updated`);
         else {
           const { defaultTags } = GetDetailsFromPage();
-          setGlobalTags(async (oldTags) => {
-            const newTags = await oldTags;
-            defaultTags.forEach(
-              (tag) => !newTags[tag] && (newTags[tag] = { Count: 0 }),
-            );
-            return newTags;
+          setRemoteTags((oldTags) => {
+            return [...new Set([...oldTags, ...defaultTags])];
           });
           if (!exists && siteData.afterAddScript)
             iframeRef.current?.contentWindow?.postMessage(
@@ -227,12 +230,17 @@ function useRemoteContextCore() {
     setPresetOptions(presetOptions);
   }, [contentData, siteData, orpc]);
 
+  useEffect(() => {
+    getTagsMutation.mutate({});
+  }, [orpc]);
+
   return {
     iframeRef,
     countRef,
     checkExistance,
     setContentFunc,
     removeContent,
+    tags: remoteTags,
   };
 }
 

@@ -88,8 +88,6 @@ function useLibraryContextCore() {
     },
   });
 
-  // 4. Read dynamic/rapidly changing state inside an ATOM on-demand, NOT in React
-  // This is the core trick. The functions read the state at the exact moment they execute.
   const setContentFunc = useAtomCallback(
     useCallback(
       async (get) => {

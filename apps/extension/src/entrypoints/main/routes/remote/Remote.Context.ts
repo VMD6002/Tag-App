@@ -35,7 +35,7 @@ export const filteredAtom = atom<ContentWebType[]>([]);
 
 function useRemoteContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [tags, setTags] = useState<Record<string, any>>({});
+  const [tags, setTags] = useState<string[]>([]);
 
   const orpc = useAtomValue(orpcAtom);
 
@@ -49,10 +49,10 @@ function useRemoteContextCore() {
   const replaceWithKeyOnUpdate = useAtomValue(replaceWithKeyOnUpdateAtom);
   const constants = useAtomValue(constantsAtom);
 
-  const getServerTagsMutation = useMutation(
-    orpc.main.getServerTags.mutationOptions({
+  const getTagsMutation = useMutation(
+    orpc.tags.getTagData.mutationOptions({
       onSuccess: (res) => {
-        setTags(res.tags);
+        setTags(Object.keys(res.tags));
       },
     }),
   );
@@ -64,7 +64,7 @@ function useRemoteContextCore() {
     orpc.main.getFilteredData.mutationOptions({
       onSuccess: (res) => {
         setFiltered(res);
-        getServerTagsMutation.mutate({});
+        getTagsMutation.mutate({});
       },
     }),
   );
@@ -99,20 +99,10 @@ function useRemoteContextCore() {
         setTitle(res.title);
         setFiltered((old) => old.map((o) => (o.id === res.id ? res : o)));
         setOpenModal(false);
-        setTags((old) => {
-          res.tags.forEach((tag) => {
-            if (!old[tag]) {
-              old[tag] = 1;
-            }
-          });
-          return { ...old };
-        });
       },
     }),
   );
 
-  // 4. Read dynamic/rapidly changing state inside an ATOM on-demand, NOT in React
-  // This is the core trick. The functions read the state at the exact moment they execute.
   const setContentFunc = useAtomCallback(
     useCallback(
       async (get, set) => {

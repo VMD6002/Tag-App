@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { X, Image } from "lucide-react";
-import { useTagContext } from "../Tags.Context";
+import { useRemoteTag } from "../Remote.Tags.Context";
 import { useAtomValue } from "jotai";
-import { tagsAtom } from "@/entrypoints/main/atoms/tags";
+import { remoteTagsAtom } from "../atom";
 
 type props = {
   tagsArray: string[];
@@ -11,8 +11,8 @@ type props = {
 };
 ``;
 export default function TagGroup({ tagsArray, parent, removeTagFunc }: props) {
-  const { openCoverModal } = useTagContext();
-  const tags = useAtomValue(tagsAtom);
+  const { openCoverModal } = useRemoteTag();
+  const tags = useAtomValue(remoteTagsAtom);
 
   const Children = useMemo(
     () => tagsArray.filter((k) => k.startsWith(parent)).sort(),

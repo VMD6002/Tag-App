@@ -1,10 +1,12 @@
-import * as fix from "./routers/fix.js";
-import * as main from "./routers/main.js";
-import { settingsDB } from "./db/settings.js";
+import * as tags from "./routers/tags";
+import * as main from "./routers/main";
+import * as restoreAndBackup from "./routers/restoreAndBackup";
+import { settingsDB } from "./db/settings";
 
 export const router = {
-  fix,
+  tags,
   main,
+  restoreAndBackup,
 };
 
 export const settings = settingsDB.data;

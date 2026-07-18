@@ -10,22 +10,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import TagGroup from "./TagGroup";
-import {
-  useFixTagCount,
-  useRemoveTag,
-  parentTagsAtom,
-  tagsAtom,
-} from "@/entrypoints/main/atoms/tags";
 import { useAtom, useAtomValue } from "jotai";
+import { remoteParentTagsAtom, remoteTagsAtom, tagStringAtom } from "../atom";
+import { useRemoteTagContext } from "../Remote.Tags.Context";
 
 export default function TagsSection() {
-  const removeTag = useRemoveTag();
-  const fixTagCount = useFixTagCount();
-  const parentTags = useAtomValue(parentTagsAtom);
-  const [tags, setTags] = useAtom(tagsAtom);
+  const { addTags, removeTags, fixTags } = useRemoteTagContext();
+  const parentTags = useAtomValue(remoteParentTagsAtom);
+  const tags = useAtomValue(remoteTagsAtom);
 
   const [selectedParent, setSelectedParent] = useState("");
-  const [tagString, setTagString] = useState("");
+  const [tagString, setTagString] = useAtom(tagStringAtom);
 
   const addTagFunc = useCallback(() => {
     if (!selectedParent) {
@@ -40,23 +35,16 @@ export default function TagsSection() {
       .split(" ")
       .filter((a) => a)
       .map((a) => `${selectedParent}:${a}`);
-    setTags(async (oldTags) => {
-      const temp = await oldTags;
-      newTags.map((tag) => {
-        if (tag in temp) return;
-        temp[tag] = { count: 0 };
-      });
-      return { ...temp };
-    });
+    addTags(newTags);
     setTagString("");
   }, [tagString, selectedParent]);
 
   const removeTagFunc = useCallback(
     (tag: string) => {
       if (!confirm(`Confirm deletion of tag ${tag}`)) return;
-      removeTag(tag);
+      removeTags([tag]);
     },
-    [removeTag],
+    [removeTags],
   );
 
   const tagsArray = Object.keys(tags);
@@ -68,7 +56,7 @@ export default function TagsSection() {
         <div className="flex justify-between mb-1 items-center">
           <Label>Add Tags</Label>
           <Button
-            onClick={fixTagCount}
+            onClick={fixTags}
             size="sm"
             variant="ghost"
             className="text-xs text-muted-foreground"

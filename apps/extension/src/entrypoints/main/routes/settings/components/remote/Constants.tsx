@@ -59,7 +59,7 @@ const validateConstants = (constants: string) => {
   }
 };
 
-export default function Constants() {
+export default function RemoteConstants() {
   const orpc = useAtomValue(orpcAtom);
   const [constants, setConstants] = useAtom(constantsAtom);
   const [replaceWithKeyOnUpdate, setReplaceWithKeyOnUpdate] = useAtom(
@@ -85,18 +85,18 @@ export default function Constants() {
   const updateConstants = () => {
     const parsed = validateConstants(constantsBuffer);
     if (!parsed) return;
-    setConstants(parsed);
+    setSettingsMutation.mutate({ constants: parsed });
   };
 
   return (
     <section className="max-w-xs w-full">
       <div className="grid w-full mb-3">
-        <Label className="text-lg mb-1">Constants</Label>
+        <Label className="text-lg mb-1">Constants (Remote)</Label>
         <div className="flex gap-2 mb-3">
           <Checkbox
             checked={replaceWithKeyOnUpdate}
             onCheckedChange={(newVal) => {
-              setReplaceWithKeyOnUpdate(newVal as boolean);
+              setSettingsMutation.mutate({ replaceWithKeyOnUpdate: newVal });
             }}
           />
           <Label>Repalce value with key on Update</Label>

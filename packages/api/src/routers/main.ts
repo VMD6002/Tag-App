@@ -1,9 +1,9 @@
 import { ORPCError, os } from "@orpc/server";
 import z from "zod";
 
-import { tagDB } from "../db/tags.js";
-import { contentDataDB } from "../db/contentData.js";
-import { settingsDB } from "../db/settings.js";
+import { DecrementTagCount, IncrementTagCount, tagDB } from "../db/tags";
+import { contentDataDB } from "../db/contentData";
+import { settingsDB } from "../db/settings";
 import {
   ContentWebBaseSchema,
   ContentWebSchema,
@@ -43,10 +43,7 @@ export const setContent = os
 
     let newContent: ContentWebType;
     if (!oldDetails) {
-      input.tags.forEach((tag) => {
-        tagDB.data[tag] ??= 0;
-        tagDB.data[tag]++;
-      });
+      IncrementTagCount(input.tags);
       newContent = {
         ...input,
         title,
@@ -61,18 +58,12 @@ export const setContent = os
     }
 
     // Handle Removed Tags
-    const deletedTags = oldDetails.tags.filter((a) => !input.tags.includes(a));
-    deletedTags.forEach((tag) => {
-      if (tagDB.data[tag]) tagDB.data[tag]--;
-      else delete tagDB.data[tag];
-    });
+    const removedTags = oldDetails.tags.filter((a) => !input.tags.includes(a));
+    DecrementTagCount(removedTags);
 
     // Handle Added Tags
     const addedTags = input.tags.filter((a) => !oldDetails.tags.includes(a));
-    addedTags.forEach((tag) => {
-      tagDB.data[tag] ??= 0;
-      tagDB.data[tag]++;
-    });
+    IncrementTagCount(addedTags);
 
     newContent = {
       ...oldDetails,
@@ -113,18 +104,12 @@ export const bulkUpdateContentTags = os
           message: `Content with id ${id} doesn't exist`,
         });
 
-      input.removed.forEach((tag) => {
-        if (tagDB.data[tag]) tagDB.data[tag]--;
-        else delete tagDB.data[tag];
-      });
+      DecrementTagCount(input.removed);
       contentDetails.tags = contentDetails.tags.filter(
         (tag) => !input.removed.includes(tag),
       );
 
-      input.added.forEach((tag) => {
-        tagDB.data[tag] ??= 0;
-        tagDB.data[tag]++;
-      });
+      IncrementTagCount(input.added);
       contentDetails.tags = [
         ...new Set([...contentDetails.tags, ...input.added]),
       ];
@@ -144,10 +129,7 @@ export const removeContents = os
       const contentDetails = contentDataDB.data[id];
       if (!contentDetails) return;
       removed.push(contentDetails);
-      contentDetails.tags.forEach((tag) => {
-        if (tagDB.data[tag]) tagDB.data[tag]--;
-        else delete tagDB.data[tag];
-      });
+      DecrementTagCount(contentDetails.tags);
       delete contentDataDB.data[id];
     });
 
@@ -155,11 +137,6 @@ export const removeContents = os
     await tagDB.write();
     return removed;
   });
-
-export const getServerTags = os.handler(async () => {
-  const Data = tagDB.data;
-  return Data;
-});
 
 export const getSettings = os.handler(async () => {
   return settingsDB.data;

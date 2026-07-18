@@ -11,7 +11,6 @@ import { ModeToggle } from "./mode-toggle";
 import { Link } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
 import { useAtom, useAtomValue } from "jotai";
-import { appModeAtom } from "../entrypoints/main/atoms/settings";
 import {
   Select,
   SelectContent,
@@ -22,26 +21,18 @@ import {
 } from "./ui/select";
 import { currentUserAtom, userListAtom } from "@/entrypoints/main/atoms/user";
 
-const local = {
+const Links = {
   Library: "/",
   Tags: "/tags",
   Settings: "/settings",
   "Supprted Sites": "/supported",
 };
 
-const remote = {
-  ...local,
-  "Remote Tags": "/remote/tags",
-};
-
-const LINKS = {
-  local,
-  remote,
-};
-
 function SelectActiveUser() {
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
   const userList = useAtomValue(userListAtom);
+
+  if (userList.length <= 1) return null;
 
   return (
     <Select value={currentUser} onValueChange={(val) => setCurrentUser(val)}>
@@ -62,10 +53,9 @@ function SelectActiveUser() {
 }
 
 export default function NavBarLinks() {
-  const mode = useAtomValue(appModeAtom);
   const currentUrl = useHashLocation()[0];
 
-  const NameAndPath = Object.entries(LINKS[mode]);
+  const NameAndPath = Object.entries(Links);
 
   return (
     <NavigationMenu>

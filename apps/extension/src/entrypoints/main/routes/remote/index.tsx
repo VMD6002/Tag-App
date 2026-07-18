@@ -13,7 +13,7 @@ import {
 import ServerAffix from "@/components/craft/ServerAffix";
 
 function Remote() {
-  const { iframeRef, filterData, setContentFunc, bulkUpdateTags } =
+  const { iframeRef, filterData, setContentFunc, bulkUpdateTags, tags } =
     useRemoteContext();
 
   const filtered = useAtomValue(filteredAtom);
@@ -31,8 +31,8 @@ function Remote() {
         sandbox="allow-scripts allow-modals allow-same-origin"
         className="hidden"
       />
-      <UpdateModal updateContentFunc={setContentFunc} />
-      <BulkUpdateModal bulkUpdateContentFunc={bulkUpdateTags} />
+      <UpdateModal updateContentFunc={setContentFunc} tags={tags} />
+      <BulkUpdateModal bulkUpdateContentFunc={bulkUpdateTags} tags={tags} />
 
       <button
         className="w-full text-left hover:cursor-pointer bg-transparent border-none p-0 appearance-none"

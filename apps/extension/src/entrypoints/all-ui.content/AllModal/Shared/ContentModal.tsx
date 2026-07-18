@@ -7,7 +7,7 @@ export default function ContentModal({
 }: {
   useContext: typeof useLocalContext | typeof useRemoteContext;
 }) {
-  const { iframeRef, setContentFunc } = useContext();
+  const { iframeRef, setContentFunc, tags } = useContext();
   return (
     <>
       <iframe
@@ -19,6 +19,7 @@ export default function ContentModal({
       <UpdateModal
         updateContentFunc={setContentFunc}
         className="text-foreground font-sans"
+        tags={tags}
       />
     </>
   );

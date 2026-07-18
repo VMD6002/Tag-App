@@ -59,3 +59,13 @@ export const ParentTagSchema = z.object({
   cover: z.string().optional(),
 });
 export type ParentTagsType = Record<string, z.infer<typeof ParentTagSchema>>;
+
+// Backup - Restore
+
+export const BackUpSchema = z.object({
+  contentData: z.record(z.string(), ContentWebSchema),
+  tags: z.record(z.string(), TagSchema),
+  parentTags: z.record(z.string(), ParentTagSchema),
+});
+
+export type BackUpType = z.infer<typeof BackUpSchema>;

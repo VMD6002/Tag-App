@@ -6,20 +6,7 @@ import { useSetAtom } from "jotai";
 import z from "zod";
 import { contentDataAtom } from "@/entrypoints/main/atoms";
 import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
-import { ContentWebSchema } from "@tagapp/utils/types";
-
-const TagTypeSchema = z.record(
-  z.string(),
-  z.object({
-    Count: z.number(),
-    CoverUrl: z.string().optional(),
-  }),
-);
-
-const BackUpSchema = z.object({
-  contentData: z.record(z.string(), ContentWebSchema),
-  tags: TagTypeSchema,
-});
+import { BackUpSchema } from "@tagapp/utils/types";
 
 export default function Restore() {
   const [overwrite, setOverwrite] = useState(false);
@@ -90,22 +77,12 @@ export default function Restore() {
             return;
           }
           const data = validator.data;
-          const parentTags: Record<string, string> = Object.keys(
-            data.tags,
-          ).reduce(
-            (acc, currentKey) => {
-              const [parent, tag] = currentKey.split(":");
-              acc[parent] = tag;
-              return acc;
-            },
-            {} as Record<string, string>,
-          );
           if (overwrite) {
             setTags(data.tags);
-            setParentTags(parentTags);
+            setParentTags(data.parentTags);
           } else {
             setTags((old) => ({ ...old, ...data.tags }));
-            setParentTags((old) => ({ ...old, ...parentTags }));
+            setParentTags((old) => ({ ...old, ...data.parentTags }));
           }
           alert(
             `Successfully restored Tags by ${
