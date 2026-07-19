@@ -7,6 +7,11 @@ export const themeAtom = atomWithUserStorage<"dark" | "light" | "system">(
 
 export const serverUrlAtom = atomWithUserStorage<string>("serverUrl", "");
 
+export const filteredDataPostServerUrlAtom = atomWithUserStorage<string>(
+  "filteredDataPostServerUrl",
+  "",
+);
+
 type AppModeType = "local" | "remote";
 
 export const appModeAtom = atomWithUserStorage<AppModeType>("appMode", "local");
@@ -17,8 +22,3 @@ export const sanitizeTitleAtom = atomWithUserStorage<boolean>(
 );
 
 export const hostNamesAtom = atomWithUserStorage<string[]>("hostNames", []);
-
-export const contentDataOptionalScriptAtom = atomWithUserStorage<string>(
-  "contentDataOptionalScript",
-  "",
-);

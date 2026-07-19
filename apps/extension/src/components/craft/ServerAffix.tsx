@@ -1,39 +1,40 @@
 import { ServerIcon } from "lucide-react";
 import { useAtomValue } from "jotai";
 import { Button } from "@/components/ui/button";
-import { contentDataOptionalScriptAtom } from "@/entrypoints/main/atoms/settings";
+import { filteredDataPostServerUrlAtom } from "@/entrypoints/main/atoms/settings";
 import type { ContentWebType } from "@tagapp/utils/types";
-import {
-  constantsAtom,
-  replaceWithKeyOnUpdateAtom,
-} from "@/entrypoints/main/atoms/constants";
-import { applyConstants } from "@tagapp/utils";
+import { useMutation } from "@tanstack/react-query";
 
 export default function ServerAffix({
-  iframeRef,
   filtered,
 }: {
-  iframeRef: React.RefObject<HTMLIFrameElement | null>;
   filtered: ContentWebType[];
 }) {
-  const contentDataOptionalScript = useAtomValue(contentDataOptionalScriptAtom);
+  const filteredDataPostUrl = useAtomValue(filteredDataPostServerUrlAtom);
 
-  const replaceWithKeyOnUpdate = useAtomValue(replaceWithKeyOnUpdateAtom);
-  const constants = useAtomValue(constantsAtom);
-
-  if (!contentDataOptionalScript) return null;
+  const postMuation = useMutation({
+    mutationFn: (filtered: ContentWebType[]) => {
+      return fetch(filteredDataPostUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(filtered),
+      });
+    },
+    onSuccess: () => {
+      alert("Filtered data posted successfully");
+    },
+    onError: () => {
+      alert("Error posting filtered data");
+    },
+  });
 
   const onClick = () => {
-    iframeRef.current?.contentWindow?.postMessage(
-      {
-        script: replaceWithKeyOnUpdate
-          ? applyConstants(contentDataOptionalScript, constants)
-          : contentDataOptionalScript,
-        data: filtered,
-      },
-      "*",
-    );
+    postMuation.mutate(filtered);
   };
+
+  if (!filteredDataPostUrl) return null;
 
   return (
     <Button

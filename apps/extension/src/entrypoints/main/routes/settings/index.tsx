@@ -6,12 +6,12 @@ import Users from "./components/Users";
 import AppMode from "./components/AppMode";
 import Constants from "./components/Constants";
 import Hostnames from "./components/Hostnames";
-import ContentDataScript from "./components/ContentDataScript";
 import { useAtomValue } from "jotai";
 import { appModeAtom } from "../../atoms/settings";
 import RemoteConstants from "./components/remote/Constants";
 import RemoteRestore from "./components/remote/Restore";
 import RemoteBackup from "./components/remote/Backup";
+import FilteredDataPost from "./components/FilteredDataPost";
 
 export default function Settings() {
   const appMode = useAtomValue(appModeAtom);
@@ -22,7 +22,7 @@ export default function Settings() {
         <Users />
         <AppMode />
         <Hostnames />
-        <ContentDataScript />
+        <FilteredDataPost />
         {appMode === "local" ? (
           <>
             <Constants />
