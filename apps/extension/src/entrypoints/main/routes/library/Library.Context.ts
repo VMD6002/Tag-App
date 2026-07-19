@@ -138,7 +138,10 @@ function useLibraryContextCore() {
           );
         }
       }
-      setFiltered((old) => old.filter((o) => !res.includes(o)));
+      setFiltered((old) => {
+        const excludedIds = new Set(res.map((o) => o.id));
+        return old.filter((o) => !excludedIds.has(o.id));
+      });
     },
   });
   // Inside your component or custom hook
