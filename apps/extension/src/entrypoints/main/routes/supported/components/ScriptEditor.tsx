@@ -49,7 +49,7 @@ export default function ScriptEditor() {
 
   if (!siteDataEditorOpen) {
     return (
-      <div className="flex flex-col items-center justify-center border border-dashed border-border rounded-lg bg-card/50 p-12 text-center min-h-[450px]">
+      <div className="flex flex-col items-center justify-center border border-dashed border-border rounded-lg bg-card/50 p-12 text-center min-h-112.5">
         <div className="p-4 bg-muted rounded-full mb-4 text-muted-foreground border border-border">
           <FileCode className="size-8" />
         </div>
@@ -200,7 +200,7 @@ export default function ScriptEditor() {
                 Runs in context of target pages
               </span>
             </div>
-            <div className="border border-border rounded-md overflow-hidden bg-background h-[550px] overflow-y-auto">
+            <div className="border border-border rounded-md overflow-hidden bg-background h-137.5 overflow-y-auto">
               <CodeEditor
                 value={siteScript}
                 language="js"
@@ -226,7 +226,7 @@ export default function ScriptEditor() {
                 Contains site name, hosts, presets
               </span>
             </div>
-            <div className="border border-border rounded-md overflow-hidden bg-background h-[550px] overflow-y-auto">
+            <div className="border border-border rounded-md overflow-hidden bg-background h-137.5 overflow-y-auto">
               <CodeEditor
                 value={siteData}
                 language="json"
@@ -252,7 +252,7 @@ export default function ScriptEditor() {
                 Runs after adding a tag
               </span>
             </div>
-            <div className="border border-border rounded-md overflow-hidden bg-background h-[550px] overflow-y-auto">
+            <div className="border border-border rounded-md overflow-hidden bg-background h-137.5 overflow-y-auto">
               <CodeEditor
                 value={afterAddScript}
                 language="js"
@@ -278,7 +278,7 @@ export default function ScriptEditor() {
                 Runs after removing a tag
               </span>
             </div>
-            <div className="border border-border rounded-md overflow-hidden bg-background h-[550px] overflow-y-auto">
+            <div className="border border-border rounded-md overflow-hidden bg-background h-137.5 overflow-y-auto">
               <CodeEditor
                 value={afterRemoveScript}
                 language="js"
