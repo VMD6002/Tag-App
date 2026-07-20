@@ -30,6 +30,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { loadAtom } from "..";
 import { applyConstants } from "@tagapp/utils";
+import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
 
 function useLocalContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -60,6 +61,23 @@ function useLocalContextCore() {
   const [exists, setExists] = useAtom(updateExistsAtom);
 
   const siteData = useMemo(() => GetTagAppSiteData(), []);
+
+  const afterAddRemoveScript = useAtomValue(enableAfterAddRemoveScriptsAtom);
+  const runScript = useCallback(
+    (script: string, data: any) => {
+      if (!afterAddRemoveScript) return;
+      iframeRef.current?.contentWindow?.postMessage(
+        {
+          script: replaceWithKeyOnUpdate
+            ? applyConstants(script, constants)
+            : script,
+          data,
+        },
+        "*",
+      );
+    },
+    [replaceWithKeyOnUpdate, constants, afterAddRemoveScript],
+  );
 
   const getContentDetailsMutation = useMutation({
     mutationFn: async (vars: { id: string }) => await getContentAction(vars),
@@ -124,15 +142,7 @@ function useLocalContextCore() {
       if (exists) log(`${res.id} Updated`);
       else {
         if (!exists && siteData.afterAddScript)
-          iframeRef.current?.contentWindow?.postMessage(
-            {
-              script: replaceWithKeyOnUpdate
-                ? applyConstants(siteData.afterAddScript, constants)
-                : siteData.afterAddScript,
-              data: { siteData, contentDetails: res },
-            },
-            "*",
-          );
+          runScript(siteData.afterAddScript, { siteData, contentDetails: res });
         log(`${res.id} Added`);
       }
 
@@ -188,17 +198,11 @@ function useLocalContextCore() {
     mutationFn: async (vars: { ids: string[] }) =>
       await removeContentsAction(vars),
     onSuccess: (res) => {
-      if (siteData.afterRemoveScript) {
-        iframeRef.current?.contentWindow?.postMessage(
-          {
-            script: replaceWithKeyOnUpdate
-              ? applyConstants(siteData.afterRemoveScript, constants)
-              : siteData.afterRemoveScript,
-            data: { siteData, contentDetails: res[0] },
-          },
-          "*",
-        );
-      }
+      if (siteData.afterRemoveScript)
+        runScript(siteData.afterRemoveScript, {
+          siteData,
+          contentDetails: res[0],
+        });
 
       const { title } = GetDetailsFromPage();
       setExists(false);

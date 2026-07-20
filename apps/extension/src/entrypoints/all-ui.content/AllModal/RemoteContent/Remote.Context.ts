@@ -26,6 +26,10 @@ import { useMutation } from "@tanstack/react-query";
 import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
 import { loadAtom } from "..";
 import { applyConstants } from "@tagapp/utils";
+import {
+  enableAfterAddRemoveScriptsAtom,
+  runAfterAddRemoveScriptsInServerAtom,
+} from "@/entrypoints/main/atoms/supportedSites";
 
 function useRemoteContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -64,6 +68,40 @@ function useRemoteContextCore() {
         setRemoteTags(Object.keys(res.tags));
       },
     }),
+  );
+  const runUserCodeMutation = useMutation(
+    orpc.main.runUserCode.mutationOptions({
+      onSuccess: (res) => {
+        log("User After Scripts Executed");
+      },
+    }),
+  );
+
+  const afterAddRemoveScript = useAtomValue(enableAfterAddRemoveScriptsAtom);
+  const runAfterAddRemoveScriptsInServer = useAtomValue(
+    runAfterAddRemoveScriptsInServerAtom,
+  );
+  const runScript = useCallback(
+    (script: string, data: any) => {
+      if (!afterAddRemoveScript) return;
+      const input = {
+        script: replaceWithKeyOnUpdate
+          ? applyConstants(script, constants)
+          : script,
+        data,
+      };
+      if (runAfterAddRemoveScriptsInServer) {
+        runUserCodeMutation.mutate(input);
+        return;
+      }
+      iframeRef.current?.contentWindow?.postMessage(input, "*");
+    },
+    [
+      replaceWithKeyOnUpdate,
+      constants,
+      afterAddRemoveScript,
+      runAfterAddRemoveScriptsInServer,
+    ],
   );
 
   const getContentDetailsMutation = useMutation(
@@ -134,15 +172,10 @@ function useRemoteContextCore() {
             return [...new Set([...oldTags, ...defaultTags])];
           });
           if (!exists && siteData.afterAddScript)
-            iframeRef.current?.contentWindow?.postMessage(
-              {
-                script: replaceWithKeyOnUpdate
-                  ? applyConstants(siteData.afterAddScript, constants)
-                  : siteData.afterAddScript,
-                data: { siteData, contentDetails: res },
-              },
-              "*",
-            );
+            runScript(siteData.afterAddScript, {
+              siteData,
+              contentDetails: res,
+            });
           log(`${res.id} Added`);
         }
 
@@ -198,17 +231,11 @@ function useRemoteContextCore() {
   const removeContentsMutation = useMutation(
     orpc.main.removeContents.mutationOptions({
       onSuccess: (res) => {
-        if (siteData.afterRemoveScript) {
-          iframeRef.current?.contentWindow?.postMessage(
-            {
-              script: replaceWithKeyOnUpdate
-                ? applyConstants(siteData.afterRemoveScript, constants)
-                : siteData.afterRemoveScript,
-              data: { siteData, contentDetails: res[0] },
-            },
-            "*",
-          );
-        }
+        if (siteData.afterRemoveScript)
+          runScript(siteData.afterRemoveScript, {
+            siteData,
+            contentDetails: res[0],
+          });
 
         const { title } = GetDetailsFromPage();
         setExists(false);

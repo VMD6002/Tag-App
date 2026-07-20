@@ -1,20 +1,51 @@
 import { useState } from "react";
-import { Save, Trash2, X, FileCode, Settings, Plus, Download } from "lucide-react";
+import {
+  Save,
+  Trash2,
+  X,
+  FileCode,
+  Settings,
+  Plus,
+  Download,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import { cn } from "@/lib/utils";
-import { useEditorState, useSiteActions, useSupportedSites, useImportExportActions } from "../SupportedSite.Context";
-
+import {
+  useEditorState,
+  useSiteActions,
+  useSupportedSites,
+  useImportExportActions,
+} from "../SupportedSite.Context";
+import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
+import { useAtomValue } from "jotai";
 
 export default function ScriptEditor() {
   const { theme } = useTheme();
-  const [activeTab, setActiveTab] = useState<"script" | "metadata" | "afterAdd" | "afterRemove">("script");
+  const [activeTab, setActiveTab] = useState<
+    "script" | "metadata" | "afterAdd" | "afterRemove"
+  >("script");
 
   const supportedSites = useSupportedSites();
-  const { siteDataEditorOpen, siteData, setSiteData, siteScript, setSiteScript, afterAddScript, setAfterAddScript, afterRemoveScript, setAfterRemoveScript, editingSiteName } = useEditorState();
+  const {
+    siteDataEditorOpen,
+    siteData,
+    setSiteData,
+    siteScript,
+    setSiteScript,
+    afterAddScript,
+    setAfterAddScript,
+    afterRemoveScript,
+    setAfterRemoveScript,
+    editingSiteName,
+  } = useEditorState();
   const { addSite, saveScript, removeSite, closeEditor } = useSiteActions();
   const { handleFileClick } = useImportExportActions();
+
+  const enableAfterAddRemoveScripts = useAtomValue(
+    enableAfterAddRemoveScriptsAtom,
+  );
 
   if (!siteDataEditorOpen) {
     return (
@@ -24,15 +55,22 @@ export default function ScriptEditor() {
         </div>
         <h3 className="text-lg font-semibold mb-1">No Script Selected</h3>
         <p className="text-sm text-muted-foreground max-w-sm mb-6">
-          Select an existing userscript from the sidebar to view/edit it, or create a brand new one to customize tag
-          download selectors.
+          Select an existing userscript from the sidebar to view/edit it, or
+          create a brand new one to customize tag download selectors.
         </p>
         <div className="flex items-center gap-3">
-          <Button onClick={addSite} className="gap-1.5 shadow-xs cursor-pointer">
+          <Button
+            onClick={addSite}
+            className="gap-1.5 shadow-xs cursor-pointer"
+          >
             <Plus className="size-4" />
             <span>New Userscript</span>
           </Button>
-          <Button variant="outline" onClick={handleFileClick} className="gap-1.5 cursor-pointer">
+          <Button
+            variant="outline"
+            onClick={handleFileClick}
+            className="gap-1.5 cursor-pointer"
+          >
             <Download className="size-4" />
             <span>Import JSON</span>
           </Button>
@@ -51,7 +89,9 @@ export default function ScriptEditor() {
           </div>
           <div>
             <h2 className="font-semibold text-sm leading-none">
-              {editingSiteName ? `Editing: ${editingSiteName}` : "New Userscript"}
+              {editingSiteName
+                ? `Editing: ${editingSiteName}`
+                : "New Userscript"}
             </h2>
             {editingSiteName && (
               <span className="text-[10px] text-muted-foreground font-mono mt-1 block">
@@ -80,7 +120,13 @@ export default function ScriptEditor() {
               <span>Delete</span>
             </Button>
           )}
-          <Button variant="ghost" size="icon" onClick={closeEditor} title="Close Editor" className="size-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={closeEditor}
+            title="Close Editor"
+            className="size-8"
+          >
             <X className="size-4" />
           </Button>
         </div>
@@ -112,30 +158,34 @@ export default function ScriptEditor() {
           <Settings className="size-3.5" />
           Site Metadata (JSON)
         </button>
-        <button
-          onClick={() => setActiveTab("afterAdd")}
-          className={cn(
-            "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",
-            activeTab === "afterAdd"
-              ? "border-primary text-foreground"
-              : "border-transparent text-muted-foreground hover:text-foreground",
-          )}
-        >
-          <Plus className="size-3.5" />
-          After Add
-        </button>
-        <button
-          onClick={() => setActiveTab("afterRemove")}
-          className={cn(
-            "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",
-            activeTab === "afterRemove"
-              ? "border-primary text-foreground"
-              : "border-transparent text-muted-foreground hover:text-foreground",
-          )}
-        >
-          <Trash2 className="size-3.5" />
-          After Remove
-        </button>
+        {enableAfterAddRemoveScripts && (
+          <>
+            <button
+              onClick={() => setActiveTab("afterAdd")}
+              className={cn(
+                "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",
+                activeTab === "afterAdd"
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <Plus className="size-3.5" />
+              After Add
+            </button>
+            <button
+              onClick={() => setActiveTab("afterRemove")}
+              className={cn(
+                "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",
+                activeTab === "afterRemove"
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <Trash2 className="size-3.5" />
+              After Remove
+            </button>
+          </>
+        )}
       </div>
 
       {/* Editor Body */}
@@ -143,8 +193,12 @@ export default function ScriptEditor() {
         {activeTab === "script" ? (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold text-muted-foreground">JavaScript Userscript Body</Label>
-              <span className="text-[10px] text-muted-foreground font-mono">Runs in context of target pages</span>
+              <Label className="text-xs font-semibold text-muted-foreground">
+                JavaScript Userscript Body
+              </Label>
+              <span className="text-[10px] text-muted-foreground font-mono">
+                Runs in context of target pages
+              </span>
             </div>
             <div className="border border-border rounded-md overflow-hidden bg-background h-[550px] overflow-y-auto">
               <CodeEditor
@@ -154,7 +208,10 @@ export default function ScriptEditor() {
                 onChange={(evn) => setSiteScript(evn.target.value)}
                 padding={15}
                 className="text-sm! min-h-full"
-                style={{ fontFamily: "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace" }}
+                style={{
+                  fontFamily:
+                    "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
+                }}
                 data-color-mode={theme === "light" ? "light" : "dark"}
               />
             </div>
@@ -162,8 +219,12 @@ export default function ScriptEditor() {
         ) : activeTab === "metadata" ? (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold text-muted-foreground">JSON Metadata Configuration</Label>
-              <span className="text-[10px] text-muted-foreground font-mono">Contains site name, hosts, presets</span>
+              <Label className="text-xs font-semibold text-muted-foreground">
+                JSON Metadata Configuration
+              </Label>
+              <span className="text-[10px] text-muted-foreground font-mono">
+                Contains site name, hosts, presets
+              </span>
             </div>
             <div className="border border-border rounded-md overflow-hidden bg-background h-[550px] overflow-y-auto">
               <CodeEditor
@@ -173,7 +234,10 @@ export default function ScriptEditor() {
                 onChange={(evn) => setSiteData(evn.target.value)}
                 padding={15}
                 className="text-sm! min-h-full"
-                style={{ fontFamily: "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace" }}
+                style={{
+                  fontFamily:
+                    "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
+                }}
                 data-color-mode={theme === "light" ? "light" : "dark"}
               />
             </div>
@@ -181,8 +245,12 @@ export default function ScriptEditor() {
         ) : activeTab === "afterAdd" ? (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold text-muted-foreground">After Add</Label>
-              <span className="text-[10px] text-muted-foreground font-mono">Runs after adding a tag</span>
+              <Label className="text-xs font-semibold text-muted-foreground">
+                After Add
+              </Label>
+              <span className="text-[10px] text-muted-foreground font-mono">
+                Runs after adding a tag
+              </span>
             </div>
             <div className="border border-border rounded-md overflow-hidden bg-background h-[550px] overflow-y-auto">
               <CodeEditor
@@ -192,7 +260,10 @@ export default function ScriptEditor() {
                 onChange={(evn) => setAfterAddScript(evn.target.value)}
                 padding={15}
                 className="text-sm! min-h-full"
-                style={{ fontFamily: "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace" }}
+                style={{
+                  fontFamily:
+                    "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
+                }}
                 data-color-mode={theme === "light" ? "light" : "dark"}
               />
             </div>
@@ -200,8 +271,12 @@ export default function ScriptEditor() {
         ) : (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold text-muted-foreground">After Remove</Label>
-              <span className="text-[10px] text-muted-foreground font-mono">Runs after removing a tag</span>
+              <Label className="text-xs font-semibold text-muted-foreground">
+                After Remove
+              </Label>
+              <span className="text-[10px] text-muted-foreground font-mono">
+                Runs after removing a tag
+              </span>
             </div>
             <div className="border border-border rounded-md overflow-hidden bg-background h-[550px] overflow-y-auto">
               <CodeEditor
@@ -211,7 +286,10 @@ export default function ScriptEditor() {
                 onChange={(evn) => setAfterRemoveScript(evn.target.value)}
                 padding={15}
                 className="text-sm! min-h-full"
-                style={{ fontFamily: "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace" }}
+                style={{
+                  fontFamily:
+                    "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
+                }}
                 data-color-mode={theme === "light" ? "light" : "dark"}
               />
             </div>

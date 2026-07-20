@@ -13,24 +13,32 @@ import {
 import ServerAffix from "@/components/craft/ServerAffix";
 
 function Remote() {
-  const { iframeRef, filterData, setContentFunc, bulkUpdateTags, tags } =
-    useRemoteContext();
+  const {
+    iframeRef,
+    afterAddRemoveScript,
+    filterData,
+    setContentFunc,
+    bulkUpdateTags,
+    tags,
+  } = useRemoteContext();
 
   const filtered = useAtomValue(filteredAtom);
   const reset = useResetFilter();
 
   return (
     <>
-      <iframe
-        ref={iframeRef}
-        src={
-          typeof browser !== "undefined"
-            ? browser.runtime.getURL("/sandbox.html")
-            : "/sandbox.html"
-        }
-        sandbox="allow-scripts allow-modals allow-same-origin"
-        className="hidden"
-      />
+      {afterAddRemoveScript && (
+        <iframe
+          ref={iframeRef}
+          src={
+            typeof browser !== "undefined"
+              ? browser.runtime.getURL("/sandbox.html")
+              : "/sandbox.html"
+          }
+          sandbox="allow-scripts allow-modals allow-same-origin"
+          className="hidden"
+        />
+      )}
       <UpdateModal updateContentFunc={setContentFunc} tags={tags} />
       <BulkUpdateModal bulkUpdateContentFunc={bulkUpdateTags} tags={tags} />
 
@@ -55,7 +63,7 @@ function Remote() {
         ))}
       </div>
 
-      <ServerAffix iframeRef={iframeRef} filtered={filtered} />
+      <ServerAffix filtered={filtered} />
     </>
   );
 }

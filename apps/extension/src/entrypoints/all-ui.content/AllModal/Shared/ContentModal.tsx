@@ -1,6 +1,8 @@
 import { useRemoteContext } from "../RemoteContent/Remote.Context";
 import { useLocalContext } from "../LocalContent/Local.Context";
 import UpdateModal from "@/components/craft/UpdateModal";
+import { useAtomValue } from "jotai";
+import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
 
 export default function ContentModal({
   useContext,
@@ -8,14 +10,17 @@ export default function ContentModal({
   useContext: typeof useLocalContext | typeof useRemoteContext;
 }) {
   const { iframeRef, setContentFunc, tags } = useContext();
+  const afterAddRemoveScript = useAtomValue(enableAfterAddRemoveScriptsAtom);
   return (
     <>
-      <iframe
-        ref={iframeRef}
-        src={browser.runtime.getURL("/sandbox.html")}
-        sandbox="allow-scripts allow-modals allow-same-origin"
-        className="hidden"
-      />
+      {afterAddRemoveScript && (
+        <iframe
+          ref={iframeRef}
+          src={browser.runtime.getURL("/sandbox.html")}
+          sandbox="allow-scripts allow-modals allow-same-origin"
+          className="hidden"
+        />
+      )}
       <UpdateModal
         updateContentFunc={setContentFunc}
         className="text-foreground font-sans"

@@ -12,6 +12,8 @@ import RemoteConstants from "./components/remote/Constants";
 import RemoteRestore from "./components/remote/Restore";
 import RemoteBackup from "./components/remote/Backup";
 import FilteredDataPost from "./components/FilteredDataPost";
+import SiteScripts from "./components/SiteScripts";
+import RemoteSiteScripts from "./components/remote/SiteScripts";
 
 export default function Settings() {
   const appMode = useAtomValue(appModeAtom);
@@ -28,6 +30,7 @@ export default function Settings() {
             <Constants />
             <Restore />
             <Backup />
+            <SiteScripts />
           </>
         ) : (
           <>
@@ -35,6 +38,7 @@ export default function Settings() {
             <RemoteConstants />
             <RemoteRestore />
             <RemoteBackup />
+            <RemoteSiteScripts />
           </>
         )}
       </div>

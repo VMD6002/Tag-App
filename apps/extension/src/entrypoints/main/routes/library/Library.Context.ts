@@ -18,7 +18,10 @@ import {
   contentDataAtom,
 } from "@/entrypoints/main/atoms";
 import { useMutation } from "@tanstack/react-query";
-import { supportedSitesAtom } from "../../atoms/supportedSites";
+import {
+  enableAfterAddRemoveScriptsAtom,
+  supportedSitesAtom,
+} from "../../atoms/supportedSites";
 import {
   selectionEntriesAtom,
   selectionTagsAtom,
@@ -58,6 +61,23 @@ function useLibraryContextCore() {
   const setContentAction = useSetContent();
   const removeContentsAction = useRemoveContents();
   const bulkUpdateContentTagsAction = useBulkUpdateContentTags();
+
+  const afterAddRemoveScript = useAtomValue(enableAfterAddRemoveScriptsAtom);
+  const runScript = useCallback(
+    (script: string, data: any) => {
+      if (!afterAddRemoveScript) return;
+      iframeRef.current?.contentWindow?.postMessage(
+        {
+          script: replaceWithKeyOnUpdate
+            ? applyConstants(script, constants)
+            : script,
+          data,
+        },
+        "*",
+      );
+    },
+    [replaceWithKeyOnUpdate, constants, afterAddRemoveScript],
+  );
 
   const getContentDetailsMutation = useMutation({
     mutationFn: async (vars: { id: string }) => await getContentAction(vars),
@@ -126,17 +146,11 @@ function useLibraryContextCore() {
       log(`${res.length} contents removed`);
       for (const content of res) {
         const siteData = supportedSiteData[content.scraper];
-        if (siteData.afterRemoveScript) {
-          iframeRef.current?.contentWindow?.postMessage(
-            {
-              script: replaceWithKeyOnUpdate
-                ? applyConstants(siteData.afterRemoveScript, constants)
-                : siteData.afterRemoveScript,
-              data: { siteData, contentDetails: res[0] },
-            },
-            "*",
-          );
-        }
+        if (siteData.afterRemoveScript)
+          runScript(siteData.afterRemoveScript, {
+            siteData,
+            contentDetails: res[0],
+          });
       }
       setFiltered((old) => {
         const excludedIds = new Set(res.map((o) => o.id));
@@ -199,6 +213,7 @@ function useLibraryContextCore() {
   return {
     iframeRef,
     supportedSiteData,
+    afterAddRemoveScript,
     setContentFunc,
     bulkUpdateTags,
     removeContents,

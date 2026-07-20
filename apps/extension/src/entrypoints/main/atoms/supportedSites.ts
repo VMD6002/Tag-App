@@ -1,8 +1,16 @@
-import { atom, Getter, Setter } from "jotai";
+import { Getter, Setter } from "jotai";
 import { SiteData } from "../routes/supported";
 import { atomWithUserStorage } from "./user";
 import { useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
+
+export const enableAfterAddRemoveScriptsAtom = atomWithUserStorage<boolean>(
+  "enableAfterAddRemoveScripts",
+  false,
+);
+
+export const runAfterAddRemoveScriptsInServerAtom =
+  atomWithUserStorage<boolean>("runAfterAddRemoveScriptsInServer", false);
 
 type SupportedSitesType = Record<string, SiteData>;
 

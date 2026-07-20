@@ -10,7 +10,11 @@ import {
   updateDataAtom,
 } from "@/components/craft/UpdateModal/atom";
 import { useMutation } from "@tanstack/react-query";
-import { supportedSitesAtom } from "../../atoms/supportedSites";
+import {
+  enableAfterAddRemoveScriptsAtom,
+  runAfterAddRemoveScriptsInServerAtom,
+  supportedSitesAtom,
+} from "../../atoms/supportedSites";
 import {
   selectionEntriesAtom,
   selectionOnAtom,
@@ -48,6 +52,40 @@ function useRemoteContextCore() {
   const supportedSiteData = useAtomValue(supportedSitesAtom);
   const replaceWithKeyOnUpdate = useAtomValue(replaceWithKeyOnUpdateAtom);
   const constants = useAtomValue(constantsAtom);
+
+  const runUserCodeMutation = useMutation(
+    orpc.main.runUserCode.mutationOptions({
+      onSuccess: (res) => {
+        log("User After Scripts Executed");
+      },
+    }),
+  );
+  const afterAddRemoveScript = useAtomValue(enableAfterAddRemoveScriptsAtom);
+  const runAfterAddRemoveScriptsInServer = useAtomValue(
+    runAfterAddRemoveScriptsInServerAtom,
+  );
+  const runScript = useCallback(
+    (script: string, data: any) => {
+      if (!afterAddRemoveScript) return;
+      const input = {
+        script: replaceWithKeyOnUpdate
+          ? applyConstants(script, constants)
+          : script,
+        data,
+      };
+      if (runAfterAddRemoveScriptsInServer) {
+        runUserCodeMutation.mutate(input);
+        return;
+      }
+      iframeRef.current?.contentWindow?.postMessage(input, "*");
+    },
+    [
+      replaceWithKeyOnUpdate,
+      constants,
+      afterAddRemoveScript,
+      runAfterAddRemoveScriptsInServer,
+    ],
+  );
 
   const getTagsMutation = useMutation(
     orpc.tags.getTagData.mutationOptions({
@@ -140,17 +178,11 @@ function useRemoteContextCore() {
         log(`${res.length} contents removed`);
         for (const content of res) {
           const siteData = supportedSiteData[content.scraper];
-          if (siteData.afterRemoveScript) {
-            iframeRef.current?.contentWindow?.postMessage(
-              {
-                script: replaceWithKeyOnUpdate
-                  ? applyConstants(siteData.afterRemoveScript, constants)
-                  : siteData.afterRemoveScript,
-                data: { siteData, contentDetails: res[0] },
-              },
-              "*",
-            );
-          }
+          if (siteData.afterRemoveScript)
+            runScript(siteData.afterRemoveScript, {
+              siteData,
+              contentDetails: content,
+            });
         }
         setFiltered((old) => {
           const excludedIds = new Set(res.map((o) => o.id));
@@ -211,6 +243,7 @@ function useRemoteContextCore() {
     tags,
     iframeRef,
     supportedSiteData,
+    afterAddRemoveScript,
     setContentFunc,
     bulkUpdateTags,
     removeContents,

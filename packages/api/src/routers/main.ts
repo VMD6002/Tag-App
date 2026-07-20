@@ -15,6 +15,7 @@ import {
   replaceWithConstantKey,
   sanitizeStringForFileName,
 } from "@tagapp/utils";
+import { runPersonalScript } from "../lib/runJsStringCode";
 
 const DocSchema = ContentWebSchema.extend({
   added: z.undefined(),
@@ -152,4 +153,10 @@ export const getFilteredData = os
   .input(FilterQuerySchema)
   .handler(async ({ input }) => {
     return filterData(input, contentDataDB.data);
+  });
+
+export const runUserCode = os
+  .input(z.object({ script: z.string(), data: z.any() }))
+  .handler(async ({ input }) => {
+    return runPersonalScript(input.script, input.data);
   });
