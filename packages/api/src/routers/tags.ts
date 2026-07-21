@@ -56,7 +56,7 @@ export const addParentTags = os
 export const removeTags = os
   .input(z.object({ tags: z.array(z.string()) }))
   .handler(async ({ input: { tags } }) => {
-    DecrementTagCount(tags);
+    for (const tag of tags) delete tagDB.data.tags[tag];
     await tagDB.write();
     return tags;
   });
@@ -64,16 +64,9 @@ export const removeTags = os
 export const removeParentTags = os
   .input(z.object({ parentTags: z.array(z.string()) }))
   .handler(async ({ input: { parentTags } }) => {
-    const tags = Object.keys(tagDB.data.tags);
-    tags.forEach((tag) => {
-      const parentTag = tag.split(":")[0]!;
-      if (parentTags.includes(parentTag)) {
-        delete tagDB.data.tags[tag];
-      }
-    });
-    parentTags.forEach((parentTag) => {
-      delete tagDB.data.parentTags[parentTag];
-    });
+    for (const tag in tagDB.data.tags)
+      if (parentTags.includes(tag.split(":")[0]!)) delete tagDB.data.tags[tag];
+    for (const parentTag of parentTags) delete tagDB.data.parentTags[parentTag];
     await tagDB.write();
     return tagDB.data;
   });
