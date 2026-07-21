@@ -50,10 +50,32 @@ async function injectSiteDataIntoPage() {
     `local:${currentUser}:hostNames`,
   );
 
+  const appMode: "local" | "remote" | null = await storage.getItem(
+    `local:${currentUser}:appMode`,
+  );
+
   // Check if its one of the hostnames defined by user and if it is then inject tag data and exit
   if (hostNames && hostNames.includes(location.origin)) {
-    const tags: Record<string, string> =
-      (await storage.getItem(`local:${currentUser}:tags`)) ?? {};
+    let tags: string[];
+
+    if (appMode === "local")
+      tags = Object.keys(
+        (await storage.getItem(`local:${currentUser}:tags`)) ?? {},
+      );
+    else {
+      const serverUrl =
+        (await storage.getItem(`local:${currentUser}:serverUrl`)) ?? "";
+      if (!serverUrl) {
+        console.error("Server URL not found");
+        return false;
+      }
+      const res = await fetch(`${serverUrl}/rpc/tags/getTagData`, {
+        body: '{"json":{}}',
+        method: "POST",
+      });
+      tags = Object.keys((await res.json())?.json?.tags ?? {});
+    }
+
     const hostNameTagsElement = generateJsonScriptElement(
       HOST_NAME_ELEMENT_ID,
       tags,
