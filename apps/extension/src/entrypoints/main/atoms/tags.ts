@@ -1,10 +1,14 @@
 import { Getter, Setter } from "jotai";
 import { contentDataAtom } from ".";
-import { resetFilterCallback, injectFilterDataIntoURLCallback } from "./filter";
 import { atomWithUserStorage } from "./user";
 import { useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
 import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
+
+export const remoteTagsUpdatedAtom = atomWithUserStorage<boolean>(
+  "remoteTagsUpdated",
+  false,
+);
 
 export const tagDefaultData = {
   "Type:GIF": { count: 0 },

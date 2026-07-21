@@ -34,6 +34,7 @@ import {
   replaceWithKeyOnUpdateAtom,
 } from "../../atoms/constants";
 import { applyConstants } from "@tagapp/utils";
+import { remoteTagsUpdatedAtom } from "../../atoms/tags";
 
 export const filteredAtom = atom<ContentWebType[]>([]);
 
@@ -42,6 +43,8 @@ function useRemoteContextCore() {
   const [tags, setTags] = useState<string[]>([]);
 
   const orpc = useAtomValue(orpcAtom);
+
+  const remoteTagsUpdated = useAtomValue(remoteTagsUpdatedAtom);
 
   const initializeFilterDataFromURL = useInitializeFilterDataFromURL();
   const setFiltered = useSetAtom(filteredAtom);
@@ -102,7 +105,6 @@ function useRemoteContextCore() {
     orpc.main.getFilteredData.mutationOptions({
       onSuccess: (res) => {
         setFiltered(res);
-        getTagsMutation.mutate({});
       },
     }),
   );
@@ -238,6 +240,10 @@ function useRemoteContextCore() {
     const initialFilterQuery = initializeFilterDataFromURL();
     getFilteredDataMutation.mutate(initialFilterQuery);
   }, [orpc]);
+
+  useEffect(() => {
+    getTagsMutation.mutate({});
+  }, [orpc, remoteTagsUpdated]);
 
   return {
     tags,

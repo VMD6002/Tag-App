@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { tagsAtom } from "../../atoms/tags";
+import { remoteTagsUpdatedAtom } from "../../atoms/tags";
 import constate from "constate";
 import {
   parentTagStringAtom,
@@ -17,9 +17,10 @@ export function useRemoteTag() {
   const [cover, setCover] = useState("");
   const [currentTag, setCurrentTag] = useState("");
   const [tags, setTags] = useAtom(remoteTagsAtom);
-  const [parentTags, setParentTags] = useAtom(remoteParentTagsAtom);
+  const setParentTags = useSetAtom(remoteParentTagsAtom);
   const setTagString = useSetAtom(tagStringAtom);
   const setParentTagString = useSetAtom(parentTagStringAtom);
+  const setRemoteTagsUpdated = useSetAtom(remoteTagsUpdatedAtom);
 
   const toggleModal = useCallback(() => setOpen((old) => !old), []);
 
@@ -71,6 +72,7 @@ export function useRemoteTag() {
           return { ...old };
         });
         setTagString("");
+        setRemoteTagsUpdated(async (old) => !(await old));
       },
     }),
   );
@@ -88,6 +90,7 @@ export function useRemoteTag() {
           });
           return { ...old };
         });
+        setRemoteTagsUpdated(async (old) => !(await old));
       },
     }),
   );
@@ -119,6 +122,7 @@ export function useRemoteTag() {
       onSuccess: (res) => {
         setParentTags(res.parentTags);
         setTags(res.tags);
+        setRemoteTagsUpdated(async (old) => !(await old));
       },
     }),
   );

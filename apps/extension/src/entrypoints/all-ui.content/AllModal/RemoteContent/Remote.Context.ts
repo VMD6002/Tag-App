@@ -30,11 +30,14 @@ import {
   enableAfterAddRemoveScriptsAtom,
   runAfterAddRemoveScriptsInServerAtom,
 } from "@/entrypoints/main/atoms/supportedSites";
+import { remoteTagsUpdatedAtom } from "@/entrypoints/main/atoms/tags";
 
 function useRemoteContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const orpc = useAtomValue(orpcAtom);
+
+  const remoteTagsUpdated = useAtomValue(remoteTagsUpdatedAtom);
 
   const replaceWithKeyOnUpdate = useAtomValue(replaceWithKeyOnUpdateAtom);
   const constants = useAtomValue(constantsAtom);
@@ -64,7 +67,7 @@ function useRemoteContextCore() {
   const getTagsMutation = useMutation(
     orpc.tags.getTagData.mutationOptions({
       onSuccess: (res) => {
-        console.log("Active Tags", res);
+        console.log("Tags", res);
         setRemoteTags(Object.keys(res.tags).sort());
       },
     }),
@@ -258,8 +261,9 @@ function useRemoteContextCore() {
   }, [contentData, siteData, orpc]);
 
   useEffect(() => {
+    log("Remote Tags Updated", remoteTagsUpdated);
     getTagsMutation.mutate({});
-  }, [orpc]);
+  }, [orpc, remoteTagsUpdated]);
 
   return {
     iframeRef,
