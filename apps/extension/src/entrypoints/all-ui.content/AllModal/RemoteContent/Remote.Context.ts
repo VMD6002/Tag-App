@@ -65,7 +65,7 @@ function useRemoteContextCore() {
     orpc.tags.getTagData.mutationOptions({
       onSuccess: (res) => {
         console.log("Active Tags", res);
-        setRemoteTags(Object.keys(res.tags));
+        setRemoteTags(Object.keys(res.tags).sort());
       },
     }),
   );
@@ -201,9 +201,9 @@ function useRemoteContextCore() {
     if (!exists && pageCover !== cover) {
       setTags((o) => [
         ...o,
-        { label: "Util:Different_Cover", value: "Util:Different_Cover" },
+        { label: "meta:different-cover", value: "meta:different-cover" },
       ]);
-      contentTags.push("Util:Different_Cover");
+      contentTags.push("meta:different-cover");
     }
 
     const newContent = {

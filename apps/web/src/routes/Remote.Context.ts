@@ -26,7 +26,7 @@ function useRemoteContextCore() {
         const activeTags = Object.entries(res.tags)
           .filter(([, tagData]) => tagData.count > 0)
           .map(([key]) => key);
-        setTags(activeTags);
+        setTags(activeTags.sort());
       },
     }),
   );

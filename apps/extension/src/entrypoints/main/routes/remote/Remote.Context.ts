@@ -90,7 +90,7 @@ function useRemoteContextCore() {
   const getTagsMutation = useMutation(
     orpc.tags.getTagData.mutationOptions({
       onSuccess: (res) => {
-        setTags(Object.keys(res.tags));
+        setTags(Object.keys(res.tags).sort());
       },
     }),
   );
