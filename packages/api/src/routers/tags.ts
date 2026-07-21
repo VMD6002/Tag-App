@@ -3,6 +3,7 @@ import z from "zod";
 import { DecrementTagCount, tagDB } from "../db/tags";
 import { contentDataDB } from "../db/contentData";
 import errorLog from "../lib/errorLog";
+import { ParentTagsType, TagsType } from "@tagapp/utils/types";
 
 export const getTagData = os.handler(async () => {
   return tagDB.data;
@@ -78,24 +79,32 @@ export const removeParentTags = os
   });
 
 export const fixTagCount = os.handler(async () => {
-  tagDB.data.tags = {};
+  const updateTagData: TagsType = {};
+  const updateParentTagData: ParentTagsType = {};
   for (const id in contentDataDB.data) {
     contentDataDB.data[id]!.tags.forEach((tag) => {
       const parentTag = tag.split(":")[0]!;
-      if (!tagDB.data.parentTags[parentTag]) {
-        tagDB.data.parentTags[parentTag] = {};
-      }
+      if (!tagDB.data.parentTags[parentTag])
+        updateParentTagData[parentTag] = {};
 
-      const newCount = (tagDB.data.tags[tag]?.count ?? 0) + 1;
-      if (!tagDB.data.tags[tag]) {
-        tagDB.data.tags[tag] = { count: newCount };
+      const newCount = (updateTagData[tag]?.count ?? 0) + 1;
+      if (!updateTagData[tag]) {
+        updateTagData[tag] = { count: newCount };
         console.log(`New tag created: ${tag}`);
       } else {
-        tagDB.data.tags[tag]!.count = newCount;
+        updateTagData[tag]!.count = newCount;
         console.log(`Increment: New Count = ${newCount}, Tag = ${tag}`);
       }
     });
   }
+
+  for (const tag in tagDB.data.tags) {
+    if (!updateTagData[tag]) {
+      updateTagData[tag] = { ...tagDB.data.tags[tag], count: 0 };
+    }
+  }
+  tagDB.data.tags = updateTagData;
+  tagDB.data.parentTags = { ...tagDB.data.parentTags, ...updateParentTagData };
 
   await tagDB.write();
   console.log("Server Tag Count Fixed");
