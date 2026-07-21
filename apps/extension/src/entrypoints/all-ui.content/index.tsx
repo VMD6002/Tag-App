@@ -78,7 +78,7 @@ async function injectSiteDataIntoPage() {
 
     const hostNameTagsElement = generateJsonScriptElement(
       HOST_NAME_ELEMENT_ID,
-      tags,
+      tags.sort(),
     );
     document.documentElement.append(hostNameTagsElement);
     return false;
