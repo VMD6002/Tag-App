@@ -71,9 +71,6 @@ export const useRemoveTag = () =>
   useAtomCallback(useCallback(removeTagCallback, []));
 
 const fixTagCountCallback = async (get: Getter, set: Setter) => {
-  resetFilterCallback(get, set);
-  injectFilterDataIntoURLCallback(get, set);
-
   const contentData = { ...(await get(contentDataAtom)) };
   const tagsData = structuredClone(await get(tagsAtom));
 
