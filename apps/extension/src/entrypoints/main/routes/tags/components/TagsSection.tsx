@@ -37,8 +37,9 @@ export default function TagsSection() {
       return;
     }
     const newTags = tagString
-      .split(" ")
-      .filter((a) => a)
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
       .map((a) => `${selectedParent}:${a}`);
     setTags(async (oldTags) => {
       const temp = await oldTags;

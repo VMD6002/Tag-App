@@ -13,7 +13,7 @@ export default function ParentTagsSection() {
   const addParentFunc = useCallback(() => {
     setParentTags(async (tmp) => {
       const old = await tmp;
-      for (const tag of parentString.trim().split(/\s+/)) {
+      for (const tag of parentString.trim().split(/\s+/).filter(Boolean)) {
         old[tag] = {};
       }
       return { ...old };

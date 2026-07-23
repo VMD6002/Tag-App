@@ -12,7 +12,7 @@ export default function ParentTagsSection() {
   const { addParentTags, removeParentTags } = useRemoteTagContext();
 
   const addParentFunc = useCallback(() => {
-    addParentTags(parentString.split(" "));
+    addParentTags(parentString.trim().split(/\s+/).filter(Boolean));
   }, [parentString]);
 
   const removeParentFunc = useCallback(
