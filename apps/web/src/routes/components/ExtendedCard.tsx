@@ -41,7 +41,7 @@ const ExtendedCard = memo(
     }, [contentDetails.url, contentDetails.cover, constants]);
 
     return (
-      <div className="block p-2 h-fit relative text-left border rounded-sm transition-all">
+      <div className="block p-2 h-fit relative text-left rounded-sm transition-all">
         <div className="w-full mb-5 bg-input/50 overflow-hidden rounded-sm">
           {memoisedUrls.cover && (
             <img
