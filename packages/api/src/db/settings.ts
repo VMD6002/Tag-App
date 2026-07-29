@@ -5,6 +5,7 @@ const settings_default = {
   replaceWithKeyOnUpdate: true,
   sanitizeTitleOnSave: false,
   constants: {},
+  prefix: "/",
 };
 
 export const settingsDB = await JSONFilePreset(
