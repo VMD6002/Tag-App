@@ -150,21 +150,19 @@ export default function UpdateModal({
               />
             </>
           )}
-          {extraData && (
-            <div className="flex justify-between mb-2 items-center">
-              <Label>Extra Data</Label>
-              {resetFuntions?.extraData && (
-                <Button
-                  onClick={() => setExtraData(resetFuntions.extraData!())}
-                  size="icon"
-                  variant="outline"
-                  className="scale-80"
-                >
-                  <Redo2 />
-                </Button>
-              )}
-            </div>
-          )}
+          <div className="flex justify-between mb-2 items-center">
+            <Label>Extra Data</Label>
+            {resetFuntions?.extraData && (
+              <Button
+                onClick={() => setExtraData(resetFuntions.extraData!())}
+                size="icon"
+                variant="outline"
+                className="scale-80"
+              >
+                <Redo2 />
+              </Button>
+            )}
+          </div>
           <div className="max-h-36 overflow-y-scroll mb-4">
             <CodeEditor
               value={extraData}
