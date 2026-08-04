@@ -104,7 +104,7 @@ export default function UpdateModal({
         />
         <SeeMore>
           <PresetsMenu />
-          {cover && (
+          {cover !== undefined && (
             <>
               <div className="flex justify-between mb-2 items-center">
                 <Label>Cover</Label>
@@ -127,7 +127,7 @@ export default function UpdateModal({
               />
             </>
           )}
-          {contentUrl && (
+          {contentUrl !== undefined && (
             <>
               <div className="flex justify-between mb-2 items-center">
                 <Label>Content Url</Label>
