@@ -1,8 +1,8 @@
 import { atom } from "jotai";
 import { RPCLink } from "@orpc/client/fetch";
 import { createORPCClient, onError } from "@orpc/client";
-import { routerType } from "@tagapp/api";
-import { RouterClient } from "@orpc/server";
+import type { routerType } from "@tagapp/api";
+import type { RouterClient } from "@orpc/server";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { serverUrlAtom } from "./settings";
 

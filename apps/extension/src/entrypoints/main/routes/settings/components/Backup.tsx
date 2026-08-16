@@ -4,7 +4,7 @@ import { useAtomValue } from "jotai";
 import saveJsonFile from "@/lib/saveJsonFile";
 import { contentDataAtom } from "@/entrypoints/main/atoms";
 import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
-import { BackUpType } from "@tagapp/utils/types";
+import type { BackUpType } from "@tagapp/utils/types";
 
 function getLocalDateStringWithTime() {
   const date = new Date();

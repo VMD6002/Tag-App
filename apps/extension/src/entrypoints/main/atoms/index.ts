@@ -1,11 +1,11 @@
-import {
+import type {
   ContentWebBaseType,
   ContentWebDataType,
   ContentWebType,
   FilterDataType,
 } from "@tagapp/utils/types";
 import { atomWithUserStorage } from "./user";
-import { Getter, Setter } from "jotai";
+import type { Getter, Setter } from "jotai";
 import { constantsAtom, replaceWithKeyOnUpdateAtom } from "./constants";
 import { tagsAtom } from "./tags";
 import { sanitizeTitleAtom } from "./settings";

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import saveJsonFile from "@/lib/saveJsonFile";
-import { BackUpType } from "@tagapp/utils/types";
+import type { BackUpType } from "@tagapp/utils/types";
 import { useMutation } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { orpcAtom } from "@/entrypoints/main/atoms/orpc";

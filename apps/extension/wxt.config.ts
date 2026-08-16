@@ -1,6 +1,7 @@
 import { defineConfig } from "wxt";
 import tailwindcss from "@tailwindcss/vite";
 import MarkdownPlugin from "@goodforyou/vite-plugin-markdown-import";
+import react from "@vitejs/plugin-react";
 import path from "path";
 import { EXTENSION_ID } from "./src/lib/CONSTANTS";
 
@@ -8,19 +9,25 @@ import { EXTENSION_ID } from "./src/lib/CONSTANTS";
 export default defineConfig({
   outDir: "dist",
   srcDir: "src",
-  modules: ["@wxt-dev/auto-icons", "@wxt-dev/module-react"],
+  modules: ["@wxt-dev/auto-icons"],
   vite: () => ({
-    plugins: [tailwindcss() as any, MarkdownPlugin()],
+    plugins: [
+      react(), // <--- Uses standard react plugin with built-in fast transformations
+      tailwindcss(),
+      MarkdownPlugin(),
+    ],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+
+        // Below path related fixes to supress filenamify warnings
+        "node:path": "path-browserify", // <--- Polyfills node:path for browser
+        path: "path-browserify", // <--- Polyfills path for browser
       },
     },
     build: {
-      target: "es2022", // <--- Forces Vite/Rollup to allow top-level await
-    },
-    esbuild: {
-      target: "es2022", // <--- Forces esbuild to transpile it properly
+      target: "es2022",
+      chunkSizeWarningLimit: 2000, // raises limit to 2MB to hide the warning temporarily
     },
   }),
   manifest: ({ command }) => {
@@ -41,7 +48,6 @@ export default defineConfig({
       name: "TagApp Extension",
       // Apply key only during build
       key: isProd ? key : undefined,
-
       sandbox: {
         pages: ["sandbox.html"],
       },

@@ -1,5 +1,5 @@
 import log from "@/lib/log";
-import { SiteData } from "../main/routes/supported";
+import type { SiteData } from "../main/routes/supported";
 import { decodeHtmlEntities, getMicroData, getOgImage } from "./dom-utils";
 import { clickUpdateOrRefresh, clickRemove } from "./extension-api";
 import { sleep, getUniqueIdFromString, toBase36 } from "./helpers";

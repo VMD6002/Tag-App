@@ -1,6 +1,6 @@
-import { atom, Getter, Setter } from "jotai";
+import { atom, type Getter, type Setter } from "jotai";
 import { contentDataAtom } from ".";
-import { ContentWebType } from "@tagapp/utils/types";
+import type { ContentWebType } from "@tagapp/utils/types";
 import { useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
 
@@ -21,7 +21,8 @@ const selectEntryCallback = (get: Getter, set: Setter, key: string) => {
   }
 };
 
-export const useSelectEntry = () => useAtomCallback(useCallback(selectEntryCallback, []));
+export const useSelectEntry = () =>
+  useAtomCallback(useCallback(selectEntryCallback, []));
 
 const toggleSelectionModeCallback = (get: Getter, set: Setter) => {
   const on = get(selectionOnAtom);
@@ -29,11 +30,16 @@ const toggleSelectionModeCallback = (get: Getter, set: Setter) => {
   set(selectionOnAtom, !on);
 };
 
-export const useToggleSelectionMode = () => useAtomCallback(useCallback(toggleSelectionModeCallback, []));
+export const useToggleSelectionMode = () =>
+  useAtomCallback(useCallback(toggleSelectionModeCallback, []));
 
 // Extension Specific
 
-const syncSelectedTagsCallback = async (get: Getter, set: Setter, remoteContentData?: ContentWebType[]) => {
+const syncSelectedTagsCallback = async (
+  get: Getter,
+  set: Setter,
+  remoteContentData?: ContentWebType[],
+) => {
   const contentData = remoteContentData
     ? Object.fromEntries(
         remoteContentData.map((contentDetails) => [
@@ -50,7 +56,7 @@ const syncSelectedTagsCallback = async (get: Getter, set: Setter, remoteContentD
     return;
   }
 
-  const tagsArray = entries.map((key) => contentData[key].tags);
+  const tagsArray = entries.map((key) => contentData[key]!.tags);
 
   const data = tagsArray.reduce((a, b) => a.filter((c) => b.includes(c)));
 
@@ -61,4 +67,5 @@ const syncSelectedTagsCallback = async (get: Getter, set: Setter, remoteContentD
   );
 };
 
-export const useSyncSelectedTags = () => useAtomCallback(useCallback(syncSelectedTagsCallback, []));
+export const useSyncSelectedTags = () =>
+  useAtomCallback(useCallback(syncSelectedTagsCallback, []));

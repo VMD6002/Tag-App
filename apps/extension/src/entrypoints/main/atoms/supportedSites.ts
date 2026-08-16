@@ -1,5 +1,5 @@
-import { Getter, Setter } from "jotai";
-import { SiteData } from "../routes/supported";
+import type { Getter, Setter } from "jotai";
+import type { SiteData } from "../routes/supported";
 import { atomWithUserStorage } from "./user";
 import { useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
@@ -47,12 +47,12 @@ const refreshSupportedHostsIndexCallback = async (
   const index: Record<string, string> = {};
   if (supportSSites) {
     for (const Site in supportSSites) {
-      for (const host of supportSSites[Site].hosts) index[host] = Site;
+      for (const host of supportSSites[Site]!.hosts) index[host] = Site;
     }
   } else {
     const supportedSites = await get(supportedSitesAtom);
     for (const Site in supportedSites) {
-      for (const host of supportedSites[Site].hosts) index[host] = Site;
+      for (const host of supportedSites[Site]!.hosts) index[host] = Site;
     }
   }
   set(supportedHostsIndexAtom, index);

@@ -1,4 +1,4 @@
-import { Getter, Setter } from "jotai";
+import type { Getter, Setter } from "jotai";
 import { contentDataAtom } from ".";
 import { atomWithUserStorage } from "./user";
 import { useCallback } from "react";

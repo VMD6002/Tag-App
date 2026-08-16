@@ -1,4 +1,4 @@
-import { SiteData } from "@/entrypoints/main/routes/supported";
+import type { SiteData } from "@/entrypoints/main/routes/supported";
 import { SITE_DATA_ELEMENT_ID } from "./CONSTANTS";
 
 export default function GetTagAppSiteData() {
