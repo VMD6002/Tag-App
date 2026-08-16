@@ -21,6 +21,6 @@
     "update:all": "bun -r update"
   },
   "devDependencies": {
-    "@types/node": "^24.13.2"
+    "@types/node": "^24.13.3"
   }
 }

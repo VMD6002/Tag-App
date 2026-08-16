@@ -9,8 +9,8 @@
     "start": "bun src/index.ts"
   },
   "dependencies": {
-    "@orpc/server": "^1.14.6",
-    "hono": "^4.12.27",
+    "@orpc/server": "^1.15.0",
+    "hono": "^4.13.2",
     "@tagapp/api": "workspace:*"
   },
   "devDependencies": {
