@@ -110,7 +110,7 @@ export default function Filters() {
     const parentTags = Array.from(
       new Set(tags.map((tag) => tag.split(":")[0])),
     );
-    const tagParentsConverted = parentTags.map((o: string) => ({
+    const tagParentsConverted = parentTags.map((o) => ({
       label: o + ":*",
       value: o + ":*",
     }));

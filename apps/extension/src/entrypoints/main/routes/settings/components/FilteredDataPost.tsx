@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";

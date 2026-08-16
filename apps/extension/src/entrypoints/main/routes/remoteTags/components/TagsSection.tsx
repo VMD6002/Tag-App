@@ -13,6 +13,7 @@ import TagGroup from "./TagGroup";
 import { useAtom, useAtomValue } from "jotai";
 import { remoteParentTagsAtom, remoteTagsAtom, tagStringAtom } from "../atom";
 import { useRemoteTagContext } from "../Remote.Tags.Context";
+import { useCallback, useState } from "react";
 
 export default function TagsSection() {
   const { addTags, removeTags, fixTags } = useRemoteTagContext();
@@ -120,11 +121,11 @@ export default function TagsSection() {
         </h1>
         {[...new Set(tagsArray.map((k) => k.split(":")[0]))]
           .sort()
-          .map((parent: string) => (
+          .map((parent) => (
             <TagGroup
               tagsArray={tagsArray}
               key={parent}
-              parent={parent}
+              parent={parent!}
               removeTagFunc={removeTagFunc}
             />
           ))}

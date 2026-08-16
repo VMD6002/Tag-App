@@ -3,6 +3,7 @@ import { X, Image } from "lucide-react";
 import { useTagContext } from "../Tags.Context";
 import { useAtomValue } from "jotai";
 import { tagsAtom } from "@/entrypoints/main/atoms/tags";
+import { useMemo } from "react";
 
 type props = {
   tagsArray: string[];
@@ -27,8 +28,8 @@ export default function TagGroup({ tagsArray, parent, removeTagFunc }: props) {
       <div className="grid gap-y-3 text-sm">
         {Children.map((tag) => (
           <div key={`${parent}-${tag}`} className="break-inside-avoid-column">
-            {tags[tag].cover ? (
-              <img loading="lazy" className="w-full" src={tags[tag].cover} />
+            {tags[tag]!.cover ? (
+              <img loading="lazy" className="w-full" src={tags[tag]!.cover} />
             ) : (
               <></>
             )}
@@ -37,7 +38,7 @@ export default function TagGroup({ tagsArray, parent, removeTagFunc }: props) {
                 <Image />
               </Button>
               <span className="mx-3 w-full">
-                {String(tags[tag].count).padStart(3, "0")} |{" "}
+                {String(tags[tag]!.count).padStart(3, "0")} |{" "}
                 {tag.replace(parent + ":", "").replaceAll("_", " ")}
               </span>
               <Button size={"icon"} onClick={() => removeTagFunc(tag)}>

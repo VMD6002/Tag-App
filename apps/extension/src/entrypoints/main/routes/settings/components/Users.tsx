@@ -58,7 +58,7 @@ export default function Users() {
       // If we are removing the currently selected user, switch to another remaining user
       if (currentUser === userToRemove) {
         if (nextList.length > 0) {
-          setCurrentUser(nextList[0]);
+          setCurrentUser(nextList[0]!);
         }
       }
     },

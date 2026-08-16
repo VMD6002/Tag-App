@@ -1,6 +1,7 @@
 import { useAtom } from "jotai";
 import { tagsAtom } from "../../atoms/tags";
 import constate from "constate";
+import { useCallback, useState } from "react";
 
 export function useTag() {
   const [open, setOpen] = useState(false);
@@ -13,7 +14,7 @@ export function useTag() {
   const openCoverModal = useCallback(
     (tag: string) => {
       setCurrentTag(tag);
-      setCover(tags[tag].cover ?? "");
+      setCover(tags[tag]!.cover ?? "");
       setOpen(true);
     },
     [tags],
@@ -27,7 +28,7 @@ export function useTag() {
     }
     setTags(async (old) => {
       const temp = await old;
-      temp[currentTag].cover = cover;
+      temp[currentTag]!.cover = cover;
       return temp;
     });
     setOpen(false);
@@ -36,7 +37,7 @@ export function useTag() {
   const removeCover = useCallback(() => {
     setTags(async (old) => {
       const temp = await old;
-      delete temp[currentTag].cover;
+      delete temp[currentTag]!.cover;
       return temp;
     });
     setOpen(false);

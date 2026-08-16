@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import { parentTagsAtom, useRemoveParent } from "@/entrypoints/main/atoms/tags";
 import { useAtom } from "jotai";
+import { useCallback, useState } from "react";
 
 export default function ParentTagsSection() {
   const [parentString, setParentString] = useState("");

@@ -9,6 +9,7 @@ import {
 } from "./atom";
 import { orpcAtom } from "../../atoms/orpc";
 import { useMutation } from "@tanstack/react-query";
+import { useCallback, useEffect, useState } from "react";
 
 export function useRemoteTag() {
   const orpc = useAtomValue(orpcAtom);
@@ -27,7 +28,7 @@ export function useRemoteTag() {
   const openCoverModal = useCallback(
     (tag: string) => {
       setCurrentTag(tag);
-      setCover(tags[tag].cover ?? "");
+      setCover(tags[tag]!.cover ?? "");
       setOpen(true);
     },
     [tags],
@@ -37,7 +38,7 @@ export function useRemoteTag() {
     orpc.tags.setTagCover.mutationOptions({
       onSuccess: (res) => {
         setTags((old) => {
-          old[res.tag].cover = res.cover;
+          old[res.tag]!.cover = res.cover;
           return { ...old };
         });
         setOpen(false);

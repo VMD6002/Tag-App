@@ -26,7 +26,7 @@ function TagParentChildList({ tags }: { tags: string[] }) {
   const parentTags = useMemo(
     () => [...new Set(tags.map((k) => k.split(":")[0]))],
     [tags],
-  );
+  ) as string[];
 
   return (
     <>

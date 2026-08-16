@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import type { ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 
 export default function SeeMore({ children }: { children: ReactNode }) {
   const [seeMore, setSeeMore] = useState(false);

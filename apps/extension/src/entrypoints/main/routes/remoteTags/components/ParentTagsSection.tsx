@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { useAtom, useAtomValue } from "jotai";
 import { parentTagStringAtom, remoteParentTagsAtom } from "../atom";
 import { useRemoteTagContext } from "../Remote.Tags.Context";
+import { useCallback } from "react";
 
 export default function ParentTagsSection() {
   const [parentString, setParentString] = useAtom(parentTagStringAtom);

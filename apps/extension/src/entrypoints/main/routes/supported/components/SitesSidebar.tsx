@@ -14,7 +14,7 @@ function SiteCard({ siteName }: { siteName: string }) {
   const { selectSite, removeSite } = useSiteActions();
   const supportedSites = useSupportedSites();
   const isActive = editingSiteName === siteName;
-  const site = supportedSites[siteName];
+  const site = supportedSites[siteName]!;
   const firstHost = site.hosts[0] || "";
 
   const [showHosts, setShowHosts] = useState(false);
@@ -117,7 +117,7 @@ export default function SitesSidebar() {
     .filter((name) => {
       if (!searchQuery) return true;
       const query = searchQuery.toLowerCase();
-      const site = supportedSites[name];
+      const site = supportedSites[name]!;
       return (
         name.toLowerCase().includes(query) ||
         site.hosts.some((host) => host.toLowerCase().includes(query))

@@ -122,8 +122,8 @@ function useLibraryContextCore() {
         const newContent = {
           ...contentDetails,
           ...updateData,
-          download: contentDetails.download?.type
-            ? { type: contentDetails.download?.type, flags: preset }
+          download: contentDetails?.download?.type
+            ? { type: contentDetails!.download?.type, flags: preset }
             : undefined,
         };
 
@@ -145,7 +145,7 @@ function useLibraryContextCore() {
     onSuccess: (res) => {
       log(`${res.length} contents removed`);
       for (const content of res) {
-        const siteData = supportedSiteData[content.scraper];
+        const siteData = supportedSiteData[content.scraper]!;
         if (siteData.afterRemoveScript)
           runScript(siteData.afterRemoveScript, {
             siteData,

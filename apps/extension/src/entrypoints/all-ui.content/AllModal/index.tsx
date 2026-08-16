@@ -6,6 +6,7 @@ import RemoteContent from "./RemoteContent";
 import { updateResetOptionsAtom } from "@/components/craft/UpdateModal/atom";
 import GetDetailsFromPage from "@/lib/GetDetailsFromPage";
 import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
+import { useState } from "react";
 
 const store = getDefaultStore();
 
