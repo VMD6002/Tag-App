@@ -27,6 +27,8 @@ import { filteredAtom } from "../Remote.Context";
 import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
 import { useRemoteContext } from "../Remote.Context";
 
+import { Pencil, Trash2 } from "lucide-react";
+
 export default function Filters() {
   const { removeContents, filterData, tags } = useRemoteContext();
 
@@ -183,15 +185,37 @@ export default function Filters() {
         </button>
       </div>
 
-      <div className="flex justify-between mb-4 items-center">
-        <div className="flex items-center space-x-5">
-          <Button onClick={toggleSelectionMode} variant="outline">
-            Toggle Selection Mode
+      <div className="sticky top-17 z-10 bg-background py-2 mb-4 flex justify-between items-center flex-wrap-reverse gap-y-3">
+        <div className="flex items-center space-x-3">
+          <Button
+            onClick={toggleSelectionMode}
+            variant={selectionOn ? "default" : "outline"}
+          >
+            Toggle Selection
           </Button>
-          <span className="font-mono text-base">{filteredLength}</span>
+
           {selectionOn && (
             <>
-              <div className="flex items-center space-x-2">
+              <Button
+                disabled={selectedEntries.length < 1}
+                onClick={toggleBulkUpdateModal}
+                variant="outline"
+                size="icon"
+                title="Update Selected"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                disabled={selectedEntries.length < 1}
+                onClick={removeSelected}
+                variant="outline"
+                size="icon"
+                title="Remove Selected"
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+
+              <div className="flex items-center space-x-2 pl-2">
                 <Label htmlFor="select-all-checkbox">Select All</Label>
                 <Checkbox
                   id="select-all-checkbox"
@@ -201,45 +225,29 @@ export default function Filters() {
                   }
                 />
               </div>
-              <span className="font-mono text-base text-muted-foreground">
-                ({selectedEntries.length} selected)
+              <span className="font-mono text-sm text-muted-foreground">
+                ({selectedEntries.length}/{filteredLength})
               </span>
             </>
           )}
+
+          {!selectionOn && (
+            <span className="font-mono text-base">{filteredLength}</span>
+          )}
         </div>
+
         <div className="flex items-center space-x-3">
           <Label htmlFor="order-latest-switch">Order By Latest</Label>
           <Switch
             id="order-latest-switch"
             checked={orderByLatest}
             onCheckedChange={(a) => {
-              setFiltered((old) => [...old].reverse()); // Safe reverse execution clone
+              setFiltered((old) => [...old].reverse());
               setOrderByLatest(a);
             }}
           />
         </div>
       </div>
-
-      {selectionOn && (
-        <div className="flex gap-2">
-          <Button
-            disabled={selectedEntries.length < 1}
-            onClick={toggleBulkUpdateModal}
-            className="mb-4"
-            variant="outline"
-          >
-            Update Selected
-          </Button>
-          <Button
-            disabled={selectedEntries.length < 1}
-            onClick={removeSelected}
-            className="mb-4 text-red-500 hover:text-red-600"
-            variant="outline"
-          >
-            Remove Selected
-          </Button>
-        </div>
-      )}
       <div className="mb-10" />
     </>
   );
