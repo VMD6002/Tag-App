@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { hostNamesAtom } from "../../../atoms/settings";
 import { Textarea } from "@/components/ui/textarea";
 import z from "zod";
+import { toast } from "sonner";
 
 const hostnamesBufferAtom = atom<string>("");
 
@@ -30,12 +31,12 @@ const validateHostnames = (hostnamesText: string) => {
       .safeParse(list);
 
     if (!parsed.success) {
-      alert(z.prettifyError(parsed.error));
+      toast.error(z.prettifyError(parsed.error));
       return null;
     }
     return parsed.data;
   } catch {
-    alert("Invalid Input!");
+    toast.error("Invalid Input!");
     return null;
   }
 };
@@ -53,6 +54,7 @@ export default function Hostnames() {
     const parsed = validateHostnames(hostnamesBuffer);
     if (!parsed) return;
     setHostNames(parsed);
+    toast.success("Successfully set Hostnames");
   };
 
   return (

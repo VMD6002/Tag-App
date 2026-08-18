@@ -14,6 +14,7 @@ import MyQueryProvider from "@/components/MyQueryProvider";
 import { appModeAtom } from "./atoms/settings";
 import { useAtomValue } from "jotai";
 import { ConfirmProvider } from "@/components/craft/confirm-dialog";
+import { Toaster } from "@/components/ui/sonner";
 
 function App() {
   const appMode = useAtomValue(appModeAtom);
@@ -45,6 +46,7 @@ function App() {
           </main>
           <div className="h-12" />
           <ConfirmProvider />
+          <Toaster />
         </ThemeProvider>
       </Router>
     </>

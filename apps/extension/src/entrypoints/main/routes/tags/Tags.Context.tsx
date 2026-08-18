@@ -2,6 +2,7 @@ import { useAtom } from "jotai";
 import { tagsAtom } from "../../atoms/tags";
 import constate from "constate";
 import { useCallback, useState } from "react";
+import { toast } from "sonner";
 
 export function useTag() {
   const [open, setOpen] = useState(false);
@@ -22,7 +23,7 @@ export function useTag() {
 
   const setTagCover = useCallback(() => {
     if (!cover.trim()) {
-      alert("Cover url can't be blank");
+      toast.warning("Cover url can't be blank");
       setCover("");
       return;
     }

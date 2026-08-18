@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { appModeAtom, serverUrlAtom } from "../../../atoms/settings";
+import { toast } from "sonner";
 
 export default function Server() {
   const [serverUrl, setServerUrl] = useAtom(serverUrlAtom);
@@ -25,7 +26,13 @@ export default function Server() {
           placeholder="server address, eg: http://localhost:5001"
         />
       </div>
-      <Button size="sm" onClick={() => setServerUrl(serverUrlBuffer)}>
+      <Button
+        size="sm"
+        onClick={() => {
+          setServerUrl(serverUrlBuffer);
+          toast.success("Successfully set Server address");
+        }}
+      >
         Update
       </Button>
     </section>

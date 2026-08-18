@@ -10,6 +10,7 @@ import {
   replaceWithKeyOnUpdateAtom,
 } from "@/entrypoints/main/atoms/constants";
 import { confirm } from "@/components/craft/confirm-dialog";
+import { toast } from "sonner";
 
 type AppModeType = "local" | "remote";
 
@@ -28,7 +29,7 @@ export default function AppMode() {
         setSanitizeTitle(data.sanitizeTitleOnSave);
       },
       onError: (error) => {
-        alert(error.message);
+        toast.error(error.message);
       },
     }),
   );
@@ -40,8 +41,9 @@ export default function AppMode() {
         constants,
         sanitizeTitleOnSave: sanitizeTitle,
       });
-      alert("Remote Settings Overridden Successfully");
+      toast.success("Remote Settings Overridden Successfully");
     } catch (err) {
+      toast.error((err as any).message);
       console.log((err as any).message);
     }
   };
@@ -52,10 +54,10 @@ export default function AppMode() {
         setSanitizeTitle(data.sanitizeTitleOnSave);
         setReplaceWithKeyOnUpdate(data.replaceWithKeyOnUpdate);
         setConstants(data.constants);
-        alert("Settings Pulled Successfully");
+        toast.success("Settings Pulled Successfully");
       },
       onError: (error) => {
-        alert(error.message);
+        toast.error(error.message);
       },
     }),
   );

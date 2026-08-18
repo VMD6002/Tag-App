@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { filteredDataPostServerUrlAtom } from "@/entrypoints/main/atoms/settings";
 import type { ContentWebType } from "@tagapp/utils/types";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export default function ServerAffix({
   filtered,
@@ -23,10 +24,10 @@ export default function ServerAffix({
       });
     },
     onSuccess: () => {
-      alert("Filtered data posted successfully");
+      toast.success("Filtered data posted successfully");
     },
     onError: () => {
-      alert("Error posting filtered data");
+      toast.error("Error posting filtered data");
     },
   });
 

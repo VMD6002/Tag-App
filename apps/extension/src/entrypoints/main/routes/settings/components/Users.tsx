@@ -14,6 +14,7 @@ import {
 import { currentUserAtom, userListAtom } from "../../../atoms/user";
 import { Trash2, UserPlus } from "lucide-react";
 import { confirm } from "@/components/craft/confirm-dialog";
+import { toast } from "sonner";
 
 export default function Users() {
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
@@ -23,11 +24,11 @@ export default function Users() {
   const handleAddUser = useCallback(() => {
     const trimmed = newUsername.trim();
     if (!trimmed) {
-      alert("Username cannot be empty");
+      toast.warning("Username cannot be empty");
       return;
     }
     if (userList.includes(trimmed)) {
-      alert("User already exists");
+      toast.warning("User already exists");
       return;
     }
     setUserList([...userList, trimmed]);
@@ -37,7 +38,7 @@ export default function Users() {
   const handleRemoveUser = useCallback(
     async (userToRemove: string) => {
       if (userList.length <= 1) {
-        alert("Cannot remove the only user left");
+        toast.warning("Cannot remove the only user left");
         return;
       }
 

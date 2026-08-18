@@ -19,6 +19,7 @@ import {
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useState } from "react";
 import { confirm } from "@/components/craft/confirm-dialog";
+import { toast } from "sonner";
 
 export default function TagsSection() {
   const removeTag = useRemoveTag();
@@ -31,7 +32,7 @@ export default function TagsSection() {
 
   const addTagFunc = useCallback(() => {
     if (!selectedParent) {
-      alert("Please Select a parent tag first");
+      toast.warning("Please Select a parent tag first");
       return;
     }
     if (!tagString.trim()) {

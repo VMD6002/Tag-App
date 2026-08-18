@@ -10,6 +10,7 @@ import {
 import { orpcAtom } from "../../atoms/orpc";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export function useRemoteTag() {
   const orpc = useAtomValue(orpcAtom);
@@ -47,7 +48,7 @@ export function useRemoteTag() {
   );
   const setTagCover = useCallback(() => {
     if (!cover.trim()) {
-      alert("Cover url can't be blank");
+      toast.warning("Cover url can't be blank");
       setCover("");
       return;
     }

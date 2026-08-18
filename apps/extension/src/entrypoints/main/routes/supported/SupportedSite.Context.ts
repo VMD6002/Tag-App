@@ -11,6 +11,7 @@ import {
 } from "../../atoms/supportedSites";
 import saveJsonFile from "@/lib/saveJsonFile";
 import { confirm } from "@/components/craft/confirm-dialog";
+import { toast } from "sonner";
 
 // ─── Schema & Types ────────────────────────────────────────────────────────────
 
@@ -117,9 +118,9 @@ function useSupportedSite() {
       });
       addSupportedHostsToIndex(data.name, data.hosts);
       setEditingSiteName(data.name);
-      alert("Script Updated Successfully");
+      toast.success("Script Updated Successfully");
     } catch (error: any) {
-      alert(error?.message ?? "");
+      toast.error(error?.message ?? "");
     }
   }, [
     siteData,
@@ -183,7 +184,7 @@ function useSupportedSite() {
             for (const site in data) {
               const parsed = SiteDataSchema.safeParse(data[site]);
               if (!parsed.success) {
-                alert(z.prettifyError(parsed.error));
+                toast.error(z.prettifyError(parsed.error));
                 continue;
               }
               New[parsed.data.name] = parsed.data;
@@ -193,6 +194,7 @@ function useSupportedSite() {
           });
         })
         .catch((error: any) => {
+          toast.error("Error reading or parsing the JSON file");
           console.error("Error reading or parsing the JSON file:", error);
         });
     },

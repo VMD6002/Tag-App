@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { filteredDataPostServerUrlAtom } from "../../../atoms/settings";
+import { toast } from "sonner";
 
 export default function FilteredDataPost() {
   const [filteredDataPostUrl, setFilteredDataPostUrl] = useAtom(
@@ -27,7 +28,13 @@ export default function FilteredDataPost() {
           placeholder="filtered data post server, eg: http://localhost:5001"
         />
       </div>
-      <Button size="sm" onClick={() => setFilteredDataPostUrl(buffer)}>
+      <Button
+        size="sm"
+        onClick={() => {
+          setFilteredDataPostUrl(buffer);
+          toast.success("Successfully set Filtered data post server address");
+        }}
+      >
         Update
       </Button>
     </section>

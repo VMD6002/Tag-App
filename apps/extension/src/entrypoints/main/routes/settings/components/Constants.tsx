@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation } from "@tanstack/react-query";
 import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 const constantsBufferAtom = atom<string>("");
 
@@ -50,12 +51,12 @@ const validateConstants = (constants: string) => {
       .record(z.string(), z.string())
       .safeParse(customFormatToObject(constants));
     if (!parsed.success) {
-      alert(z.prettifyError(parsed.error));
+      toast.error(z.prettifyError(parsed.error));
       return null;
     }
     return parsed.data;
   } catch {
-    alert("Invalid Input!");
+    toast.error("Invalid Input!");
     return null;
   }
 };
@@ -79,7 +80,7 @@ export default function Constants() {
         setReplaceWithKeyOnUpdate(data.replaceWithKeyOnUpdate);
       },
       onError: (error) => {
-        alert(error.message);
+        toast.error(error.message);
       },
     }),
   );
@@ -87,6 +88,7 @@ export default function Constants() {
     const parsed = validateConstants(constantsBuffer);
     if (!parsed) return;
     setConstants(parsed);
+    toast.success("Successfully set Constants");
   };
 
   return (

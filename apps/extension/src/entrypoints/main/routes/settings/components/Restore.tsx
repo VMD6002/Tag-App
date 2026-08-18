@@ -8,6 +8,7 @@ import { contentDataAtom } from "@/entrypoints/main/atoms";
 import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
 import { BackUpSchema } from "@tagapp/utils/types";
 import { confirm } from "@/components/craft/confirm-dialog";
+import { toast } from "sonner";
 
 export default function Restore() {
   const [overwrite, setOverwrite] = useState(false);
@@ -33,7 +34,7 @@ export default function Restore() {
         .then((parsedData: Record<string, any>) => {
           const validator = BackUpSchema.safeParse(parsedData);
           if (!validator.success) {
-            alert(z.prettifyError(validator.error));
+            toast.error(z.prettifyError(validator.error));
             return;
           }
           const data = validator.data;
@@ -45,7 +46,7 @@ export default function Restore() {
             setContentData((old) => ({ ...old, ...data.contentData }));
             setTags((old) => ({ ...old, ...data.tags }));
           }
-          alert(
+          toast.success(
             `Successfully restored Tags and ContentData by ${
               overwrite ? "Overwriting" : "Merging"
             }`,
@@ -74,7 +75,7 @@ export default function Restore() {
         .then((parsedData: Record<string, any>) => {
           const validator = BackUpSchema.safeParse(parsedData);
           if (!validator.success) {
-            alert(z.prettifyError(validator.error));
+            toast.error(z.prettifyError(validator.error));
             return;
           }
           const data = validator.data;
@@ -85,7 +86,7 @@ export default function Restore() {
             setTags((old) => ({ ...old, ...data.tags }));
             setParentTags((old) => ({ ...old, ...data.parentTags }));
           }
-          alert(
+          toast.success(
             `Successfully restored Tags by ${
               overwrite ? "Overwriting" : "Merging"
             }`,
@@ -117,7 +118,7 @@ export default function Restore() {
         .then((parsedData: Record<string, any>) => {
           const validator = BackUpSchema.safeParse(parsedData);
           if (!validator.success) {
-            alert(z.prettifyError(validator.error));
+            toast.error(z.prettifyError(validator.error));
             return;
           }
           const data = validator.data;
@@ -127,7 +128,7 @@ export default function Restore() {
           } else {
             setContentData((old) => ({ ...old, ...data.contentData }));
           }
-          alert(
+          toast.success(
             `Successfully restored ContentData by ${
               overwrite ? "Overwriting" : "Merging"
             }`,

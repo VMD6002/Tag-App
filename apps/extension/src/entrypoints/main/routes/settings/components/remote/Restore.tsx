@@ -8,6 +8,7 @@ import { useAtomValue } from "jotai";
 import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
 import { useMutation } from "@tanstack/react-query";
 import { confirm } from "@/components/craft/confirm-dialog";
+import { toast } from "sonner";
 
 export default function RemoteRestore() {
   const [overwrite, setOverwrite] = useState(false);
@@ -15,7 +16,7 @@ export default function RemoteRestore() {
   const restoreMutation = useMutation(
     orpc.restoreAndBackup.restore.mutationOptions({
       onSuccess: () => {
-        alert(
+        toast.success(
           `Successfully restored Tags and ContentData by ${
             overwrite ? "Overwriting" : "Merging"
           }`,
@@ -42,7 +43,7 @@ export default function RemoteRestore() {
         .then((parsedData: Record<string, any>) => {
           const validator = BackUpSchema.safeParse(parsedData);
           if (!validator.success) {
-            alert(z.prettifyError(validator.error));
+            toast.error(z.prettifyError(validator.error));
             return;
           }
           const data = validator.data;
