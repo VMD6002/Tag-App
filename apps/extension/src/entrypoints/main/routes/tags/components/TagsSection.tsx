@@ -18,6 +18,7 @@ import {
 } from "@/entrypoints/main/atoms/tags";
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useState } from "react";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 export default function TagsSection() {
   const removeTag = useRemoveTag();
@@ -54,10 +55,10 @@ export default function TagsSection() {
   }, [tagString, selectedParent]);
 
   const removeTagFunc = useCallback(
-    (tag: string) => {
-      if (!confirm(`Confirm deletion of tag ${tag}`)) return;
-      removeTag(tag);
-    },
+    (tag: string) => () =>
+      confirm.destructive(`Confirm deletion of tag ${tag}`).then((ok) => {
+        if (ok) removeTag(tag);
+      }),
     [removeTag],
   );
 

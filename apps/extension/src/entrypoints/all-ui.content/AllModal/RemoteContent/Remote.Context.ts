@@ -31,6 +31,7 @@ import {
   runAfterAddRemoveScriptsInServerAtom,
 } from "@/entrypoints/main/atoms/supportedSites";
 import { remoteTagsUpdatedAtom } from "@/entrypoints/main/atoms/tags";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 function useRemoteContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -248,7 +249,7 @@ function useRemoteContextCore() {
     }),
   );
   const removeContent = useCallback(async () => {
-    if (!confirm("Confirm Deletion")) return;
+    if (!(await confirm.destructive("Confirm Deletion"))) return;
     const { identifier } = GetDetailsFromPage();
 
     removeContentsMutation.mutate({ ids: [identifier] });

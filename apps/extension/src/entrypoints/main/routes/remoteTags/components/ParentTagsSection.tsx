@@ -6,6 +6,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { parentTagStringAtom, remoteParentTagsAtom } from "../atom";
 import { useRemoteTagContext } from "../Remote.Tags.Context";
 import { useCallback } from "react";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 export default function ParentTagsSection() {
   const [parentString, setParentString] = useAtom(parentTagStringAtom);
@@ -17,15 +18,10 @@ export default function ParentTagsSection() {
   }, [parentString]);
 
   const removeParentFunc = useCallback(
-    (parent: string) => () => {
-      if (
-        !confirm(
-          `Confirm deletion of parent tag ${parent}.\nNote: Every related child tag will also be deleted`,
-        )
-      )
-        return;
-      removeParentTags([parent]);
-    },
+    (parent: string) => () =>
+      confirm(
+        `Confirm deletion of parent tag ${parent}.\nNote: Every related child tag will also be deleted`,
+      ).then((ok) => ok && removeParentTags([parent])),
     [removeParentTags],
   );
 

@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { parentTagsAtom, useRemoveParent } from "@/entrypoints/main/atoms/tags";
 import { useAtom } from "jotai";
 import { useCallback, useState } from "react";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 export default function ParentTagsSection() {
   const [parentString, setParentString] = useState("");
@@ -23,15 +24,14 @@ export default function ParentTagsSection() {
   }, [parentString]);
 
   const removeParentFunc = useCallback(
-    (parent: string) => () => {
-      if (
-        !confirm(
+    (parent: string) => () =>
+      confirm
+        .destructive(
           `Confirm deletion of parent tag ${parent}.\nNote: Every related child tag will also be deleted`,
         )
-      )
-        return;
-      removeParent(parent);
-    },
+        .then((ok) => {
+          if (ok) removeParent(parent);
+        }),
     [removeParent],
   );
 

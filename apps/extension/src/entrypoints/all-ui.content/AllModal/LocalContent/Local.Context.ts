@@ -31,6 +31,7 @@ import { useMutation } from "@tanstack/react-query";
 import { loadAtom } from "..";
 import { applyConstants } from "@tagapp/utils";
 import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 function useLocalContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -211,7 +212,7 @@ function useLocalContextCore() {
     },
   });
   const removeContent = useCallback(async () => {
-    if (!confirm("Confirm Deletion")) return;
+    if (!(await confirm.destructive("Confirm Deletion"))) return;
     const { identifier } = GetDetailsFromPage();
 
     removeContentsMutation.mutate({ ids: [identifier] });

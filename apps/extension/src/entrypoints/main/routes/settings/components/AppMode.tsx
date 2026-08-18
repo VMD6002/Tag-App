@@ -9,6 +9,7 @@ import {
   constantsAtom,
   replaceWithKeyOnUpdateAtom,
 } from "@/entrypoints/main/atoms/constants";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 type AppModeType = "local" | "remote";
 
@@ -87,7 +88,9 @@ export default function AppMode() {
             onClick={() =>
               confirm(
                 `Are you sure you want to change app mode to "${mode}"?`,
-              ) && setAppMode(mode)
+              ).then((ok) => {
+                if (ok) setAppMode(mode);
+              })
             }
           >
             {mode}
@@ -103,7 +106,9 @@ export default function AppMode() {
             onClick={() =>
               confirm(
                 `Are you sure you want to override the remote settings with local settings?`,
-              ) && overRideRemoteSettings()
+              ).then((ok) => {
+                if (ok) overRideRemoteSettings();
+              })
             }
           >
             Override Remote Settings
@@ -115,7 +120,9 @@ export default function AppMode() {
             onClick={() =>
               confirm(
                 `Are you sure you want to override the local settings with remote settings?`,
-              ) && getSettingsMutation.mutate({})
+              ).then((ok) => {
+                if (ok) getSettingsMutation.mutate({});
+              })
             }
           >
             Pull Remote Settings

@@ -7,6 +7,7 @@ import { BackUpSchema } from "@tagapp/utils/types";
 import { useAtomValue } from "jotai";
 import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
 import { useMutation } from "@tanstack/react-query";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 export default function RemoteRestore() {
   const [overwrite, setOverwrite] = useState(false);
@@ -24,10 +25,10 @@ export default function RemoteRestore() {
   );
 
   const restore = useCallback(
-    (event: any, type: "All" | "contentData" | "tags") => {
+    async (event: any, type: "All" | "contentData" | "tags") => {
       if (
         overwrite &&
-        !confirm("U sure want to overwrite ContentData and Tags ?")
+        !(await confirm("U sure want to overwrite ContentData and Tags ?"))
       ) {
         event.target.value = null;
         return;

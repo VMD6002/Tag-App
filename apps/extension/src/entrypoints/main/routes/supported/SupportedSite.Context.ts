@@ -10,6 +10,7 @@ import {
   supportedHostsIndexAtom,
 } from "../../atoms/supportedSites";
 import saveJsonFile from "@/lib/saveJsonFile";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 // ─── Schema & Types ────────────────────────────────────────────────────────────
 
@@ -144,17 +145,17 @@ function useSupportedSite() {
   }, []);
 
   const removeSite = useCallback(
-    (siteName: string) => {
-      if (confirm(`Are you sure you want to remove ${siteName}?`)) {
-        setSupportedSites(async (old) => {
-          const New = { ...(await old) };
-          delete New[siteName];
-          return New;
-        });
-        if (editingSiteName === siteName) {
-          setSiteDataEditorOpen(false);
-          setEditingSiteName(null);
-        }
+    async (siteName: string) => {
+      if (!(await confirm(`Are you sure you want to remove ${siteName}?`)))
+        return;
+      setSupportedSites(async (old) => {
+        const New = { ...(await old) };
+        delete New[siteName];
+        return New;
+      });
+      if (editingSiteName === siteName) {
+        setSiteDataEditorOpen(false);
+        setEditingSiteName(null);
       }
     },
     [editingSiteName],

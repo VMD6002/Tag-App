@@ -21,6 +21,7 @@ import { constantsAtom } from "@/entrypoints/main/atoms/constants";
 import { applyConstants } from "@tagapp/utils";
 import { supportedSitesAtom } from "@/entrypoints/main/atoms/supportedSites"; // Adjust path if needed
 import { useRemoteContext } from "../Remote.Context";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 function TagParentChildList({ tags }: { tags: string[] }) {
   const parentTags = useMemo(
@@ -116,7 +117,7 @@ const ExtendedCard = memo(
     ]);
 
     const removeContent = useCallback(async () => {
-      if (!confirm("Confirm Deletion")) return;
+      if (!(await confirm.destructive("Confirm Deletion"))) return;
       removeContents([contentDetails.id]);
     }, [contentDetails, removeContents]);
 

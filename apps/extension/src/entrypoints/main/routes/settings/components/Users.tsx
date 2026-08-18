@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { currentUserAtom, userListAtom } from "../../../atoms/user";
 import { Trash2, UserPlus } from "lucide-react";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 export default function Users() {
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
@@ -34,19 +35,19 @@ export default function Users() {
   }, [newUsername, userList, setUserList]);
 
   const handleRemoveUser = useCallback(
-    (userToRemove: string) => {
+    async (userToRemove: string) => {
       if (userList.length <= 1) {
         alert("Cannot remove the only user left");
         return;
       }
 
       // Double confirmation
-      const firstConfirm = confirm(
+      const firstConfirm = await confirm.warning(
         `Are you sure you want to remove user "${userToRemove}"?`,
       );
       if (!firstConfirm) return;
 
-      const secondConfirm = confirm(
+      const secondConfirm = await confirm.destructive(
         `WARNING: This will permanently delete settings scoped to "${userToRemove}" in this browser. Do you really want to proceed?`,
       );
       if (!secondConfirm) return;

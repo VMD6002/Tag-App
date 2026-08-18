@@ -7,6 +7,7 @@ import z from "zod";
 import { contentDataAtom } from "@/entrypoints/main/atoms";
 import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
 import { BackUpSchema } from "@tagapp/utils/types";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 export default function Restore() {
   const [overwrite, setOverwrite] = useState(false);
@@ -15,10 +16,10 @@ export default function Restore() {
   const setParentTags = useSetAtom(parentTagsAtom);
 
   const restoreAll = useCallback(
-    (event: any) => {
+    async (event: any) => {
       if (
         overwrite &&
-        !confirm("U sure want to overwrite ContentData and Tags ?")
+        !(await confirm("U sure want to overwrite ContentData and Tags ?"))
       ) {
         event.target.value = null;
         return;
@@ -59,8 +60,8 @@ export default function Restore() {
   );
 
   const restoreTags = useCallback(
-    (event: any) => {
-      if (overwrite && !confirm("U sure want to overwrite Tags ?")) {
+    async (event: any) => {
+      if (overwrite && !(await confirm("U sure want to overwrite Tags ?"))) {
         event.target.value = null;
         return;
       }
@@ -99,8 +100,11 @@ export default function Restore() {
   );
 
   const restoreContentData = useCallback(
-    (event: any) => {
-      if (overwrite && !confirm("U sure want to overwrite contentData ?")) {
+    async (event: any) => {
+      if (
+        overwrite &&
+        !(await confirm("U sure want to overwrite contentData ?"))
+      ) {
         event.target.value = null;
         return;
       }

@@ -13,6 +13,7 @@ import RemoteTagPage from "./routes/remoteTags";
 import MyQueryProvider from "@/components/MyQueryProvider";
 import { appModeAtom } from "./atoms/settings";
 import { useAtomValue } from "jotai";
+import { ConfirmProvider } from "@/components/craft/confirm-dialog";
 
 function App() {
   const appMode = useAtomValue(appModeAtom);
@@ -43,6 +44,7 @@ function App() {
             </MyQueryProvider>
           </main>
           <div className="h-12" />
+          <ConfirmProvider />
         </ThemeProvider>
       </Router>
     </>

@@ -28,6 +28,7 @@ import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
 import { useRemoteContext } from "../Remote.Context";
 
 import { Pencil, Trash2 } from "lucide-react";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 export default function Filters() {
   const { removeContents, filterData, tags } = useRemoteContext();
@@ -84,18 +85,18 @@ export default function Filters() {
 
   const removeSelected = useAtomCallback(
     useCallback(
-      async (get, set) => {
+      (get, set) => {
         const selectedEntries = get(selectionEntriesAtom);
-        if (
-          !confirm(
-            `Are you sure you want to remove ${selectedEntries.length} items?`,
-          )
-        )
-          return;
-        removeContents(selectedEntries);
-        set(selectionEntriesAtom, []);
+        confirm(
+          `Are you sure you want to remove ${selectedEntries.length} items?`,
+        ).then((ok) => {
+          if (ok) {
+            removeContents(selectedEntries);
+            set(selectionEntriesAtom, []);
+          }
+        });
       },
-      [removeContents, selectionEntriesAtom],
+      [selectionEntriesAtom, removeContents],
     ),
   );
 

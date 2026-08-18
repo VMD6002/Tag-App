@@ -29,6 +29,7 @@ import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
 import { useLibraryContext } from "../Library.Context";
 
 import { Pencil, Trash2 } from "lucide-react";
+import { confirm } from "@/components/craft/confirm-dialog";
 
 export default function Filters() {
   const parentTags = useAtomValue(parentTagsAtom);
@@ -89,14 +90,14 @@ export default function Filters() {
     useCallback(
       (get, set) => {
         const selectedEntries = get(selectionEntriesAtom);
-        if (
-          !confirm(
-            `Are you sure you want to remove ${selectedEntries.length} items?`,
-          )
-        )
-          return;
-        removeContents(selectedEntries);
-        set(selectionEntriesAtom, []);
+        confirm(
+          `Are you sure you want to remove ${selectedEntries.length} items?`,
+        ).then((ok) => {
+          if (ok) {
+            removeContents(selectedEntries);
+            set(selectionEntriesAtom, []);
+          }
+        });
       },
       [selectionEntriesAtom, removeContents],
     ),
