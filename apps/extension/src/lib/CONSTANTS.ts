@@ -4,5 +4,3 @@ export const SHADOW_ROOT_ID = "tag-app-overlay";
 export const EXTENSION_ID = "TagAppExtension@dev.com";
 
 export const DEFAULT_USER = "DEFAULT";
-
-export const HOST_NAME_ELEMENT_ID = "TagAppHostNames";

@@ -7,7 +7,6 @@ import {
   DEFAULT_USER,
   SHADOW_ROOT_ID,
   SITE_DATA_ELEMENT_ID,
-  HOST_NAME_ELEMENT_ID,
 } from "@/lib/CONSTANTS";
 import { generateJsonScriptElement } from "@/lib/generateJsonScriptElement";
 
@@ -42,6 +41,51 @@ function checkMatchPatterns(SiteData: SiteData) {
   return false;
 }
 
+const MESSAGE_TYPE_SEND_TAGS = "TAG_APP_INJECT_TAGS";
+const MESSAGE_TYPE_ACK_TAGS = "TAG_APP_TAGS_RECEIVED";
+
+// Helper to broadcast tags until an ACK is received or max attempts hit
+const sendTagsWithHandshake = (
+  tags: string[],
+  intervalMs = 500,
+  maxAttempts = 20,
+): Promise<boolean> => {
+  return new Promise((resolve) => {
+    let attempts = 0;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
+    const handleAck = (event: MessageEvent) => {
+      if (event.source !== window) return;
+      if (event.data?.type === MESSAGE_TYPE_ACK_TAGS) {
+        cleanup();
+        console.log("Tag handshake successful: ACK received from page.");
+        resolve(true);
+      }
+    };
+
+    const cleanup = () => {
+      if (intervalId) clearInterval(intervalId);
+      window.removeEventListener("message", handleAck);
+    };
+
+    window.addEventListener("message", handleAck);
+
+    const attemptSend = () => {
+      attempts++;
+      window.postMessage({ type: MESSAGE_TYPE_SEND_TAGS, payload: tags }, "*");
+
+      if (attempts >= maxAttempts) {
+        console.warn("Max tag send attempts reached without ACK.");
+        cleanup();
+        resolve(false);
+      }
+    };
+
+    attemptSend();
+    intervalId = setInterval(attemptSend, intervalMs);
+  });
+};
+
 async function injectSiteDataIntoPage() {
   const currentUser =
     (await storage.getItem<string>("local:currentUser")) ?? DEFAULT_USER;
@@ -56,31 +100,39 @@ async function injectSiteDataIntoPage() {
 
   // Check if its one of the hostnames defined by user and if it is then inject tag data and exit
   if (hostNames && hostNames.includes(location.origin)) {
-    let tags: string[];
+    const fetchAndBroadcastTags = async () => {
+      let tags: string[];
 
-    if (appMode === "local")
-      tags = Object.keys(
-        (await storage.getItem(`local:${currentUser}:tags`)) ?? {},
-      );
-    else {
-      const serverUrl =
-        (await storage.getItem(`local:${currentUser}:serverUrl`)) ?? "";
-      if (!serverUrl) {
-        console.error("Server URL not found");
-        return false;
+      if (appMode === "local") {
+        tags = Object.keys(
+          (await storage.getItem(`local:${currentUser}:tags`)) ?? {},
+        );
+      } else {
+        const serverUrl =
+          (await storage.getItem(`local:${currentUser}:serverUrl`)) ?? "";
+        if (!serverUrl) {
+          console.error("Server URL not found");
+          return;
+        }
+        const res = await fetch(`${serverUrl}/rpc/tags/getTagData`, {
+          body: '{"json":{}}',
+          method: "POST",
+        });
+        tags = Object.keys((await res.json())?.json?.tags ?? {});
       }
-      const res = await fetch(`${serverUrl}/rpc/tags/getTagData`, {
-        body: '{"json":{}}',
-        method: "POST",
-      });
-      tags = Object.keys((await res.json())?.json?.tags ?? {});
-    }
 
-    const hostNameTagsElement = generateJsonScriptElement(
-      HOST_NAME_ELEMENT_ID,
-      tags.sort(),
-    );
-    document.documentElement.append(hostNameTagsElement);
+      await sendTagsWithHandshake(tags.sort());
+    };
+
+    // 1. Initial tag fetch and handshake broadcast on load
+    await fetchAndBroadcastTags();
+
+    // 2. Storage watcher to re-run handshake whenever remote tags update
+    storage.watch<boolean>("local:remoteTagsUpdated", async (newValue) => {
+      await fetchAndBroadcastTags();
+      await storage.setItem("local:remoteTagsUpdated", false);
+    });
+
     return false;
   }
 
@@ -92,11 +144,11 @@ async function injectSiteDataIntoPage() {
 
   const SupportedSites: Record<string, SiteData> =
     (await storage.getItem(`local:${currentUser}:supportedSites`)) ?? {};
-  if (!checkMatchPatterns(SupportedSites[SiteName])) return false;
+  if (!checkMatchPatterns(SupportedSites[SiteName]!)) return false;
 
   const siteDataScriptEle = generateJsonScriptElement(
     SITE_DATA_ELEMENT_ID,
-    SupportedSites[SiteName],
+    SupportedSites[SiteName]!,
   );
   document.documentElement.append(siteDataScriptEle);
   return true;
