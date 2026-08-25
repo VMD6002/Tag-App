@@ -66,10 +66,7 @@ function useRemoteContextCore() {
   const [remoteTags, setRemoteTags] = useState<string[]>([]);
   const getTagsMutation = useMutation(
     orpc.tags.getTagData.mutationOptions({
-      onSuccess: (res) => {
-        console.log("Tags", res);
-        setRemoteTags(Object.keys(res.tags).sort());
-      },
+      onSuccess: (res) => setRemoteTags(Object.keys(res.tags).sort()),
     }),
   );
   const runUserCodeMutation = useMutation(
@@ -261,7 +258,7 @@ function useRemoteContextCore() {
   }, [contentData, siteData, orpc]);
 
   useEffect(() => {
-    log("Remote Tags Updated", remoteTagsUpdated);
+    log("Remote Tags Updated");
     getTagsMutation.mutate({});
   }, [orpc, remoteTagsUpdated]);
 
