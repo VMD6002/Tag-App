@@ -1,4 +1,4 @@
-## Properties you can read/invole from script with sh
+## Properties you can read/invoke from script with sh
 
 ```ts
 interface SiteContentDetails {
@@ -70,3 +70,42 @@ TagAppExt comes with some build helper functions for that can be accessed by `sh
 
 - `toBase36(num: Number)`
   Converts a number to base 36 string. eg: toBase36(1000) // returns "ks"
+
+## siteData schema
+
+```ts
+type SiteData = {
+  name: string;
+  hosts: string[];
+  script: string;
+  afterAddScript?: string | undefined;
+  afterRemoveScript?: string | undefined;
+  matchPatterns?: string[] | undefined;
+  download?:
+    | {
+        presets: {
+          label: string;
+          value: string;
+        }[];
+        defaultPreset: {
+          label: string;
+          value: string;
+        };
+      }
+    | undefined;
+};
+```
+
+## How to use after(Add|Remove)Scripts
+
+The scripts are provided data object
+
+```ts
+type data = {
+  // Refer the full types for below in the above sections
+  ctdls: SiteContentDetails;
+  siteData: SiteData;
+};
+```
+
+You can do fetch, console.logs ...etc with this data then
