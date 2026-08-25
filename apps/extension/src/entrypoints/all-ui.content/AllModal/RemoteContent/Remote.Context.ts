@@ -174,7 +174,7 @@ function useRemoteContextCore() {
           if (!exists && siteData.afterAddScript)
             runScript(siteData.afterAddScript, {
               siteData,
-              ctdls: res,
+              contentDetails: res,
             });
           log(`${res.id} Added`);
         }

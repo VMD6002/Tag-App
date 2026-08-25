@@ -1,19 +1,3 @@
-## Properties you can read/invoke from script with sh
-
-```ts
-interface SiteContentDetails {
-  downloadType?: string;
-  site: string;
-  title: string;
-  cover?: string;
-  identifier: string;
-  url: string;
-  defaultTags: string[];
-  contentUrl?: string;
-  extraData?: string;
-}
-```
-
 ## Principles/Tips for writing good site scripts
 
 1. Always use built in variables if available.
@@ -71,7 +55,21 @@ TagAppExt comes with some build helper functions for that can be accessed by `sh
 - `toBase36(num: Number)`
   Converts a number to base 36 string. eg: toBase36(1000) // returns "ks"
 
-## siteData schema
+## How to use after(Add|Remove)Scripts
+
+The scripts are provided data object
+
+```ts
+type data = {
+  // Refer the TS Types section to see full type defenitions
+  contentDetails: ContentWebType;
+  siteData: SiteData;
+};
+```
+
+You can do fetch, console.logs ...etc with this data then.
+
+## TS types
 
 ```ts
 type SiteData = {
@@ -94,18 +92,40 @@ type SiteData = {
       }
     | undefined;
 };
-```
 
-## How to use after(Add|Remove)Scripts
-
-The scripts are provided data object
-
-```ts
-type data = {
-  // Refer the full types for below in the above sections
-  ctdls: SiteContentDetails;
-  siteData: SiteData;
+type ContentWebType = {
+  id: string;
+  title: string;
+  tags: string[];
+  extraData: string;
+  url: string;
+  scraper: string;
+  added: number;
+  lastUpdated: number;
+  cover?: string | undefined;
+  download?:
+    | {
+        type: string;
+        flags?:
+          | {
+              label: string;
+              value: string;
+            }
+          | undefined;
+      }
+    | undefined;
+  contentUrl?: string | undefined;
 };
-```
 
-You can do fetch, console.logs ...etc with this data then
+interface SiteContentDetails {
+  downloadType?: string;
+  site: string;
+  title: string;
+  cover?: string;
+  identifier: string;
+  url: string;
+  defaultTags: string[];
+  contentUrl?: string;
+  extraData?: string;
+}
+```

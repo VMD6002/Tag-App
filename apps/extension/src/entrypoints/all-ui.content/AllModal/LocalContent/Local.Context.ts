@@ -142,7 +142,7 @@ function useLocalContextCore() {
       if (exists) log(`${res.id} Updated`);
       else {
         if (!exists && siteData.afterAddScript)
-          runScript(siteData.afterAddScript, { siteData, ctdls: res });
+          runScript(siteData.afterAddScript, { siteData, contentDetails: res });
         log(`${res.id} Added`);
       }
 
