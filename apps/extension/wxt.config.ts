@@ -60,11 +60,7 @@ export default defineConfig({
       },
       web_accessible_resources: [
         {
-          resources: [
-            "all-script-userscript.js",
-            "sandbox.html",
-            "favicon.ico",
-          ],
+          resources: ["all-script-userscript.js", "sandbox.html"],
           matches: ["*://*/*"],
         },
       ],
