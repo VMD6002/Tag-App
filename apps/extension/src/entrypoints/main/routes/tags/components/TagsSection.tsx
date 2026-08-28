@@ -56,7 +56,7 @@ export default function TagsSection() {
   }, [tagString, selectedParent]);
 
   const removeTagFunc = useCallback(
-    (tag: string) => () =>
+    (tag: string) =>
       confirm.destructive(`Confirm deletion of tag ${tag}`).then((ok) => {
         if (ok) removeTag(tag);
       }),
