@@ -69,7 +69,7 @@ export function useRemoteTag() {
       onSuccess: (res) => {
         setTags((old) => {
           res.forEach((tag) => {
-            old[tag] = { count: 1 };
+            old[tag] = { count: 0 };
           });
           return { ...old };
         });
