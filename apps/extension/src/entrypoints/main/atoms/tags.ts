@@ -5,9 +5,9 @@ import { useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
 import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
 
-export const remoteTagsUpdatedAtom = atomWithUserStorage<boolean>(
+export const remoteTagsUpdatedAtom = atomWithUserStorage<number>(
   "remoteTagsUpdated",
-  false,
+  0,
 );
 
 export const tagDefaultData = {

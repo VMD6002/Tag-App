@@ -74,7 +74,7 @@ export function useRemoteTag() {
           return { ...old };
         });
         setTagString("");
-        setRemoteTagsUpdated(async (old) => !(await old));
+        setRemoteTagsUpdated(Date.now());
       },
     }),
   );
@@ -92,7 +92,7 @@ export function useRemoteTag() {
           });
           return { ...old };
         });
-        setRemoteTagsUpdated(async (old) => !(await old));
+        setRemoteTagsUpdated(Date.now());
       },
     }),
   );
@@ -124,7 +124,7 @@ export function useRemoteTag() {
       onSuccess: (res) => {
         setParentTags(res.parentTags);
         setTags(res.tags);
-        setRemoteTagsUpdated(async (old) => !(await old));
+        setRemoteTagsUpdated(Date.now());
       },
     }),
   );

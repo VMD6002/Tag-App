@@ -128,10 +128,10 @@ async function injectSiteDataIntoPage() {
     await fetchAndBroadcastTags();
 
     // 2. Storage watcher to re-run handshake whenever remote tags update
-    storage.watch<boolean>("local:remoteTagsUpdated", async () => {
-      await fetchAndBroadcastTags();
-      await storage.setItem("local:remoteTagsUpdated", false);
-    });
+    storage.watch<boolean>(
+      `local:${currentUser}:remoteTagsUpdated`,
+      async () => await fetchAndBroadcastTags(),
+    );
 
     return false;
   }
