@@ -1,8 +1,8 @@
-import { defineConfig } from "wxt";
-import tailwindcss from "@tailwindcss/vite";
+import path from "node:path";
 import MarkdownPlugin from "@goodforyou/vite-plugin-markdown-import";
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import path from "path";
+import { defineConfig } from "wxt";
 import { EXTENSION_ID } from "./src/lib/CONSTANTS";
 
 // See https://wxt.dev/api/config.html

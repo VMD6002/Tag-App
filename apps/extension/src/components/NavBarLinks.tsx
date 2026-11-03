@@ -1,3 +1,6 @@
+import { useAtom, useAtomValue } from "jotai";
+import { Link } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -7,10 +10,8 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { currentUserAtom, userListAtom } from "@/entrypoints/main/atoms/user";
 import { ModeToggle } from "./mode-toggle";
-import { Link } from "wouter";
-import { useHashLocation } from "wouter/use-hash-location";
-import { useAtom, useAtomValue } from "jotai";
 import {
   Select,
   SelectContent,
@@ -19,7 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { currentUserAtom, userListAtom } from "@/entrypoints/main/atoms/user";
 
 const Links = {
   Library: "/",

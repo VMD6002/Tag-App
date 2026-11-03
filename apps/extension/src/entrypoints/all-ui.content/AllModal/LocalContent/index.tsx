@@ -1,8 +1,7 @@
-import { LocalProvider } from "./Local.Context";
-import HiddenForms from "../Shared/HiddenForms";
-import FloatingButtons from "../Shared/FloatingButtons";
-import { useLocalContext } from "./Local.Context";
 import ContentModal from "../Shared/ContentModal";
+import FloatingButtons from "../Shared/FloatingButtons";
+import HiddenForms from "../Shared/HiddenForms";
+import { LocalProvider, useLocalContext } from "./Local.Context";
 
 export default function LocalContent() {
   return (

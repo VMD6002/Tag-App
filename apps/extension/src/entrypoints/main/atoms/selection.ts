@@ -1,8 +1,8 @@
-import { atom, type Getter, type Setter } from "jotai";
-import { contentDataAtom } from ".";
 import type { ContentWebType } from "@tagapp/utils/types";
-import { useCallback } from "react";
+import { atom, type Getter, type Setter } from "jotai";
 import { useAtomCallback } from "jotai/utils";
+import { useCallback } from "react";
+import { contentDataAtom } from ".";
 
 export const selectionOnAtom = atom(false);
 export const selectionEntriesAtom = atom<string[]>([]);

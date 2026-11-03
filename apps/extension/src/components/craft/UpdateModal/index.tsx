@@ -1,12 +1,12 @@
+import CodeEditor from "@uiw/react-textarea-code-editor";
+import { useAtom, useAtomValue } from "jotai";
+import { Redo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import MultipleSelector from "@/components/ui/multiple-selector";
-import CodeEditor from "@uiw/react-textarea-code-editor";
-import SeeMore from "./SeeMore";
-import { useAtom, useAtomValue } from "jotai";
 import { tagsAtom } from "@/entrypoints/main/atoms/tags";
-import PresetsMenu from "./PresetsMenu";
+import { cn } from "@/lib/utils";
 import {
   updateContentUrlAtom,
   updateCoverAtom,
@@ -18,8 +18,8 @@ import {
   updateTagsAtom,
   updateTitleAtom,
 } from "./atom";
-import { Redo2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import PresetsMenu from "./PresetsMenu";
+import SeeMore from "./SeeMore";
 
 export default function UpdateModal({
   className = "",
@@ -43,16 +43,18 @@ export default function UpdateModal({
   const exists = useAtomValue(updateExistsAtom);
   const resetFuntions = useAtomValue(updateResetOptionsAtom);
 
-  if (!modalOpen) return <></>;
+  if (!modalOpen) return null;
 
   return (
     <div
       style={{ zIndex: 2147483647 }}
       className="grid fixed min-h-screen top-0 right-0 w-full place-items-center overflow-y-auto overflow-x-clip"
     >
-      <div
+      <button
+        type="button"
+        aria-label="Close modal"
         onClick={() => setModalOpen(false)}
-        className="h-screen absolute w-full bg-black/10 backdrop-blur-xs"
+        className="h-screen absolute w-full bg-black/10 backdrop-blur-xs cursor-default"
       />
       <div
         className={cn(
@@ -64,7 +66,10 @@ export default function UpdateModal({
           <Label>Name</Label>
           {resetFuntions?.title && (
             <Button
-              onClick={() => setTitle(resetFuntions.title!())}
+              onClick={() => {
+                const val = resetFuntions.title?.();
+                if (val !== undefined) setTitle(val);
+              }}
               size="icon"
               variant="outline"
               className="scale-80"
@@ -83,7 +88,10 @@ export default function UpdateModal({
           <Label>Tags</Label>
           {resetFuntions?.tags && (
             <Button
-              onClick={() => setUpdateTags(resetFuntions.tags!())}
+              onClick={() => {
+                const val = resetFuntions.tags?.();
+                if (val !== undefined) setUpdateTags(val);
+              }}
               size="icon"
               variant="outline"
               className="scale-80"
@@ -110,7 +118,10 @@ export default function UpdateModal({
                 <Label>Cover</Label>
                 {resetFuntions?.cover && (
                   <Button
-                    onClick={() => setCover(resetFuntions.cover!())}
+                    onClick={() => {
+                      const val = resetFuntions.cover?.();
+                      if (val !== undefined) setCover(val);
+                    }}
                     size="icon"
                     variant="outline"
                     className="scale-80"
@@ -133,7 +144,10 @@ export default function UpdateModal({
                 <Label>Content Url</Label>
                 {resetFuntions?.contentUrl && (
                   <Button
-                    onClick={() => setContentUrl(resetFuntions.contentUrl!())}
+                    onClick={() => {
+                      const val = resetFuntions.contentUrl?.();
+                      if (val !== undefined) setContentUrl(val);
+                    }}
                     size="icon"
                     variant="outline"
                     className="scale-80"
@@ -154,7 +168,10 @@ export default function UpdateModal({
             <Label>Extra Data</Label>
             {resetFuntions?.extraData && (
               <Button
-                onClick={() => setExtraData(resetFuntions.extraData!())}
+                onClick={() => {
+                  const val = resetFuntions.extraData?.();
+                  if (val !== undefined) setExtraData(val);
+                }}
                 size="icon"
                 variant="outline"
                 className="scale-80"

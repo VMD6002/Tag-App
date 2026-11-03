@@ -1,8 +1,8 @@
 import type { Getter, Setter } from "jotai";
+import { useAtomCallback } from "jotai/utils";
+import { useCallback } from "react";
 import type { SiteData } from "../routes/supported";
 import { atomWithUserStorage } from "./user";
-import { useCallback } from "react";
-import { useAtomCallback } from "jotai/utils";
 
 export const enableAfterAddRemoveScriptsAtom = atomWithUserStorage<boolean>(
   "enableAfterAddRemoveScripts",
@@ -30,7 +30,9 @@ const addSupportedHostsToIndexCallback = async (
   supportedSitesList: string[],
 ) => {
   const oldHostsIndex = await get(supportedHostsIndexAtom);
-  supportedSitesList.forEach((site) => (oldHostsIndex[site] = siteName));
+  supportedSitesList.forEach((site) => {
+    oldHostsIndex[site] = siteName;
+  });
   set(supportedHostsIndexAtom, oldHostsIndex);
 };
 

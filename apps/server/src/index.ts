@@ -1,15 +1,13 @@
+import { mkdirSync } from "node:fs";
+import { networkInterfaces } from "node:os";
+import { parseArgs } from "node:util";
+import { RPCHandler } from "@orpc/server/fetch";
+import { router, settingsDB } from "@tagapp/api";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
-import { trimTrailingSlash } from "hono/trailing-slash";
 import { logger } from "hono/logger";
-
-import { RPCHandler } from "@orpc/server/fetch";
-
-import { router, settingsDB } from "@tagapp/api";
-import { parseArgs } from "node:util";
-import { mkdirSync } from "node:fs";
-import { networkInterfaces } from "node:os";
+import { trimTrailingSlash } from "hono/trailing-slash";
 
 function getLocalIP(): string {
   const nets = networkInterfaces();
@@ -39,12 +37,11 @@ const { values } = parseArgs({
 const { port, prefix } = values;
 
 // --- Port Settings Logic ---
-let activePort: number;
 if (port && !settingsDB.data.port) {
   settingsDB.data.port = Number(port);
   settingsDB.write();
 }
-activePort = settingsDB.data.port;
+const activePort: number = settingsDB.data.port;
 
 // --- Prefix Settings Logic ---
 if (prefix) {

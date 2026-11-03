@@ -1,7 +1,7 @@
+import { useAtom, useAtomValue } from "jotai";
+import { Redo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Redo2 } from "lucide-react";
-import { useAtom, useAtomValue } from "jotai";
 import {
   updateDownloadTypeAtom,
   updatePresetAtom,
@@ -15,8 +15,8 @@ export default function PresetsMenu() {
   const resetOptions = useAtomValue(updateResetOptionsAtom);
   const downloadType = useAtomValue(updateDownloadTypeAtom);
 
-  if (!downloadType) return <></>;
-  if (!presetOptions || presetOptions.length <= 0) return <></>;
+  if (!downloadType) return null;
+  if (!presetOptions || presetOptions.length <= 0) return null;
 
   return (
     <>
@@ -24,7 +24,7 @@ export default function PresetsMenu() {
         <Label>Presets</Label>
         {resetOptions?.preset && (
           <Button
-            onClick={() => setPreset(resetOptions.preset)}
+            onClick={() => setPreset(resetOptions.preset?.())}
             size="icon"
             variant="outline"
             className="scale-80"

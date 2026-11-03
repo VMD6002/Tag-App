@@ -1,6 +1,6 @@
 import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
-import errorLog from "../lib/errorLog";
 import { JSONFilePreset } from "lowdb/node";
+import errorLog from "../lib/errorLog";
 
 const tagDB_DefaultData = {
   parentTags: {} as ParentTagsType,
@@ -44,4 +44,5 @@ const IncrementTagCount = (tags: string[] | Set<string>) => {
     errorLog(batchError);
   }
 };
-export { tagDB, IncrementTagCount, DecrementTagCount };
+
+export { DecrementTagCount, IncrementTagCount, tagDB };

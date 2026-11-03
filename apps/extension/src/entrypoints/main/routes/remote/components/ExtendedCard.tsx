@@ -1,12 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
-import { memo, useMemo, useCallback } from "react"; // Fixed: Added missing imports
+import { applyConstants } from "@tagapp/utils";
+import type { ContentWebType } from "@tagapp/utils/types";
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import {
-  selectionEntriesAtom, // Added for atomic selection check
-  selectionOnAtom,
-  useSelectEntry,
-} from "@/entrypoints/main/atoms/selection";
+import { Check } from "lucide-react";
+import { memo, useCallback, useMemo } from "react"; // Fixed: Added missing imports
+import { confirm } from "@/components/craft/confirm-dialog";
 import {
   updateCoverAtom,
   updateExtraDataAtom,
@@ -16,12 +13,15 @@ import {
   updateTagsAtom,
   updateTitleAtom,
 } from "@/components/craft/UpdateModal/atom";
-import type { ContentWebType } from "@tagapp/utils/types";
+import { Button } from "@/components/ui/button";
 import { constantsAtom } from "@/entrypoints/main/atoms/constants";
-import { applyConstants } from "@tagapp/utils";
+import {
+  selectionEntriesAtom, // Added for atomic selection check
+  selectionOnAtom,
+  useSelectEntry,
+} from "@/entrypoints/main/atoms/selection";
 import { supportedSitesAtom } from "@/entrypoints/main/atoms/supportedSites"; // Adjust path if needed
 import { useRemoteContext } from "../Remote.Context";
-import { confirm } from "@/components/craft/confirm-dialog";
 
 function TagParentChildList({ tags }: { tags: string[] }) {
   const parentTags = useMemo(
@@ -38,7 +38,7 @@ function TagParentChildList({ tags }: { tags: string[] }) {
             {tags
               .filter((k) => k.startsWith(parent))
               .sort()
-              .map((e) => e.replace(parent + ":", "").replaceAll("_", " "))
+              .map((e) => e.replace(`${parent}:`, "").replaceAll("_", " "))
               .join(", ")}
           </span>
         </div>
@@ -122,6 +122,8 @@ const ExtendedCard = memo(
     }, [contentDetails, removeContents]);
 
     return (
+      // biome-ignore lint/a11y/noStaticElementInteractions: card selection click handler contains nested controls
+      // biome-ignore lint/a11y/useKeyWithClickEvents: card selection click handler contains nested controls
       <div
         onClick={() => selectionOn && selectEntry(contentDetails.id)} // Fixed: id -> contentDetails.id
         className={`block p-2 h-fit relative text-left border rounded-sm transition-all ${

@@ -1,9 +1,9 @@
+import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
 import type { Getter, Setter } from "jotai";
+import { useAtomCallback } from "jotai/utils";
+import { useCallback } from "react";
 import { contentDataAtom } from ".";
 import { atomWithUserStorage } from "./user";
-import { useCallback } from "react";
-import { useAtomCallback } from "jotai/utils";
-import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
 
 export const remoteTagsUpdatedAtom = atomWithUserStorage<number>(
   "remoteTagsUpdated",

@@ -1,21 +1,21 @@
+import {
+  filterData,
+  replaceWithConstantKey,
+  sanitizeStringForFileName,
+} from "@tagapp/utils";
 import type {
   ContentWebBaseType,
   ContentWebDataType,
   ContentWebType,
   FilterDataType,
 } from "@tagapp/utils/types";
-import { atomWithUserStorage } from "./user";
 import type { Getter, Setter } from "jotai";
-import { constantsAtom, replaceWithKeyOnUpdateAtom } from "./constants";
-import { tagsAtom } from "./tags";
-import { sanitizeTitleAtom } from "./settings";
-import {
-  filterData,
-  replaceWithConstantKey,
-  sanitizeStringForFileName,
-} from "@tagapp/utils";
-import { useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
+import { useCallback } from "react";
+import { constantsAtom, replaceWithKeyOnUpdateAtom } from "./constants";
+import { sanitizeTitleAtom } from "./settings";
+import { tagsAtom } from "./tags";
+import { atomWithUserStorage } from "./user";
 
 export const contentDataAtom = atomWithUserStorage<ContentWebDataType>(
   "contentData",

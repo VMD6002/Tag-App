@@ -1,7 +1,7 @@
+import { applyConstants } from "@tagapp/utils";
+import type { ContentWebType } from "@tagapp/utils/types";
 import { memo, useMemo } from "react"; // Fixed: Added missing imports
 import { useRemoteContext } from "../Remote.Context";
-import type { ContentWebType } from "@tagapp/utils/types";
-import { applyConstants } from "@tagapp/utils";
 
 function TagParentChildList({ tags }: { tags: string[] }) {
   const parentTags = useMemo(
@@ -18,7 +18,7 @@ function TagParentChildList({ tags }: { tags: string[] }) {
             {tags
               .filter((k) => k.startsWith(parent))
               .sort()
-              .map((e) => e.replace(parent + ":", "").replaceAll("_", " "))
+              .map((e) => e.replace(`${parent}:`, "").replaceAll("_", " "))
               .join(", ")}
           </span>
         </div>

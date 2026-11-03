@@ -1,9 +1,9 @@
 import { os } from "@orpc/server";
+import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
 import z from "zod";
-import { DecrementTagCount, tagDB } from "../db/tags";
 import { contentDataDB } from "../db/contentData";
+import { tagDB } from "../db/tags";
 import errorLog from "../lib/errorLog";
-import { ParentTagsType, TagsType } from "@tagapp/utils/types";
 
 export const getTagData = os.handler(async () => {
   return tagDB.data;

@@ -1,12 +1,12 @@
-import MyQueryProvider from "@/components/MyQueryProvider";
-import LocalContent from "./LocalContent";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
-import { appModeAtom } from "@/entrypoints/main/atoms/settings";
-import RemoteContent from "./RemoteContent";
+import { useState } from "react";
 import { updateResetOptionsAtom } from "@/components/craft/UpdateModal/atom";
+import MyQueryProvider from "@/components/MyQueryProvider";
+import { appModeAtom } from "@/entrypoints/main/atoms/settings";
 import GetDetailsFromPage from "@/lib/GetDetailsFromPage";
 import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
-import { useState } from "react";
+import LocalContent from "./LocalContent";
+import RemoteContent from "./RemoteContent";
 
 const store = getDefaultStore();
 
@@ -16,9 +16,9 @@ store.set(updateResetOptionsAtom, {
   tags: () =>
     GetDetailsFromPage().defaultTags.map((o) => ({ label: o, value: o })),
   contentUrl: () => GetDetailsFromPage().contentUrl!,
-  preset: () => GetTagAppSiteData().download?.defaultPreset!,
+  preset: () => GetTagAppSiteData().download?.defaultPreset,
   extraData: () =>
-    `Web: [${GetDetailsFromPage().url}](${GetDetailsFromPage().url})${GetDetailsFromPage().extraData ? "\n" + GetDetailsFromPage().extraData : ""}`,
+    `Web: [${GetDetailsFromPage().url}](${GetDetailsFromPage().url})${GetDetailsFromPage().extraData ? `\n${GetDetailsFromPage().extraData}` : ""}`,
 });
 
 export const loadAtom = atom(false);

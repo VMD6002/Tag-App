@@ -1,13 +1,13 @@
+import { useAtomValue, useSetAtom } from "jotai";
+import { resetFilterAtom } from "@/atom";
 import TitleHeader from "@/components/craft/TitleHeader";
-import Filters from "./components/Filters";
 import ExtendedCard from "./components/ExtendedCard";
-import { useSetAtom, useAtomValue } from "jotai";
+import Filters from "./components/Filters";
 import {
   filteredAtom,
   RemoteProvider,
   useRemoteContext,
 } from "./Remote.Context";
-import { resetFilterAtom } from "@/atom";
 
 function Library() {
   const { filterData } = useRemoteContext();
@@ -18,6 +18,7 @@ function Library() {
   return (
     <>
       <button
+        type="button"
         className="w-full text-left hover:cursor-pointer bg-transparent border-none p-0 appearance-none"
         onClick={() => {
           reset();

@@ -1,3 +1,4 @@
+import { atom, useAtom } from "jotai";
 import { BookOpen } from "lucide-react";
 import Markdown from "react-markdown";
 import ScriptingGuidMD from "@/../../../Notes/Scripting Guide.md";
@@ -8,7 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { atom, useAtom } from "jotai";
 
 export const guideOpenAtom = atom(false);
 

@@ -1,10 +1,5 @@
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import MultipleSelector from "@/components/ui/multiple-selector";
-import { useMemo } from "react"; // Fixed: Added missing imports
 import { useAtom, useSetAtom } from "jotai";
+import { useMemo } from "react"; // Fixed: Added missing imports
 import {
   allAtom,
   anyAtom,
@@ -14,9 +9,12 @@ import {
   resetFilterAtom,
   searchAtom,
 } from "@/atom";
-
-import { filteredAtom } from "../Remote.Context";
-import { useRemoteContext } from "../Remote.Context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import MultipleSelector from "@/components/ui/multiple-selector";
+import { Switch } from "@/components/ui/switch";
+import { filteredAtom, useRemoteContext } from "../Remote.Context";
 
 export default function Filters() {
   const { filterData, tags } = useRemoteContext();
@@ -47,8 +45,8 @@ export default function Filters() {
       new Set(tags.map((tag) => tag.split(":")[0])),
     );
     const tagParentsConverted = parentTags.map((o: string) => ({
-      label: o + ":*",
-      value: o + ":*",
+      label: `${o}:*`,
+      value: `${o}:*`,
     }));
 
     return [
@@ -101,6 +99,7 @@ export default function Filters() {
             Filter
           </Button>
           <button
+            type="button"
             className="text-muted-foreground underline ml-4 cursor-pointer text-sm bg-transparent border-none"
             onClick={reset}
           >

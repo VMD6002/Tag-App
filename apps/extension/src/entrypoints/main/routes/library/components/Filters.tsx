@@ -1,13 +1,15 @@
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Checkbox } from "@/components/ui/checkbox";
-import MultipleSelector from "@/components/ui/multiple-selector";
-import { useMemo, useCallback } from "react"; // Fixed: Added missing imports
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
+import { Pencil, Trash2 } from "lucide-react";
+import { useCallback, useMemo } from "react"; // Fixed: Added missing imports
+import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
+import { confirm } from "@/components/craft/confirm-dialog";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import MultipleSelector from "@/components/ui/multiple-selector";
+import { Switch } from "@/components/ui/switch";
 import {
   allAtom,
   anyAtom,
@@ -20,16 +22,11 @@ import {
 import {
   selectionEntriesAtom,
   selectionOnAtom,
-  useToggleSelectionMode,
   useSyncSelectedTags,
+  useToggleSelectionMode,
 } from "@/entrypoints/main/atoms/selection";
-
-import { filteredAtom } from "../Library.Context";
-import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
-import { useLibraryContext } from "../Library.Context";
-
-import { Pencil, Trash2 } from "lucide-react";
-import { confirm } from "@/components/craft/confirm-dialog";
+import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
+import { filteredAtom, useLibraryContext } from "../Library.Context";
 
 export default function Filters() {
   const parentTags = useAtomValue(parentTagsAtom);
@@ -114,8 +111,8 @@ export default function Filters() {
 
   const anyAndNoneTagsForMuliSelectComponent = useMemo(() => {
     const parentTagsConverted = Object.keys(parentTags).map((o: string) => ({
-      label: o + ":*",
-      value: o + ":*",
+      label: `${o}:*`,
+      value: `${o}:*`,
     }));
 
     return [
@@ -179,6 +176,7 @@ export default function Filters() {
           Filter
         </Button>
         <button
+          type="button"
           className="text-muted-foreground underline ml-4 cursor-pointer text-sm bg-transparent border-none"
           onClick={reset}
         >

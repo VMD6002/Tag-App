@@ -1,13 +1,13 @@
-import { Button } from "@/components/ui/button";
+import { useAtom, useAtomValue } from "jotai";
 import { Pen, Plus, Trash } from "lucide-react";
 import {
   updateExistsAtom,
   updateModalOpenAtom,
 } from "@/components/craft/UpdateModal/atom";
+import { Button } from "@/components/ui/button";
 import { loadAtom } from "..";
-import { useAtom, useAtomValue } from "jotai";
-import { useLocalContext } from "../LocalContent/Local.Context";
-import { useRemoteContext } from "../RemoteContent/Remote.Context";
+import type { useLocalContext } from "../LocalContent/Local.Context";
+import type { useRemoteContext } from "../RemoteContent/Remote.Context";
 
 export default function FloatingButtons({
   useContext,

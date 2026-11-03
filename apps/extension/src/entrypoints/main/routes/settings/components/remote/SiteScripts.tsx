@@ -1,10 +1,10 @@
-import { Label } from "@/components/ui/label";
+import { useAtom } from "jotai";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
   enableAfterAddRemoveScriptsAtom,
   runAfterAddRemoveScriptsInServerAtom,
 } from "@/entrypoints/main/atoms/supportedSites";
-import { useAtom } from "jotai";
 
 export default function RemoteSiteScripts() {
   const [enableAfterAddRemoveScripts, setEnableAfterAddRemoveScriptsAtom] =

@@ -1,16 +1,16 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { appModeAtom, sanitizeTitleAtom } from "../../../atoms/settings";
-import { Checkbox } from "@/components/ui/checkbox";
-import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
 import { useMutation } from "@tanstack/react-query";
+import { useAtom, useAtomValue } from "jotai";
+import { toast } from "sonner";
+import { confirm } from "@/components/craft/confirm-dialog";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
   constantsAtom,
   replaceWithKeyOnUpdateAtom,
 } from "@/entrypoints/main/atoms/constants";
-import { confirm } from "@/components/craft/confirm-dialog";
-import { toast } from "sonner";
+import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
+import { appModeAtom, sanitizeTitleAtom } from "../../../atoms/settings";
 
 type AppModeType = "local" | "remote";
 

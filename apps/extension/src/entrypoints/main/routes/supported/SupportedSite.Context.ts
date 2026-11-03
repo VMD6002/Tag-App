@@ -1,17 +1,17 @@
-import { useState, useCallback, useRef } from "react";
-import constate from "constate";
-import z from "zod";
-import { useAtom, useAtomValue } from "jotai";
 import { PresetSchema } from "@tagapp/utils/types";
+import constate from "constate";
+import { useAtom, useAtomValue } from "jotai";
+import { useCallback, useRef, useState } from "react";
+import { toast } from "sonner";
+import z from "zod";
+import { confirm } from "@/components/craft/confirm-dialog";
+import saveJsonFile from "@/lib/saveJsonFile";
 import {
+  supportedHostsIndexAtom,
+  supportedSitesAtom,
   useAddSupportedHostsToIndex,
   useRefreshSupportedHostsIndex,
-  supportedSitesAtom,
-  supportedHostsIndexAtom,
 } from "../../atoms/supportedSites";
-import saveJsonFile from "@/lib/saveJsonFile";
-import { confirm } from "@/components/craft/confirm-dialog";
-import { toast } from "sonner";
 
 // ─── Schema & Types ────────────────────────────────────────────────────────────
 

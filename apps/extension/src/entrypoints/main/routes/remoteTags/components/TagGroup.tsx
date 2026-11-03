@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { X, Image } from "lucide-react";
-import { useRemoteTag } from "../Remote.Tags.Context";
 import { useAtomValue } from "jotai";
-import { remoteTagsAtom } from "../atom";
+import { Image, X } from "lucide-react";
 import { useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { remoteTagsAtom } from "../atom";
+import { useRemoteTag } from "../Remote.Tags.Context";
 
 type props = {
   tagsArray: string[];
@@ -29,17 +29,20 @@ export default function TagGroup({ tagsArray, parent, removeTagFunc }: props) {
         {Children.map((tag) => (
           <div key={`${parent}-${tag}`} className="break-inside-avoid-column">
             {tags[tag]!.cover ? (
-              <img loading="lazy" className="w-full" src={tags[tag]!.cover} />
-            ) : (
-              <></>
-            )}
+              <img
+                alt={`${tag} cover`}
+                loading="lazy"
+                className="w-full"
+                src={tags[tag]!.cover}
+              />
+            ) : null}
             <div className="bg-secondary flex place-items-center justify-between">
               <Button size={"icon"} onClick={() => openCoverModal(tag)}>
                 <Image />
               </Button>
               <span className="mx-3 w-full">
                 {String(tags[tag]!.count).padStart(3, "0")} |{" "}
-                {tag.replace(parent + ":", "").replaceAll("_", " ")}
+                {tag.replace(`${parent}:`, "").replaceAll("_", " ")}
               </span>
               <Button size={"icon"} onClick={() => removeTagFunc(tag)}>
                 <X />

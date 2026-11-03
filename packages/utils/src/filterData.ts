@@ -1,10 +1,10 @@
 import { ArrayHasAll, ArrayHasAnyModified } from "@tagapp/utils";
-import Fuse from "fuse.js";
 import type {
   ContentWebDataType,
   ContentWebType,
   FilterDataType,
 } from "@tagapp/utils/types";
+import Fuse from "fuse.js";
 
 function GetSearchIds(ids: ContentWebType[], search: string) {
   const fuse = new Fuse(ids, {

@@ -1,11 +1,11 @@
-import constate from "constate";
-import { useCallback, useEffect, useState } from "react";
-import { atom, useSetAtom } from "jotai";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ContentWebType } from "@tagapp/utils/types";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import constate from "constate";
+import { atom, useSetAtom } from "jotai";
+import { useAtomCallback } from "jotai/utils";
+import { useCallback, useEffect, useState } from "react";
 import { FilterQueryAtom, initializeFilterDataFromURLAtom } from "@/atom";
 import { orpc } from "@/lib/orpc";
-import { useAtomCallback } from "jotai/utils";
 
 export const filteredAtom = atom<ContentWebType[]>([]);
 

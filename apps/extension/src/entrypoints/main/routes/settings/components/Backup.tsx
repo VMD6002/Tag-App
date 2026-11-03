@@ -1,10 +1,10 @@
+import type { BackUpType } from "@tagapp/utils/types";
+import { useAtomValue } from "jotai";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { useAtomValue } from "jotai";
-import saveJsonFile from "@/lib/saveJsonFile";
 import { contentDataAtom } from "@/entrypoints/main/atoms";
 import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
-import type { BackUpType } from "@tagapp/utils/types";
+import saveJsonFile from "@/lib/saveJsonFile";
 
 function getLocalDateStringWithTime() {
   const date = new Date();

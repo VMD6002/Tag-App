@@ -1,25 +1,25 @@
-import { useState } from "react";
+import CodeEditor from "@uiw/react-textarea-code-editor";
+import { useAtomValue } from "jotai";
 import {
+  Download,
+  FileCode,
+  Plus,
   Save,
+  Settings,
   Trash2,
   X,
-  FileCode,
-  Settings,
-  Plus,
-  Download,
 } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import CodeEditor from "@uiw/react-textarea-code-editor";
+import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
 import { cn } from "@/lib/utils";
 import {
   useEditorState,
+  useImportExportActions,
   useSiteActions,
   useSupportedSites,
-  useImportExportActions,
 } from "../SupportedSite.Context";
-import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
-import { useAtomValue } from "jotai";
 
 export default function ScriptEditor() {
   const { theme } = useTheme();
@@ -135,6 +135,7 @@ export default function ScriptEditor() {
       {/* Tab Selection */}
       <div className="flex border-b border-border bg-muted/10 px-4">
         <button
+          type="button"
           onClick={() => setActiveTab("script")}
           className={cn(
             "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",
@@ -147,6 +148,7 @@ export default function ScriptEditor() {
           Userscript Code
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("metadata")}
           className={cn(
             "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",
@@ -161,6 +163,7 @@ export default function ScriptEditor() {
         {enableAfterAddRemoveScripts && (
           <>
             <button
+              type="button"
               onClick={() => setActiveTab("afterAdd")}
               className={cn(
                 "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",
@@ -173,6 +176,7 @@ export default function ScriptEditor() {
               After Add
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab("afterRemove")}
               className={cn(
                 "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",

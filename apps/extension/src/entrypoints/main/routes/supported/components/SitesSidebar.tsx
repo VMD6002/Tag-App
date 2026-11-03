@@ -1,12 +1,12 @@
+import { ChevronDown, ChevronRight, Plus, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Search, Plus, Trash2, ChevronRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
-  useSupportedSites,
   useEditorState,
   useSiteActions,
+  useSupportedSites,
 } from "../SupportedSite.Context";
 
 function SiteCard({ siteName }: { siteName: string }) {
@@ -35,9 +35,10 @@ function SiteCard({ siteName }: { siteName: string }) {
             : "text-foreground",
         )}
       >
-        <div
+        <button
+          type="button"
           onClick={() => selectSite(site)}
-          className="flex items-center cursor-pointer gap-2.5 w-full"
+          className="flex items-center cursor-pointer gap-2.5 w-full text-left bg-transparent border-none p-0"
         >
           <img
             className="size-5 rounded bg-muted/80 border border-border shrink-0"
@@ -56,7 +57,7 @@ function SiteCard({ siteName }: { siteName: string }) {
               </p>
             )}
           </div>
-        </div>
+        </button>
         <div className="flex absolute right-0 top-1/2 -translate-y-1/2 items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
             size="icon-xs"
@@ -86,20 +87,19 @@ function SiteCard({ siteName }: { siteName: string }) {
         </div>
       </div>
       {showHosts && (
-        <>
-          <div className="mt-3 space-y-1 pl-6">
-            {site.hosts.map((host, i) => (
-              <a
-                key={i}
-                href={"https://" + host}
-                target="_blank"
-                className={`text-xs block w-fit text-primary/80 font-mono hover:text-accent-foreground transition-colors underline ${i !== site.hosts.length - 1 ? "pb-1" : ""}`}
-              >
-                {host}
-              </a>
-            ))}
-          </div>
-        </>
+        <div className="mt-3 space-y-1 pl-6">
+          {site.hosts.map((host, i) => (
+            <a
+              key={host}
+              href={`https://${host}`}
+              target="_blank"
+              className={`text-xs block w-fit text-primary/80 font-mono hover:text-accent-foreground transition-colors underline ${i !== site.hosts.length - 1 ? "pb-1" : ""}`}
+              rel="noopener"
+            >
+              {host}
+            </a>
+          ))}
+        </div>
       )}
     </div>
   );

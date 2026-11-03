@@ -1,6 +1,6 @@
-import * as tags from "./routers/tags";
 import * as main from "./routers/main";
 import * as restoreAndBackup from "./routers/restoreAndBackup";
+import * as tags from "./routers/tags";
 
 export const router = {
   tags,

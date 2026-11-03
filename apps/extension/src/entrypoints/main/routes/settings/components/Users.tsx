@@ -1,8 +1,11 @@
-import { useState, useCallback } from "react";
 import { useAtom } from "jotai";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Trash2, UserPlus } from "lucide-react";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
+import { confirm } from "@/components/craft/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -12,9 +15,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { currentUserAtom, userListAtom } from "../../../atoms/user";
-import { Trash2, UserPlus } from "lucide-react";
-import { confirm } from "@/components/craft/confirm-dialog";
-import { toast } from "sonner";
 
 export default function Users() {
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);

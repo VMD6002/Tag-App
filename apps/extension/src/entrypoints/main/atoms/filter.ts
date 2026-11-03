@@ -1,7 +1,7 @@
-import { atom } from "jotai";
 import type { Getter, Setter } from "jotai";
-import { useCallback } from "react";
+import { atom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
+import { useCallback } from "react";
 
 export const searchAtom = atom("");
 export const allAtom = atom<MultiSelectOption[]>([]);

@@ -1,14 +1,14 @@
-import log from "@/lib/log";
-import type { SiteData } from "../main/routes/supported";
-import { decodeHtmlEntities, getMicroData, getOgImage } from "./dom-utils";
-import { clickUpdateOrRefresh, clickRemove } from "./extension-api";
-import { sleep, getUniqueIdFromString, toBase36 } from "./helpers";
 import {
-  SHADOW_ROOT_ID,
   CONTENT_DETAILS_ELEMENT_ID,
+  SHADOW_ROOT_ID,
   SITE_DATA_ELEMENT_ID,
 } from "@/lib/CONSTANTS";
 import { generateJsonScriptElement } from "@/lib/generateJsonScriptElement";
+import log from "@/lib/log";
+import type { SiteData } from "../main/routes/supported";
+import { decodeHtmlEntities, getMicroData, getOgImage } from "./dom-utils";
+import { clickRemove, clickUpdateOrRefresh } from "./extension-api";
+import { getUniqueIdFromString, sleep, toBase36 } from "./helpers";
 
 export default defineUnlistedScript(async () => {
   const contentDetails: SiteContentDetails = {
@@ -81,9 +81,7 @@ export default defineUnlistedScript(async () => {
   contentDetails.defaultTags.push(`Site:${siteData.name}`);
 
   if (siteData.script) {
-    const AsyncFunction = Object.getPrototypeOf(
-      async function () {},
-    ).constructor;
+    const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
     const scriptFunction = new AsyncFunction("ctdls", "sh", siteData.script);
     scriptFunction(contentDetails, sh);
   }

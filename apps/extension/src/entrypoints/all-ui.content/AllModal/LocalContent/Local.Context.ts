@@ -1,36 +1,36 @@
+import { applyConstants } from "@tagapp/utils";
+import { useMutation } from "@tanstack/react-query";
 import constate from "constate";
-import { useCallback, useRef, useEffect, useMemo } from "react";
-import GetDetailsFromPage from "@/lib/GetDetailsFromPage";
-import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
-import TIMEOUTS from "@/lib/TIMEOUTS";
-import log from "@/lib/log";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  updateContentUrlAtom,
+  updateCoverAtom,
+  updateDownloadTypeAtom,
+  updateExistsAtom,
+  updateExtraDataAtom,
+  updateModalOpenAtom,
+  updatePresetAtom,
+  updatePresetOptionsAtom,
+  updateTagsAtom,
+  updateTitleAtom,
+} from "@/components/craft/UpdateModal/atom";
 import {
   contentDataAtom,
-  useSetContent,
-  useRemoveContents,
   useGetContent,
+  useRemoveContents,
+  useSetContent,
 } from "@/entrypoints/main/atoms";
-import {
-  updateTitleAtom,
-  updateTagsAtom,
-  updateCoverAtom,
-  updateExtraDataAtom,
-  updatePresetAtom,
-  updateExistsAtom,
-  updateModalOpenAtom,
-  updateContentUrlAtom,
-  updatePresetOptionsAtom,
-  updateDownloadTypeAtom,
-} from "@/components/craft/UpdateModal/atom";
 import {
   constantsAtom,
   replaceWithKeyOnUpdateAtom,
 } from "@/entrypoints/main/atoms/constants";
-import { useMutation } from "@tanstack/react-query";
-import { loadAtom } from "..";
-import { applyConstants } from "@tagapp/utils";
 import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
+import GetDetailsFromPage from "@/lib/GetDetailsFromPage";
+import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
+import log from "@/lib/log";
+import TIMEOUTS from "@/lib/TIMEOUTS";
+import { loadAtom } from "..";
 
 function useLocalContextCore() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -105,7 +105,7 @@ function useLocalContextCore() {
         );
         setCover(extractedContentDetails.cover || "");
         setExtraData(
-          `Web: [${extractedContentDetails.url}](${extractedContentDetails.url})${extractedContentDetails.extraData ? "\n" + extractedContentDetails.extraData : ""}`,
+          `Web: [${extractedContentDetails.url}](${extractedContentDetails.url})${extractedContentDetails.extraData ? `\n${extractedContentDetails.extraData}` : ""}`,
         );
         extractedContentDetails.contentUrl &&
           setContentUrl(extractedContentDetails.contentUrl);
@@ -123,7 +123,7 @@ function useLocalContextCore() {
     const { identifier: id } = GetDetailsFromPage();
     if (!id && countRef.current < 20) {
       countRef.current++;
-      log(countRef.current + ":" + " Existance");
+      log(`${countRef.current}: Existance`);
       TIMEOUTS.clearAllTimeouts();
       TIMEOUTS.setTimeout(() => checkExistance(), 500);
       return;

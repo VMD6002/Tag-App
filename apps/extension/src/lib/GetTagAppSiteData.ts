@@ -14,6 +14,6 @@ export default function GetTagAppSiteData() {
     console.error(err);
   }
 
-  // @ts-ignore
+  // @ts-expect-error
   return Data;
 }

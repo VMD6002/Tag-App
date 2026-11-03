@@ -1,7 +1,7 @@
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
 import { useAtom } from "jotai";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
 
 export default function SiteScripts() {
   const [enableAfterAddRemoveScripts, setEnableAfterAddRemoveScriptsAtom] =

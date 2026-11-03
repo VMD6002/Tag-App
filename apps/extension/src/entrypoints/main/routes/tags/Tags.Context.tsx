@@ -1,8 +1,8 @@
-import { useAtom } from "jotai";
-import { tagsAtom } from "../../atoms/tags";
 import constate from "constate";
+import { useAtom } from "jotai";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { tagsAtom } from "../../atoms/tags";
 
 export function useTag() {
   const [open, setOpen] = useState(false);

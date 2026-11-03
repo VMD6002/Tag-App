@@ -1,8 +1,8 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { atomFamily } from "jotai-family";
-import { createWxtStorage } from "./storage";
 import { DEFAULT_USER } from "@/lib/CONSTANTS";
+import { createWxtStorage } from "./storage";
 
 // 1. Define your current user atom first
 export const currentUserAtom = atomWithStorage<string>(
@@ -21,11 +21,7 @@ export const userListAtom = atomWithStorage<string[]>(
 export function atomWithUserStorage<T>(key: string, initialValue: T) {
   // The family is scoped to this specific setting
   const settingFamily = atomFamily((username: string) =>
-    atomWithStorage<T>(
-      `${username}:${key}`,
-      initialValue,
-      createWxtStorage(),
-    )
+    atomWithStorage<T>(`${username}:${key}`, initialValue, createWxtStorage()),
   );
 
   // Return the proxy atom that automatically routes to the current user
@@ -36,11 +32,11 @@ export function atomWithUserStorage<T>(key: string, initialValue: T) {
       const action =
         typeof update === "function"
           ? (prev: Promise<T>) => {
-            if (prev instanceof Promise) {
-              return prev.then(update as (prev: T) => T | Promise<T>);
+              if (prev instanceof Promise) {
+                return prev.then(update as (prev: T) => T | Promise<T>);
+              }
+              return (update as (prev: T) => T | Promise<T>)(prev);
             }
-            return (update as (prev: T) => T | Promise<T>)(prev);
-          }
           : update;
       set(settingFamily(username), action as any);
     },

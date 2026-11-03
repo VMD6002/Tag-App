@@ -1,10 +1,10 @@
-import { ServerIcon } from "lucide-react";
-import { useAtomValue } from "jotai";
-import { Button } from "@/components/ui/button";
-import { filteredDataPostServerUrlAtom } from "@/entrypoints/main/atoms/settings";
 import type { ContentWebType } from "@tagapp/utils/types";
 import { useMutation } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
+import { ServerIcon } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { filteredDataPostServerUrlAtom } from "@/entrypoints/main/atoms/settings";
 
 export default function ServerAffix({
   filtered,

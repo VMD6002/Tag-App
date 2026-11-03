@@ -1,7 +1,7 @@
 "use client";
 
 import { Command as CommandPrimitive, useCommandState } from "cmdk";
-import { X, ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, X } from "lucide-react";
 import * as React from "react";
 import { forwardRef, useEffect } from "react";
 
@@ -356,7 +356,7 @@ const MultipleSelector = React.forwardRef<
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedSearchTerm, groupBy, open, triggerSearchOnFocus]);
 
-    const CreatableItem = () => {
+    const renderCreatableItem = () => {
       if (!creatable) return undefined;
       if (
         isOptionsExist(options, [{ value: inputValue, label: inputValue }]) ||
@@ -455,6 +455,8 @@ const MultipleSelector = React.forwardRef<
         } // When onSearch is provided, we don't want to filter the options. You can still override it.
         filter={commandFilter()}
       >
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: focus input wrapper */}
+        {/* biome-ignore lint/a11y/useKeyWithClickEvents: focus input wrapper */}
         <div
           className={cn(
             "flex items-start justify-between rounded-md border border-input px-3 py-2 text-base ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 md:text-sm",
@@ -582,11 +584,11 @@ const MultipleSelector = React.forwardRef<
               }}
             >
               {isLoading ? (
-                <>{loadingIndicator}</>
+                loadingIndicator
               ) : (
                 <>
                   {EmptyItem()}
-                  {CreatableItem()}
+                  {renderCreatableItem()}
                   {!selectFirstItem && (
                     <CommandItem value="-" className="hidden" />
                   )}
@@ -596,38 +598,36 @@ const MultipleSelector = React.forwardRef<
                       heading={key}
                       className="h-full overflow-auto"
                     >
-                      <>
-                        {dropdowns.map((option) => {
-                          return (
-                            <CommandItem
-                              key={option.value}
-                              value={option.label}
-                              disabled={option.disable}
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                              }}
-                              onSelect={() => {
-                                if (selected.length >= maxSelected) {
-                                  onMaxSelected?.(selected.length);
-                                  return;
-                                }
-                                setInputValue("");
-                                const newOptions = [...selected, option];
-                                setSelected(newOptions);
-                                onChange?.(newOptions);
-                              }}
-                              className={cn(
-                                "cursor-pointer",
-                                option.disable &&
-                                  "cursor-default text-muted-foreground",
-                              )}
-                            >
-                              {option.label}
-                            </CommandItem>
-                          );
-                        })}
-                      </>
+                      {dropdowns.map((option) => {
+                        return (
+                          <CommandItem
+                            key={option.value}
+                            value={option.label}
+                            disabled={option.disable}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                            onSelect={() => {
+                              if (selected.length >= maxSelected) {
+                                onMaxSelected?.(selected.length);
+                                return;
+                              }
+                              setInputValue("");
+                              const newOptions = [...selected, option];
+                              setSelected(newOptions);
+                              onChange?.(newOptions);
+                            }}
+                            className={cn(
+                              "cursor-pointer",
+                              option.disable &&
+                                "cursor-default text-muted-foreground",
+                            )}
+                          >
+                            {option.label}
+                          </CommandItem>
+                        );
+                      })}
                     </CommandGroup>
                   ))}
                 </>

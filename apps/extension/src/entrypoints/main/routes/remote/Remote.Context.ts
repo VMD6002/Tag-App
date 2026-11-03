@@ -1,20 +1,28 @@
-import constate from "constate";
-import { useRef, useEffect, useState, useCallback } from "react";
-import log from "@/lib/log";
-import { atom, useAtomValue, useSetAtom } from "jotai";
-import {
-  updateTitleAtom,
-  updatePresetAtom,
-  updateModalOpenAtom,
-  updateIdAtom,
-  updateDataAtom,
-} from "@/components/craft/UpdateModal/atom";
+import { applyConstants } from "@tagapp/utils";
+import type { ContentWebType } from "@tagapp/utils/types";
 import { useMutation } from "@tanstack/react-query";
+import constate from "constate";
+import { atom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomCallback } from "jotai/utils";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
 import {
-  enableAfterAddRemoveScriptsAtom,
-  runAfterAddRemoveScriptsInServerAtom,
-  supportedSitesAtom,
-} from "../../atoms/supportedSites";
+  updateDataAtom,
+  updateIdAtom,
+  updateModalOpenAtom,
+  updatePresetAtom,
+  updateTitleAtom,
+} from "@/components/craft/UpdateModal/atom";
+import log from "@/lib/log";
+import {
+  constantsAtom,
+  replaceWithKeyOnUpdateAtom,
+} from "../../atoms/constants";
+import {
+  FilterQueryAtom,
+  useInitializeFilterDataFromURL,
+} from "../../atoms/filter";
+import { orpcAtom } from "../../atoms/orpc";
 import {
   selectionEntriesAtom,
   selectionOnAtom,
@@ -22,18 +30,10 @@ import {
   selectionTagsInitialAtom,
 } from "../../atoms/selection";
 import {
-  FilterQueryAtom,
-  useInitializeFilterDataFromURL,
-} from "../../atoms/filter";
-import type { ContentWebType } from "@tagapp/utils/types";
-import { orpcAtom } from "../../atoms/orpc";
-import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
-import { useAtomCallback } from "jotai/utils";
-import {
-  constantsAtom,
-  replaceWithKeyOnUpdateAtom,
-} from "../../atoms/constants";
-import { applyConstants } from "@tagapp/utils";
+  enableAfterAddRemoveScriptsAtom,
+  runAfterAddRemoveScriptsInServerAtom,
+  supportedSitesAtom,
+} from "../../atoms/supportedSites";
 import { remoteTagsUpdatedAtom } from "../../atoms/tags";
 
 export const filteredAtom = atom<ContentWebType[]>([]);

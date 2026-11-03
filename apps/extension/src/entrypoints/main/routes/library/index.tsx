@@ -1,16 +1,16 @@
-import TitleHeader from "@/components/craft/TitleHeader";
-import Filters from "./components/Filters";
-import ExtendedCard from "./components/ExtendedCard";
-import UpdateModal from "@/components/craft/UpdateModal";
+import { useAtomValue } from "jotai";
 import BulkUpdateModal from "@/components/craft/BulkUpdateModal";
-import { useSetAtom, useAtomValue } from "jotai";
+import ServerAffix from "@/components/craft/ServerAffix";
+import TitleHeader from "@/components/craft/TitleHeader";
+import UpdateModal from "@/components/craft/UpdateModal";
 import { useResetFilter } from "@/entrypoints/main/atoms/filter";
+import ExtendedCard from "./components/ExtendedCard";
+import Filters from "./components/Filters";
 import {
   filteredAtom,
   LibraryProvider,
   useLibraryContext,
 } from "./Library.Context";
-import ServerAffix from "@/components/craft/ServerAffix";
 
 function Library() {
   const {
@@ -29,6 +29,7 @@ function Library() {
       {afterAddRemoveScript && (
         <iframe
           ref={iframeRef}
+          title="Script Sandbox"
           src={
             typeof browser !== "undefined"
               ? browser.runtime.getURL("/sandbox.html")
@@ -42,6 +43,7 @@ function Library() {
       <BulkUpdateModal bulkUpdateContentFunc={bulkUpdateTags} />
 
       <button
+        type="button"
         className="w-full text-left hover:cursor-pointer bg-transparent border-none p-0 appearance-none"
         onClick={() => {
           reset();

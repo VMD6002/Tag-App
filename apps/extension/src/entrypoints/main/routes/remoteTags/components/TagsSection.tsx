@@ -1,3 +1,7 @@
+import { useAtom, useAtomValue } from "jotai";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
+import { confirm } from "@/components/craft/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,13 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import TagGroup from "./TagGroup";
-import { useAtom, useAtomValue } from "jotai";
 import { remoteParentTagsAtom, remoteTagsAtom, tagStringAtom } from "../atom";
 import { useRemoteTagContext } from "../Remote.Tags.Context";
-import { useCallback, useState } from "react";
-import { confirm } from "@/components/craft/confirm-dialog";
-import { toast } from "sonner";
+import TagGroup from "./TagGroup";
 
 export default function TagsSection() {
   const { addTags, removeTags, fixTags } = useRemoteTagContext();
@@ -88,11 +88,9 @@ export default function TagsSection() {
                 ))}
               </SelectGroup>
               {!parentTagsArray.length ? (
-                <>
-                  <p className="max-w-xs w-11/12 mx-auto text-center py-4 text-muted-foreground">
-                    No tags are present. Add tags <br /> to view them here...
-                  </p>
-                </>
+                <p className="max-w-xs w-11/12 mx-auto text-center py-4 text-muted-foreground">
+                  No tags are present. Add tags <br /> to view them here...
+                </p>
               ) : (
                 <></>
               )}

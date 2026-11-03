@@ -1,11 +1,11 @@
+import { useAtom } from "jotai";
+import { X } from "lucide-react";
+import { useCallback, useState } from "react";
+import { confirm } from "@/components/craft/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X } from "lucide-react";
 import { parentTagsAtom, useRemoveParent } from "@/entrypoints/main/atoms/tags";
-import { useAtom } from "jotai";
-import { useCallback, useState } from "react";
-import { confirm } from "@/components/craft/confirm-dialog";
 
 export default function ParentTagsSection() {
   const [parentString, setParentString] = useState("");

@@ -1,5 +1,5 @@
-import log from "@/lib/log";
 import { SHADOW_ROOT_ID } from "@/lib/CONSTANTS";
+import log from "@/lib/log";
 
 export function clickUpdateOrRefresh(
   parentDiv: HTMLScriptElement,

@@ -6,7 +6,7 @@ export function decodeHtmlEntities(str: string): string {
 
 export function getMicroData(): any {
   const el = document.querySelector<HTMLScriptElement>(
-    "script[type='application/ld+json']"
+    "script[type='application/ld+json']",
   );
   return JSON.parse(el!.textContent!);
 }

@@ -1,10 +1,10 @@
-import { lazy, Suspense } from "react";
-import { Router, Route, Switch } from "wouter";
-import { ThemeProvider } from "@/components/theme-provider";
-import NavBar from "@/components/NavBar";
-import Spinner from "@/components/craft/Spinner";
-import { useHashLocation } from "wouter/use-hash-location";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { lazy, Suspense } from "react";
+import { Route, Router, Switch } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location";
+import Spinner from "@/components/craft/Spinner";
+import NavBar from "@/components/NavBar";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const PageNotFound = lazy(() => import("./404"));
 const Library = lazy(() => import("./routes/"));

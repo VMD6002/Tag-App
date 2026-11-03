@@ -1,10 +1,10 @@
+import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { useAtom, useAtomValue } from "jotai";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { appModeAtom, serverUrlAtom } from "../../../atoms/settings";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { serverUrlAtom } from "../../../atoms/settings";
 
 export default function Server() {
   const [serverUrl, setServerUrl] = useAtom(serverUrlAtom);

@@ -1,8 +1,8 @@
-import { useRemoteContext } from "../RemoteContent/Remote.Context";
-import { useLocalContext } from "../LocalContent/Local.Context";
-import UpdateModal from "@/components/craft/UpdateModal";
 import { useAtomValue } from "jotai";
+import UpdateModal from "@/components/craft/UpdateModal";
 import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
+import type { useLocalContext } from "../LocalContent/Local.Context";
+import type { useRemoteContext } from "../RemoteContent/Remote.Context";
 
 export default function ContentModal({
   useContext,
@@ -16,6 +16,7 @@ export default function ContentModal({
       {afterAddRemoveScript && (
         <iframe
           ref={iframeRef}
+          title="Script Sandbox"
           src={browser.runtime.getURL("/sandbox.html")}
           sandbox="allow-scripts allow-modals allow-same-origin"
           className="hidden"

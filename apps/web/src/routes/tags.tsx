@@ -1,9 +1,9 @@
-import TitleHeader from "@/components/craft/TitleHeader";
-import { Button } from "@/components/ui/button";
+import type { TagsType } from "@tagapp/utils/types";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import TitleHeader from "@/components/craft/TitleHeader";
+import { Button } from "@/components/ui/button";
 import { orpc } from "@/lib/orpc";
-import type { TagsType } from "@tagapp/utils/types";
 
 function TagGroup({
   tags,
@@ -28,14 +28,17 @@ function TagGroup({
         {Children.map((tag) => (
           <div key={`${parent}-${tag}`} className="break-inside-avoid-column">
             {tags[tag].cover ? (
-              <img loading="lazy" className="w-full" src={tags[tag].cover} />
-            ) : (
-              <></>
-            )}
+              <img
+                alt={`${tag} cover`}
+                loading="lazy"
+                className="w-full"
+                src={tags[tag].cover}
+              />
+            ) : null}
             <div className="bg-secondary flex place-items-center justify-between">
               <span className="mx-3 w-full">
                 {String(tags[tag].count).padStart(3, "0")} |{" "}
-                {tag.replace(parent + ":", "").replaceAll("_", " ")}
+                {tag.replace(`${parent}:`, "").replaceAll("_", " ")}
               </span>
             </div>
           </div>

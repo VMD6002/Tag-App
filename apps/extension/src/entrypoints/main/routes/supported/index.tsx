@@ -1,24 +1,28 @@
+import { useSetAtom } from "jotai";
+import { BookOpen, Download, RefreshCw, Upload } from "lucide-react";
 import TitleHeader from "@/components/craft/TitleHeader";
 import { Button } from "@/components/ui/button";
-import { Upload, Download, RefreshCw, BookOpen } from "lucide-react";
-
+import GuideDialog, { guideOpenAtom } from "./components/GuideDialog";
+import ScriptEditor from "./components/ScriptEditor";
+import SitesSidebar from "./components/SitesSidebar";
 import {
   SupportedSiteProvider,
-  useSupportedSites,
   useImportExportActions,
+  useSupportedSites,
 } from "./SupportedSite.Context";
-import SitesSidebar from "./components/SitesSidebar";
-import ScriptEditor from "./components/ScriptEditor";
-import GuideDialog, { guideOpenAtom } from "./components/GuideDialog";
-import { useSetAtom } from "jotai";
 
 export type { SiteData } from "./SupportedSite.Context";
 
 function Toolbar() {
   const supportedSites = useSupportedSites();
   const setGuideOpen = useSetAtom(guideOpenAtom);
-  const { exportSiteList, handleFileClick, importSiteList, fileInputRef, refreshSupportedHostsIndex } =
-    useImportExportActions();
+  const {
+    exportSiteList,
+    handleFileClick,
+    importSiteList,
+    fileInputRef,
+    refreshSupportedHostsIndex,
+  } = useImportExportActions();
 
   return (
     <div className="flex flex-col gap-4 border-b border-border pb-4">
@@ -37,19 +41,39 @@ function Toolbar() {
             accept=".json,application/json"
             onChange={importSiteList}
           />
-          <Button variant="outline" size="sm" onClick={handleFileClick} className="gap-1.5 h-9">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleFileClick}
+            className="gap-1.5 h-9"
+          >
             <Download className="size-4" />
             <span>Import</span>
           </Button>
-          <Button variant="outline" size="sm" onClick={exportSiteList} className="gap-1.5 h-9">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exportSiteList}
+            className="gap-1.5 h-9"
+          >
             <Upload className="size-4" />
             <span>Export</span>
           </Button>
-          <Button variant="outline" size="sm" onClick={() => refreshSupportedHostsIndex()} className="gap-1.5 h-9">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refreshSupportedHostsIndex()}
+            className="gap-1.5 h-9"
+          >
             <RefreshCw className="size-4" />
             <span>Refresh Index</span>
           </Button>
-          <Button variant="secondary" size="sm" onClick={() => setGuideOpen(true)} className="gap-1.5 h-9">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setGuideOpen(true)}
+            className="gap-1.5 h-9"
+          >
             <BookOpen className="size-4" />
             <span>Guide</span>
           </Button>
@@ -58,7 +82,6 @@ function Toolbar() {
     </div>
   );
 }
-
 
 function SupportedLayout() {
   return (
@@ -74,7 +97,6 @@ function SupportedLayout() {
     </div>
   );
 }
-
 
 export default function Supported() {
   return (

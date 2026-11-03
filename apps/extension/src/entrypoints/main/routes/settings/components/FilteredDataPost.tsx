@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { filteredDataPostServerUrlAtom } from "../../../atoms/settings";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { filteredDataPostServerUrlAtom } from "../../../atoms/settings";
 
 export default function FilteredDataPost() {
   const [filteredDataPostUrl, setFilteredDataPostUrl] = useAtom(

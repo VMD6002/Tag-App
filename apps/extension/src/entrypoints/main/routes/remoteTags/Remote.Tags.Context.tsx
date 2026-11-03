@@ -1,16 +1,16 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { remoteTagsUpdatedAtom } from "../../atoms/tags";
+import { useMutation } from "@tanstack/react-query";
 import constate from "constate";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { orpcAtom } from "../../atoms/orpc";
+import { remoteTagsUpdatedAtom } from "../../atoms/tags";
 import {
   parentTagStringAtom,
   remoteParentTagsAtom,
   remoteTagsAtom,
   tagStringAtom,
 } from "./atom";
-import { orpcAtom } from "../../atoms/orpc";
-import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
 
 export function useRemoteTag() {
   const orpc = useAtomValue(orpcAtom);

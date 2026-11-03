@@ -1,11 +1,11 @@
-import { useEffect } from "react";
 import { atom, useAtom } from "jotai";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { hostNamesAtom } from "../../../atoms/settings";
-import { Textarea } from "@/components/ui/textarea";
-import z from "zod";
+import { useEffect } from "react";
 import { toast } from "sonner";
+import z from "zod";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { hostNamesAtom } from "../../../atoms/settings";
 
 const hostnamesBufferAtom = atom<string>("");
 

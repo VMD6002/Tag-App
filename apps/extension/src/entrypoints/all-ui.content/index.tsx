@@ -1,14 +1,14 @@
 import "@/assets/tailwind.css";
 import ReactDOM from "react-dom/client";
 import type { ContentScriptContext } from "wxt/utils/content-script-context";
-import type { SiteData } from "../main/routes/supported";
-import App from "./AllModal";
 import {
   DEFAULT_USER,
   SHADOW_ROOT_ID,
   SITE_DATA_ELEMENT_ID,
 } from "@/lib/CONSTANTS";
 import { generateJsonScriptElement } from "@/lib/generateJsonScriptElement";
+import type { SiteData } from "../main/routes/supported";
+import App from "./AllModal";
 
 const createOverlayUI = (ctx: ContentScriptContext) =>
   createShadowRootUi(ctx, {
@@ -99,7 +99,7 @@ async function injectSiteDataIntoPage() {
   );
 
   // Check if its one of the hostnames defined by user and if it is then inject tag data and exit
-  if (hostNames && hostNames.includes(location.origin)) {
+  if (hostNames?.includes(location.origin)) {
     const fetchAndBroadcastTags = async () => {
       let tags: string[];
 

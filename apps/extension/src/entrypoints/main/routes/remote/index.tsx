@@ -1,16 +1,16 @@
-import TitleHeader from "@/components/craft/TitleHeader";
-import Filters from "./components/Filters";
-import ExtendedCard from "./components/ExtendedCard";
-import UpdateModal from "@/components/craft/UpdateModal";
-import BulkUpdateModal from "@/components/craft/BulkUpdateModal";
 import { useAtomValue } from "jotai";
+import BulkUpdateModal from "@/components/craft/BulkUpdateModal";
+import ServerAffix from "@/components/craft/ServerAffix";
+import TitleHeader from "@/components/craft/TitleHeader";
+import UpdateModal from "@/components/craft/UpdateModal";
 import { useResetFilter } from "@/entrypoints/main/atoms/filter";
+import ExtendedCard from "./components/ExtendedCard";
+import Filters from "./components/Filters";
 import {
   filteredAtom,
   RemoteProvider,
   useRemoteContext,
 } from "./Remote.Context";
-import ServerAffix from "@/components/craft/ServerAffix";
 
 function Remote() {
   const {
@@ -30,6 +30,7 @@ function Remote() {
       {afterAddRemoveScript && (
         <iframe
           ref={iframeRef}
+          title="Script Sandbox"
           src={
             typeof browser !== "undefined"
               ? browser.runtime.getURL("/sandbox.html")
@@ -43,6 +44,7 @@ function Remote() {
       <BulkUpdateModal bulkUpdateContentFunc={bulkUpdateTags} tags={tags} />
 
       <button
+        type="button"
         className="w-full text-left hover:cursor-pointer bg-transparent border-none p-0 appearance-none"
         onClick={() => {
           reset();

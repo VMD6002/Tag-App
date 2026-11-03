@@ -1,17 +1,17 @@
+import { useMutation } from "@tanstack/react-query";
 import { atom, useAtom, useAtomValue } from "jotai";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { useEffect } from "react";
+import { toast } from "sonner";
 import z from "zod";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   constantsAtom,
   replaceWithKeyOnUpdateAtom,
 } from "@/entrypoints/main/atoms/constants";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useMutation } from "@tanstack/react-query";
 import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
-import { useEffect } from "react";
-import { toast } from "sonner";
 
 const constantsBufferAtom = atom<string>("");
 

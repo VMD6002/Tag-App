@@ -1,44 +1,44 @@
+import { applyConstants } from "@tagapp/utils";
+import type { ContentWebType } from "@tagapp/utils/types";
+import { useMutation } from "@tanstack/react-query";
 import constate from "constate";
-import { useRef, useEffect, useCallback } from "react";
-import log from "@/lib/log";
 import { atom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomCallback } from "jotai/utils";
+import { useCallback, useEffect, useRef } from "react";
+import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
 import {
-  updateTitleAtom,
-  updatePresetAtom,
-  updateModalOpenAtom,
-  updateIdAtom,
   updateDataAtom,
+  updateIdAtom,
+  updateModalOpenAtom,
+  updatePresetAtom,
+  updateTitleAtom,
 } from "@/components/craft/UpdateModal/atom";
 import {
+  contentDataAtom,
+  useBulkUpdateContentTags,
   useGetContent,
   useGetFilteredData,
-  useSetContent,
   useRemoveContents,
-  useBulkUpdateContentTags,
-  contentDataAtom,
+  useSetContent,
 } from "@/entrypoints/main/atoms";
-import { useMutation } from "@tanstack/react-query";
+import log from "@/lib/log";
 import {
-  enableAfterAddRemoveScriptsAtom,
-  supportedSitesAtom,
-} from "../../atoms/supportedSites";
+  constantsAtom,
+  replaceWithKeyOnUpdateAtom,
+} from "../../atoms/constants";
+import {
+  FilterQueryAtom,
+  useInitializeFilterDataFromURL,
+} from "../../atoms/filter";
 import {
   selectionEntriesAtom,
   selectionTagsAtom,
   selectionTagsInitialAtom,
 } from "../../atoms/selection";
 import {
-  FilterQueryAtom,
-  useInitializeFilterDataFromURL,
-} from "../../atoms/filter";
-import type { ContentWebType } from "@tagapp/utils/types";
-import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
-import { useAtomCallback } from "jotai/utils";
-import {
-  constantsAtom,
-  replaceWithKeyOnUpdateAtom,
-} from "../../atoms/constants";
-import { applyConstants } from "@tagapp/utils";
+  enableAfterAddRemoveScriptsAtom,
+  supportedSitesAtom,
+} from "../../atoms/supportedSites";
 
 export const filteredAtom = atom<ContentWebType[]>([]);
 

@@ -1,6 +1,6 @@
-import { themeAtom } from "@/entrypoints/main/atoms/settings";
 import { useAtom } from "jotai";
 import { createContext, useContext, useEffect } from "react";
+import { themeAtom } from "@/entrypoints/main/atoms/settings";
 
 type Theme = "dark" | "light" | "system";
 

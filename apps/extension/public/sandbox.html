@@ -7,7 +7,7 @@
   <body>
     <script>
       const AsyncFunction = Object.getPrototypeOf(
-        async function () {},
+        async () => {},
       ).constructor;
       // Listen for the code and data from the parent React window
       window.addEventListener("message", (event) => {
