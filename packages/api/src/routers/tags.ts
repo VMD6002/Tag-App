@@ -5,6 +5,16 @@ import { contentDataDB } from "../db/contentData";
 import { tagDB } from "../db/tags";
 import errorLog from "../lib/errorLog";
 
+// Strip the given tags from every content item so no item references a removed tag.
+const stripTagsFromContent = (shouldRemove: (tag: string) => boolean) => {
+  const now = Math.floor(Date.now() / 1000);
+  for (const content of Object.values(contentDataDB.data)) {
+    if (!content.tags.some(shouldRemove)) continue;
+    content.tags = content.tags.filter((t) => !shouldRemove(t));
+    content.lastUpdated = now;
+  }
+};
+
 export const getTagData = os.handler(async () => {
   return tagDB.data;
 });
@@ -57,7 +67,8 @@ export const removeTags = os
   .input(z.object({ tags: z.array(z.string()) }))
   .handler(async ({ input: { tags } }) => {
     for (const tag of tags) delete tagDB.data.tags[tag];
-    await tagDB.write();
+    stripTagsFromContent((tag) => tags.includes(tag));
+    await Promise.all([tagDB.write(), contentDataDB.write()]);
     return tags;
   });
 
@@ -67,7 +78,8 @@ export const removeParentTags = os
     for (const tag in tagDB.data.tags)
       if (parentTags.includes(tag.split(":")[0]!)) delete tagDB.data.tags[tag];
     for (const parentTag of parentTags) delete tagDB.data.parentTags[parentTag];
-    await tagDB.write();
+    stripTagsFromContent((tag) => parentTags.includes(tag.split(":")[0]!));
+    await Promise.all([tagDB.write(), contentDataDB.write()]);
     return tagDB.data;
   });
 

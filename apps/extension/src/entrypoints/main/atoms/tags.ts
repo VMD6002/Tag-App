@@ -36,21 +36,27 @@ const removeParentCallback = async (
   set: Setter,
   parent: string,
 ) => {
-  const parentTags = await get(parentTagsAtom);
+  const parentTags = { ...(await get(parentTagsAtom)) };
   delete parentTags[parent];
 
-  const tagsData = { ...(await get(tagsAtom)) };
-  const deletedTags = new Set<string>();
+  const isInParent = (tag: string) => tag.split(":")[0] === parent;
 
+  const tagsData = { ...(await get(tagsAtom)) };
   Object.keys(tagsData).forEach((tag) => {
-    if (tag.startsWith(parent)) {
-      deletedTags.add(tag);
-      delete tagsData[tag];
-    }
+    if (isInParent(tag)) delete tagsData[tag];
+  });
+
+  // Strip the removed tags from content too
+  const contentData = structuredClone(await get(contentDataAtom));
+  Object.values(contentData).forEach((entry) => {
+    if (!entry.tags.some(isInParent)) return;
+    entry.tags = entry.tags.filter((t) => !isInParent(t));
+    entry.lastUpdated = Math.floor(Date.now() / 1000);
   });
 
   set(tagsAtom, tagsData);
   set(parentTagsAtom, parentTags);
+  set(contentDataAtom, contentData);
 };
 
 export const useRemoveParent = () =>
