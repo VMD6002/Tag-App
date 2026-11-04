@@ -9,10 +9,10 @@ import {
   resetFilterAtom,
   searchAtom,
 } from "@/atom";
+import MultiSelect from "@/components/craft/MultiSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import MultipleSelector from "@/components/ui/multiple-selector";
 import { Switch } from "@/components/ui/switch";
 import { filteredAtom, useRemoteContext } from "../Remote.Context";
 
@@ -68,19 +68,19 @@ export default function Filters() {
         className="mb-4"
       />
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-        <MultipleSelector
+        <MultiSelect
           value={any}
           onChange={setAny}
           options={anyAndNoneTagsForMuliSelectComponent}
           placeholder="Any of these tags"
         />
-        <MultipleSelector
+        <MultiSelect
           value={none}
           onChange={setNone}
           options={anyAndNoneTagsForMuliSelectComponent}
           placeholder="None of these tags"
         />
-        <MultipleSelector
+        <MultiSelect
           value={all}
           onChange={setAll}
           options={allTagsForMultiSelectComponent}

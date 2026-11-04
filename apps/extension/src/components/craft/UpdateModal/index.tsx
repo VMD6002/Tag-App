@@ -1,10 +1,10 @@
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import { useAtom, useAtomValue } from "jotai";
 import { Redo2 } from "lucide-react";
+import MultiSelect from "@/components/craft/MultiSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import MultipleSelector from "@/components/ui/multiple-selector";
 import { tagsAtom } from "@/entrypoints/main/atoms/tags";
 import { cn } from "@/lib/utils";
 import {
@@ -100,7 +100,7 @@ export default function UpdateModal({
             </Button>
           )}
         </div>
-        <MultipleSelector
+        <MultiSelect
           options={tagsArray.map((o) => ({
             label: o,
             value: o,
