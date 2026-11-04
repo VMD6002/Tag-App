@@ -2,24 +2,26 @@
 
 Browser-extension "web clipper" for saving and tagging content (videos, galleries, etc.) from websites, with an optional self-hosted **remote DB** server for backup/sync. Extension-first; the old media server was split out into the separate **TagAppVault** project (not in this repo). **Storage is browser extension storage (local mode) or JSON files via LowDB (server). There is no SQL database.**
 
+> **Chrome only.** The extension targets Chrome (MV3) exclusively for now; Firefox support is not maintained or tested. There are no users yet, so changes may break stored data and storage formats freely: no backwards compatibility or migrations are needed.
+>
 > For LLM sessions: this file is the project reference. Code is the source of truth. Update this file when you change something it describes.
 
 ## Stack
 
-Bun workspaces · WXT (extension, MV3/Chrome + Firefox) · Hono + oRPC (`/rpc`) · Vite + React + wouter (hash router) · LowDB (JSON) · Zod · Jotai + Constate + TanStack Query · Tailwind + shadcn/ui · Biome (lint/format).
+Bun workspaces · WXT (extension, MV3, Chrome only) · Hono + oRPC (`/rpc`) · Vite + React + wouter (hash router) · LowDB (JSON) · Zod · Jotai + Constate + TanStack Query · Tailwind + shadcn/ui · Biome (lint/format).
 
 ## Repo map
 
-| Path             | Package              | Role                                                                                                                                                                  |
-| ---------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/extension` | `tag-app-extension`  | **The main product.** WXT extension: content script overlay, userscript runner, library/tags/settings/site-script UI.                                                |
-| `apps/server`    | `tag-app-server`     | Hono entry (`src/index.ts`): mounts oRPC at `/rpc`, serves built web UI from `./WebUI` under a configurable prefix. Port/prefix from `settings.json`.                |
-| `apps/web`       | `tag-app-web`        | Small React SPA to browse the **remote** DB (library + tags). Builds into `apps/server/dist/WebUI`. oRPC client: `src/lib/orpc.ts`.                                   |
-| `packages/api`   | `@tagapp/api`        | oRPC `router` (`src/index.ts`): `routers/{main,tags,restoreAndBackup}.ts`, LowDB stores in `db/`, `lib/runJsStringCode.ts`. Exports `router`, `routerType`, `settingsDB`. |
-| `packages/utils` | `@tagapp/utils`      | Shared Zod schemas/types (`@tagapp/utils/types`), `filterData` (Fuse.js title search + tag filters), array/string helpers (`replaceWithConstantKey`, `sanitizeStringForFileName`, ...). |
-| `Notes/`         | -                    | `Scripting Guide.md`: how to write site scripts (also bundled into the extension's guide dialog).                                                                      |
-| `.devtool/features/` | -                | Feature/todo markdown files (status in frontmatter; `done/` = finished).                                                                                              |
-| `tmp/`           | -                    | Gitignored scratch: build/zip scripts, signing key, personal notes. Ignore.                                                                                           |
+| Path                 | Package             | Role                                                                                                                                                                                    |
+| -------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/extension`     | `tag-app-extension` | **The main product.** WXT extension: content script overlay, userscript runner, library/tags/settings/site-script UI.                                                                   |
+| `apps/server`        | `tag-app-server`    | Hono entry (`src/index.ts`): mounts oRPC at `/rpc`, serves built web UI from `./WebUI` under a configurable prefix. Port/prefix from `settings.json`.                                   |
+| `apps/web`           | `tag-app-web`       | Small React SPA to browse the **remote** DB (library + tags). Builds into `apps/server/dist/WebUI`. oRPC client: `src/lib/orpc.ts`.                                                     |
+| `packages/api`       | `@tagapp/api`       | oRPC `router` (`src/index.ts`): `routers/{main,tags,restoreAndBackup}.ts`, LowDB stores in `db/`, `lib/runJsStringCode.ts`. Exports `router`, `routerType`, `settingsDB`.               |
+| `packages/utils`     | `@tagapp/utils`     | Shared Zod schemas/types (`@tagapp/utils/types`), `filterData` (Fuse.js title search + tag filters), array/string helpers (`replaceWithConstantKey`, `sanitizeStringForFileName`, ...). |
+| `Notes/`             | -                   | `Scripting Guide.md`: how to write site scripts (also bundled into the extension's guide dialog).                                                                                       |
+| `.devtool/features/` | -                   | Feature/todo markdown files (status in frontmatter; `done/` = finished).                                                                                                                |
+| `tmp/`               | -                   | Gitignored scratch: build/zip scripts, signing key, personal notes. Ignore.                                                                                                             |
 
 Imports: `@/` → app `src/` (extension and web). Extension imports server types via `import type { routerType } from "@tagapp/api"` (types only; never import server code at runtime in the extension).
 
@@ -62,29 +64,30 @@ Runtime files (relative to server cwd): `settings.json`, `DB/contentData.json` (
 
 ## Where to change X
 
-| Task                                  | Look at                                                                                                                                                   |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Content/tag schema                    | `packages/utils/src/types.ts`, then local atoms (`atoms/index.ts`, `atoms/tags.ts`) **and** server routers/db                                              |
-| Filtering/search                      | `packages/utils/src/filterData.ts` (shared by both modes)                                                                                                 |
-| New persisted extension setting       | `atoms/settings.ts` via `atomWithUserStorage`, UI in `routes/settings/components/`                                                                          |
-| New script helper (`sh.*`)            | `entrypoints/all-script-userscript/{index,helpers,dom-utils,extension-api}.ts`, document in `Notes/Scripting Guide.md`                                      |
-| Site-script data shape                | `SiteDataSchema` in `routes/supported/SupportedSite.Context.ts`, `lib/GetTagAppSiteData.ts`                                                                |
-| Clip overlay / save flow              | `entrypoints/all-ui.content/AllModal/{LocalContent,RemoteContent,Shared}`                                                                                  |
-| Host-page tag injection               | `entrypoints/all-ui.content/index.tsx` (`sendTagsWithHandshake`)                                                                                           |
-| Server port/prefix / static serving   | `apps/server/src/index.ts`, `packages/api/src/db/settings.ts`                                                                                              |
-| Manifest / permissions / build        | `apps/extension/wxt.config.ts`                                                                                                                             |
+| Task                                | Look at                                                                                                                |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Content/tag schema                  | `packages/utils/src/types.ts`, then local atoms (`atoms/index.ts`, `atoms/tags.ts`) **and** server routers/db          |
+| Filtering/search                    | `packages/utils/src/filterData.ts` (shared by both modes)                                                              |
+| New persisted extension setting     | `atoms/settings.ts` via `atomWithUserStorage`, UI in `routes/settings/components/`                                     |
+| New script helper (`sh.*`)          | `entrypoints/all-script-userscript/{index,helpers,dom-utils,extension-api}.ts`, document in `Notes/Scripting Guide.md` |
+| Site-script data shape              | `SiteDataSchema` in `routes/supported/SupportedSite.Context.ts`, `lib/GetTagAppSiteData.ts`                            |
+| Clip overlay / save flow            | `entrypoints/all-ui.content/AllModal/{LocalContent,RemoteContent,Shared}`                                              |
+| Host-page tag injection             | `entrypoints/all-ui.content/index.tsx` (`sendTagsWithHandshake`)                                                       |
+| Server port/prefix / static serving | `apps/server/src/index.ts`, `packages/api/src/db/settings.ts`                                                          |
+| Manifest / permissions / build      | `apps/extension/wxt.config.ts`                                                                                         |
 
 ## Commands
 
 ```bash
 bun install
-bun dev:ext          # WXT dev (Chrome); `bun --cwd apps/extension dev:firefox` for Firefox
+bun dev:ext          # WXT dev (Chrome)
 bun dev:server       # cwd = apps/server (runtime files land there)
 bun dev:web          # Vite
 bun build:ext        # → apps/extension/dist/<browser>-mv3
 bun build:serverFull # → apps/server/dist: index.js + WebUI/ (build:server then build:web)
 bun type:check       # recursive; only packages/api and packages/utils define it
 bun --cwd apps/extension compile   # extension tsc --noEmit
+bun test             # bun:test unit tests (packages/utils)
 bun check            # Biome lint+format (check:fix / lint:fix / format to apply)
 ```
 

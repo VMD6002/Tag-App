@@ -20,6 +20,7 @@
     "type:check": "bun run -r type:check",
     "lint": "biome lint",
     "lint:fix": "biome lint --write",
+    "test": "bun test packages/utils",
     "check": "biome check",
     "check:fix": "biome check --write",
     "format": "biome format --write",

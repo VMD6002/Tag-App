@@ -1,5 +1,6 @@
 {
   "extends": "../../tsconfig.lib.json",
+  "exclude": ["dist", "node_modules", "src/**/*.test.ts"],
   "exports": {
     ".": "./src/index.ts"
   }
