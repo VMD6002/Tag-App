@@ -94,31 +94,38 @@ async function injectSiteDataIntoPage() {
     `local:${currentUser}:hostNames`,
   );
 
-  const appMode: "local" | "remote" | null = await storage.getItem(
-    `local:${currentUser}:appMode`,
-  );
+  const appMode: "local" | "remote" =
+    (await storage.getItem<"local" | "remote">(
+      `local:${currentUser}:appMode`,
+    )) ?? "local"; // defaults are never written to storage
 
   // Check if its one of the hostnames defined by user and if it is then inject tag data and exit
   if (hostNames?.includes(location.origin)) {
     const fetchAndBroadcastTags = async () => {
       let tags: string[];
 
-      if (appMode === "local") {
-        tags = Object.keys(
-          (await storage.getItem(`local:${currentUser}:tags`)) ?? {},
-        );
-      } else {
-        const serverUrl =
-          (await storage.getItem(`local:${currentUser}:serverUrl`)) ?? "";
-        if (!serverUrl) {
-          console.error("Server URL not found");
-          return;
+      try {
+        if (appMode === "local") {
+          tags = Object.keys(
+            (await storage.getItem(`local:${currentUser}:tags`)) ?? {},
+          );
+        } else {
+          const serverUrl =
+            (await storage.getItem(`local:${currentUser}:serverUrl`)) ?? "";
+          if (!serverUrl) {
+            console.error("Server URL not found");
+            return;
+          }
+          const res = await fetch(`${serverUrl}/rpc/tags/getTagData`, {
+            body: '{"json":{}}',
+            method: "POST",
+          });
+          tags = Object.keys((await res.json())?.json?.tags ?? {});
         }
-        const res = await fetch(`${serverUrl}/rpc/tags/getTagData`, {
-          body: '{"json":{}}',
-          method: "POST",
-        });
-        tags = Object.keys((await res.json())?.json?.tags ?? {});
+      } catch (error) {
+        // Must not throw: the storage watcher below still has to be registered.
+        console.error("Couldn't load tags to broadcast", error);
+        return;
       }
 
       await sendTagsWithHandshake(tags.sort());
@@ -144,11 +151,12 @@ async function injectSiteDataIntoPage() {
 
   const SupportedSites: Record<string, SiteData> =
     (await storage.getItem(`local:${currentUser}:supportedSites`)) ?? {};
-  if (!checkMatchPatterns(SupportedSites[SiteName]!)) return false;
+  const siteData = SupportedSites[SiteName];
+  if (!siteData || !checkMatchPatterns(siteData)) return false;
 
   const siteDataScriptEle = generateJsonScriptElement(
     SITE_DATA_ELEMENT_ID,
-    SupportedSites[SiteName]!,
+    siteData,
   );
   document.documentElement.append(siteDataScriptEle);
   return true;

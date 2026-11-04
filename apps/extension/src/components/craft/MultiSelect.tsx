@@ -67,7 +67,10 @@ export default function MultiSelect({
               ))}
               <CommandPrimitive.Input
                 value={query}
-                onValueChange={setQuery}
+                onValueChange={(v) => {
+                  setQuery(v);
+                  setOpen(true);
+                }}
                 onFocus={() => setOpen(true)}
                 onClick={() => setOpen(true)}
                 onKeyDown={(e) => {

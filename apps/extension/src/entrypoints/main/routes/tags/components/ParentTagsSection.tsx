@@ -16,7 +16,7 @@ export default function ParentTagsSection() {
     setParentTags(async (tmp) => {
       const old = await tmp;
       for (const tag of parentString.trim().split(/\s+/).filter(Boolean)) {
-        old[tag] = {};
+        old[tag] ??= {};
       }
       return { ...old };
     });

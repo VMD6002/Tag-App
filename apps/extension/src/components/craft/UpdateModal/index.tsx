@@ -1,6 +1,7 @@
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import { useAtom, useAtomValue } from "jotai";
 import { Redo2 } from "lucide-react";
+import { useEffect } from "react";
 import MultiSelect from "@/components/craft/MultiSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,14 @@ export default function UpdateModal({
   const isDisabled = useAtomValue(updateInputDisabledAtom);
   const exists = useAtomValue(updateExistsAtom);
   const resetFuntions = useAtomValue(updateResetOptionsAtom);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+    const onKey = (e: KeyboardEvent) =>
+      e.key === "Escape" && setModalOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [modalOpen, setModalOpen]);
 
   if (!modalOpen) return null;
 
@@ -133,7 +142,7 @@ export default function UpdateModal({
               <Input
                 value={cover}
                 onChange={(e) => setCover(e.target.value)}
-                placeholder="Name"
+                placeholder="Cover URL"
                 className="mb-4"
               />
             </>

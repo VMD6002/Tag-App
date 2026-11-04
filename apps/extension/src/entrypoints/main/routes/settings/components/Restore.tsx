@@ -1,5 +1,5 @@
 import { BackUpSchema } from "@tagapp/utils/types";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
@@ -8,138 +8,81 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { contentDataAtom } from "@/entrypoints/main/atoms";
-import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
+import {
+  parentTagsAtom,
+  tagsAtom,
+  useFixTagCount,
+} from "@/entrypoints/main/atoms/tags";
+
+type RestoreType = "All" | "contentData" | "tags";
 
 export default function Restore() {
   const [overwrite, setOverwrite] = useState(false);
+  const contentData = useAtomValue(contentDataAtom);
+  const tags = useAtomValue(tagsAtom);
+  const parentTags = useAtomValue(parentTagsAtom);
   const setContentData = useSetAtom(contentDataAtom);
   const setTags = useSetAtom(tagsAtom);
   const setParentTags = useSetAtom(parentTagsAtom);
+  const fixTagCount = useFixTagCount();
 
-  const restoreAll = useCallback(
-    async (event: any) => {
-      if (
-        overwrite &&
-        !(await confirm("U sure want to overwrite ContentData and Tags ?"))
-      ) {
-        event.target.value = null;
-        return;
+  const restore = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>, type: RestoreType) => {
+      const input = event.target;
+      const file = input.files?.[0];
+      try {
+        if (!file) return;
+        if (overwrite && !(await confirm(`U sure want to overwrite ${type}?`)))
+          return;
+
+        const validator = BackUpSchema.safeParse(JSON.parse(await file.text()));
+        if (!validator.success) {
+          toast.error(z.prettifyError(validator.error));
+          return;
+        }
+        const data = validator.data;
+        const combine = <T extends object>(old: T, incoming: T): T =>
+          overwrite ? incoming : { ...old, ...incoming };
+
+        if (type !== "tags")
+          await setContentData(combine(contentData, data.contentData));
+        if (type !== "contentData") {
+          await setTags(combine(tags, data.tags));
+          await setParentTags(combine(parentTags, data.parentTags));
+        }
+        // Counts in the backup may not match the content that ended up on disk.
+        await fixTagCount();
+        toast.success(
+          `Successfully restored ${type} by ${overwrite ? "Overwriting" : "Merging"}`,
+        );
+      } catch (error) {
+        toast.error("Error reading or parsing the JSON file");
+        console.error("Error reading or parsing the JSON file:", error);
+      } finally {
+        input.value = "";
       }
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      file
-        .text()
-        .then((text: string) => JSON.parse(text))
-        .then((parsedData: Record<string, any>) => {
-          const validator = BackUpSchema.safeParse(parsedData);
-          if (!validator.success) {
-            toast.error(z.prettifyError(validator.error));
-            return;
-          }
-          const data = validator.data;
-          if (overwrite) {
-            setContentData(data.contentData);
-            setTags(data.tags);
-            return;
-          } else {
-            setContentData((old) => ({ ...old, ...data.contentData }));
-            setTags((old) => ({ ...old, ...data.tags }));
-          }
-          toast.success(
-            `Successfully restored Tags and ContentData by ${
-              overwrite ? "Overwriting" : "Merging"
-            }`,
-          );
-        })
-        .catch((error: any) => {
-          console.error("Error reading or parsing the JSON file:", error);
-        });
-      event.target.value = null;
     },
-    [overwrite, setContentData, setTags],
+    [
+      overwrite,
+      contentData,
+      tags,
+      parentTags,
+      setContentData,
+      setTags,
+      setParentTags,
+      fixTagCount,
+    ],
   );
 
-  const restoreTags = useCallback(
-    async (event: any) => {
-      if (overwrite && !(await confirm("U sure want to overwrite Tags ?"))) {
-        event.target.value = null;
-        return;
-      }
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      file
-        .text()
-        .then((text: string) => JSON.parse(text))
-        .then((parsedData: Record<string, any>) => {
-          const validator = BackUpSchema.safeParse(parsedData);
-          if (!validator.success) {
-            toast.error(z.prettifyError(validator.error));
-            return;
-          }
-          const data = validator.data;
-          if (overwrite) {
-            setTags(data.tags);
-            setParentTags(data.parentTags);
-          } else {
-            setTags((old) => ({ ...old, ...data.tags }));
-            setParentTags((old) => ({ ...old, ...data.parentTags }));
-          }
-          toast.success(
-            `Successfully restored Tags by ${
-              overwrite ? "Overwriting" : "Merging"
-            }`,
-          );
-        })
-        .catch((error: any) => {
-          console.error("Error reading or parsing the JSON file:", error);
-        });
-      event.target.value = null;
-    },
-    [overwrite, setTags],
-  );
-
-  const restoreContentData = useCallback(
-    async (event: any) => {
-      if (
-        overwrite &&
-        !(await confirm("U sure want to overwrite contentData ?"))
-      ) {
-        event.target.value = null;
-        return;
-      }
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      file
-        .text()
-        .then((text: string) => JSON.parse(text))
-        .then((parsedData: Record<string, any>) => {
-          const validator = BackUpSchema.safeParse(parsedData);
-          if (!validator.success) {
-            toast.error(z.prettifyError(validator.error));
-            return;
-          }
-          const data = validator.data;
-          if (overwrite) {
-            setContentData(data.contentData);
-            return;
-          } else {
-            setContentData((old) => ({ ...old, ...data.contentData }));
-          }
-          toast.success(
-            `Successfully restored ContentData by ${
-              overwrite ? "Overwriting" : "Merging"
-            }`,
-          );
-        })
-        .catch((error: any) => {
-          console.error("Error reading or parsing the JSON file:", error);
-        });
-      event.target.value = null;
-    },
-    [overwrite, setContentData],
+  const fileInput = (label: string, type: RestoreType) => (
+    <div className="grid w-full items-center">
+      <Label className="mb-2">{label}</Label>
+      <Input
+        type="file"
+        accept=".json,application/json"
+        onChange={(e) => restore(e, type)}
+      />
+    </div>
   );
 
   return (
@@ -154,33 +97,9 @@ export default function Restore() {
           />
         </div>
       </div>
-      <div className="grid w-full items-center">
-        <Label className="mb-2">All</Label>
-        <Input
-          type="file"
-          accept=".json,application/json"
-          onChange={restoreAll}
-          placeholder="Select backup file to restore"
-        />
-      </div>
-      <div className="grid w-full items-center">
-        <Label className="mb-2">Only ContentData</Label>
-        <Input
-          type="file"
-          accept=".json,application/json"
-          onChange={restoreContentData}
-          placeholder="Select backup file to restore"
-        />
-      </div>
-      <div className="grid w-full items-center">
-        <Label className="mb-2">Only Tags</Label>
-        <Input
-          type="file"
-          accept=".json,application/json"
-          onChange={restoreTags}
-          placeholder="Select backup file to restore"
-        />
-      </div>
+      {fileInput("All", "All")}
+      {fileInput("Only ContentData", "contentData")}
+      {fileInput("Only Tags", "tags")}
     </section>
   );
 }

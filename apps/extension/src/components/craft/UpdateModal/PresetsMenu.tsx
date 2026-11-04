@@ -42,13 +42,16 @@ export default function PresetsMenu() {
           backgroundSize: "1.5em 1.5em",
           paddingRight: "2.5rem",
         }}
-        value={preset?.label}
+        value={preset?.label ?? ""}
         onChange={(o) =>
           setPreset(
             presetOptions.filter((p) => p.label === o.currentTarget.value)[0],
           )
         }
       >
+        <option value="" disabled>
+          Select preset
+        </option>
         {presetOptions.map((obj) => (
           <option key={`Select-${obj.label}`} value={obj.label}>
             {obj.label}

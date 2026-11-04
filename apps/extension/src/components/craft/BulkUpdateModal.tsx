@@ -1,4 +1,5 @@
 import { atom, useAtom, useAtomValue } from "jotai";
+import { useEffect } from "react";
 import MultiSelect from "@/components/craft/MultiSelect";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,14 @@ export default function BlukUpdateModal({
   const [modalOpen, setModalOpen] = useAtom(bulkUpdateModalOpenAtom);
 
   const [selectionTags, setSelectionTags] = useAtom(selectionTagsAtom);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+    const onKey = (e: KeyboardEvent) =>
+      e.key === "Escape" && setModalOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [modalOpen, setModalOpen]);
 
   if (!modalOpen) return null;
 

@@ -25,6 +25,7 @@ import {
   constantsAtom,
   replaceWithKeyOnUpdateAtom,
 } from "@/entrypoints/main/atoms/constants";
+import { sanitizeTitleAtom } from "@/entrypoints/main/atoms/settings";
 import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
 import GetDetailsFromPage from "@/lib/GetDetailsFromPage";
 import GetTagAppSiteData from "@/lib/GetTagAppSiteData";
@@ -37,6 +38,7 @@ function useLocalContextCore() {
 
   const replaceWithKeyOnUpdate = useAtomValue(replaceWithKeyOnUpdateAtom);
   const constants = useAtomValue(constantsAtom);
+  useAtomValue(sanitizeTitleAtom); // keep subscribed: setContent reads it without mounting
 
   const setLoad = useSetAtom(loadAtom);
   const setOpenModal = useSetAtom(updateModalOpenAtom);
@@ -164,7 +166,7 @@ function useLocalContextCore() {
 
     const contentTags = tags.map((o) => o.value);
 
-    if (!exists && pageCover !== cover) {
+    if (!exists && (pageCover || "") !== (cover || "")) {
       setTags((o) => [
         ...o,
         { label: "meta:different-cover", value: "meta:different-cover" },
@@ -204,9 +206,9 @@ function useLocalContextCore() {
           contentDetails: res[0],
         });
 
-      const { title } = GetDetailsFromPage();
+      const { title, defaultTags } = GetDetailsFromPage();
       setExists(false);
-      setTags([]);
+      setTags(defaultTags.map((o) => ({ label: o, value: o })));
       setTitle(title);
     },
   });

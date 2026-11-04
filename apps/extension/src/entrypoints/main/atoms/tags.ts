@@ -67,7 +67,7 @@ const removeTagCallback = async (get: Getter, set: Setter, tag: string) => {
   delete tagsData[tag];
   set(tagsAtom, tagsData);
 
-  const contentData = { ...(await get(contentDataAtom)) };
+  const contentData = structuredClone(await get(contentDataAtom));
   Object.values(contentData).forEach((entry) => {
     if (entry.tags.includes(tag)) {
       entry.tags = entry.tags.filter((t) => t !== tag);

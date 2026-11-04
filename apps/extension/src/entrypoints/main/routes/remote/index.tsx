@@ -3,7 +3,10 @@ import BulkUpdateModal from "@/components/craft/BulkUpdateModal";
 import ServerAffix from "@/components/craft/ServerAffix";
 import TitleHeader from "@/components/craft/TitleHeader";
 import UpdateModal from "@/components/craft/UpdateModal";
-import { useResetFilter } from "@/entrypoints/main/atoms/filter";
+import {
+  useInjectFilterDataIntoURL,
+  useResetFilter,
+} from "@/entrypoints/main/atoms/filter";
 import ExtendedCard from "./components/ExtendedCard";
 import Filters from "./components/Filters";
 import {
@@ -24,6 +27,7 @@ function Remote() {
 
   const filtered = useAtomValue(filteredAtom);
   const reset = useResetFilter();
+  const injectFilterDataIntoURL = useInjectFilterDataIntoURL();
 
   return (
     <>
@@ -48,6 +52,7 @@ function Remote() {
         className="w-full text-left hover:cursor-pointer bg-transparent border-none p-0 appearance-none"
         onClick={() => {
           reset();
+          injectFilterDataIntoURL();
           filterData();
         }}
       >

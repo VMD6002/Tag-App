@@ -15,7 +15,7 @@ function TagGroup({
   parent: string;
 }) {
   const Children = useMemo(
-    () => tagsArray.filter((k) => k.startsWith(parent)).sort(),
+    () => tagsArray.filter((k) => k.split(":")[0] === parent).sort(),
     [tagsArray, parent],
   );
 
@@ -60,7 +60,9 @@ export default function RemoteTags() {
   );
 
   const fixTagCountMutation = useMutation(
-    orpc.tags.fixTagCount.mutationOptions(),
+    orpc.tags.fixTagCount.mutationOptions({
+      onSuccess: (res) => setTags(res.tags),
+    }),
   );
 
   useEffect(() => {

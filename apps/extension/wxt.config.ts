@@ -51,7 +51,7 @@ export default defineConfig({
       sandbox: {
         pages: ["sandbox.html"],
       },
-      permissions: ["storage"],
+      permissions: ["storage", "unlimitedStorage"],
       host_permissions: ["<all_urls>"],
       browser_specific_settings: {
         gecko: {

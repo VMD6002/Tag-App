@@ -54,6 +54,13 @@ export default function Users() {
       if (!secondConfirm) return;
 
       // Execute removal
+      const snapshot = await storage.snapshot("local");
+      const prefix = `${userToRemove}:`;
+      await storage.removeItems(
+        Object.keys(snapshot)
+          .filter((k) => k.startsWith(prefix))
+          .map((k) => `local:${k}` as const),
+      );
       const nextList = userList.filter((u) => u !== userToRemove);
       setUserList(nextList);
 

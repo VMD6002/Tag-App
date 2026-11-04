@@ -114,6 +114,7 @@ export const bulkUpdateContentTags = os
           message: `Content with id ${id} doesn't exist`,
         });
 
+    const now = Math.floor(Date.now() / 1000);
     for (const id of new Set(input.ids)) {
       const content = contentDataDB.data[id]!;
       const removed = input.removed.filter((t) => content.tags.includes(t));
@@ -122,6 +123,7 @@ export const bulkUpdateContentTags = os
         (t) => !content.tags.includes(t),
       );
       content.tags.push(...added);
+      if (removed.length || added.length) content.lastUpdated = now;
       DecrementTagCount(removed);
       IncrementTagCount(added);
     }

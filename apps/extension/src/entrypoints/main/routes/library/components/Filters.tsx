@@ -131,6 +131,7 @@ export default function Filters() {
       () =>
         atom(
           (get) =>
+            get(filteredAtom).length > 0 &&
             get(selectionEntriesAtom).length === get(filteredAtom).length,
         ),
       [],
@@ -142,6 +143,11 @@ export default function Filters() {
       <Input
         value={search}
         onChange={(a) => setSearch(a.target.value)}
+        onKeyDown={(e) => {
+          if (e.key !== "Enter") return;
+          injectFilterDataIntoURL();
+          filterData();
+        }}
         placeholder="Search"
         className="mb-4"
       />
@@ -178,7 +184,10 @@ export default function Filters() {
         <button
           type="button"
           className="text-muted-foreground underline ml-4 cursor-pointer text-sm bg-transparent border-none"
-          onClick={reset}
+          onClick={() => {
+            reset();
+            injectFilterDataIntoURL();
+          }}
         >
           Clear Filters
         </button>

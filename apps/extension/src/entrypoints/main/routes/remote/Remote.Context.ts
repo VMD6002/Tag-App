@@ -179,8 +179,8 @@ function useRemoteContextCore() {
       onSuccess: (res) => {
         log(`${res.length} contents removed`);
         for (const content of res) {
-          const siteData = supportedSiteData[content.scraper]!;
-          if (siteData.afterRemoveScript)
+          const siteData = supportedSiteData[content.scraper];
+          if (siteData?.afterRemoveScript)
             runScript(siteData.afterRemoveScript, {
               siteData,
               contentDetails: content,

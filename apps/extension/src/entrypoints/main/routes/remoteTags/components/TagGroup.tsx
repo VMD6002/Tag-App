@@ -3,20 +3,19 @@ import { Image, X } from "lucide-react";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { remoteTagsAtom } from "../atom";
-import { useRemoteTag } from "../Remote.Tags.Context";
+import { useRemoteTagContext } from "../Remote.Tags.Context";
 
 type props = {
   tagsArray: string[];
   parent: string;
   removeTagFunc: any;
 };
-``;
 export default function TagGroup({ tagsArray, parent, removeTagFunc }: props) {
-  const { openCoverModal } = useRemoteTag();
+  const { openCoverModal } = useRemoteTagContext();
   const tags = useAtomValue(remoteTagsAtom);
 
   const Children = useMemo(
-    () => tagsArray.filter((k) => k.startsWith(parent)).sort(),
+    () => tagsArray.filter((k) => k.split(":")[0] === parent).sort(),
     [tagsArray, parent],
   );
 

@@ -32,6 +32,7 @@ import {
 } from "../../atoms/filter";
 import {
   selectionEntriesAtom,
+  selectionOnAtom,
   selectionTagsAtom,
   selectionTagsInitialAtom,
 } from "../../atoms/selection";
@@ -87,12 +88,17 @@ function useLibraryContextCore() {
     onSuccess: (res) => setFiltered(res),
   });
 
-  const filterQueryReadAtom = atom((get) => get(FilterQueryAtom));
   const filterData = useAtomCallback(
     useCallback(
-      (get) => {
-        const query = get(filterQueryReadAtom);
-        getFilteredDataMutation.mutate(query);
+      (get, set, dontOffSelection = false) => {
+        // A new result set invalidates the selection, otherwise hidden items get bulk-deleted.
+        if (!dontOffSelection) {
+          set(selectionEntriesAtom, []);
+          set(selectionOnAtom, false);
+          set(selectionTagsAtom, []);
+          set(selectionTagsInitialAtom, []);
+        }
+        getFilteredDataMutation.mutate(get(FilterQueryAtom));
       },
       [contentData],
     ),
@@ -145,11 +151,11 @@ function useLibraryContextCore() {
     onSuccess: (res) => {
       log(`${res.length} contents removed`);
       for (const content of res) {
-        const siteData = supportedSiteData[content.scraper]!;
-        if (siteData.afterRemoveScript)
+        const siteData = supportedSiteData[content.scraper];
+        if (siteData?.afterRemoveScript)
           runScript(siteData.afterRemoveScript, {
             siteData,
-            contentDetails: res[0],
+            contentDetails: content,
           });
       }
       setFiltered((old) => {
@@ -173,7 +179,7 @@ function useLibraryContextCore() {
       removed: string[];
     }) => await bulkUpdateContentTagsAction(vars),
     onSuccess: () => {
-      filterData();
+      filterData(true);
       setBulkUpdateModalOpen(false);
     },
   });

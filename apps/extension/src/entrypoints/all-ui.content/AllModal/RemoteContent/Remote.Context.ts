@@ -198,7 +198,7 @@ function useRemoteContextCore() {
 
     const contentTags = tags.map((o) => o.value);
 
-    if (!exists && pageCover !== cover) {
+    if (!exists && (pageCover || "") !== (cover || "")) {
       setTags((o) => [
         ...o,
         { label: "meta:different-cover", value: "meta:different-cover" },
@@ -237,9 +237,9 @@ function useRemoteContextCore() {
             contentDetails: res[0],
           });
 
-        const { title } = GetDetailsFromPage();
+        const { title, defaultTags } = GetDetailsFromPage();
         setExists(false);
-        setTags([]);
+        setTags(defaultTags.map((o) => ({ label: o, value: o })));
         setTitle(title);
       },
     }),

@@ -25,7 +25,7 @@ const Links = {
   Library: "/",
   Tags: "/tags",
   Settings: "/settings",
-  "Supprted Sites": "/supported",
+  "Supported Sites": "/supported",
 };
 
 function SelectActiveUser() {

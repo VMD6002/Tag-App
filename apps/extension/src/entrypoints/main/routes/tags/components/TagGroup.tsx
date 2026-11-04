@@ -16,7 +16,7 @@ export default function TagGroup({ tagsArray, parent, removeTagFunc }: props) {
   const tags = useAtomValue(tagsAtom);
 
   const Children = useMemo(
-    () => tagsArray.filter((k) => k.startsWith(parent)).sort(),
+    () => tagsArray.filter((k) => k.split(":")[0] === parent).sort(),
     [tagsArray, parent],
   );
 

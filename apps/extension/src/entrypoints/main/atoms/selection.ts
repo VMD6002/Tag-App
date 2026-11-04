@@ -56,9 +56,13 @@ const syncSelectedTagsCallback = async (
     return;
   }
 
-  const tagsArray = entries.map((key) => contentData[key]!.tags);
+  const perItem = entries
+    .map((key) => contentData[key]?.tags)
+    .filter((t): t is string[] => !!t);
 
-  const data = tagsArray.reduce((a, b) => a.filter((c) => b.includes(c)));
+  const data = perItem.length
+    ? perItem.reduce((a, b) => a.filter((c) => b.includes(c)))
+    : [];
 
   set(selectionTagsInitialAtom, data);
   set(

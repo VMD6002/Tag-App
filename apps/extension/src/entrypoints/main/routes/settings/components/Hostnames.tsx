@@ -34,7 +34,7 @@ const validateHostnames = (hostnamesText: string) => {
       toast.error(z.prettifyError(parsed.error));
       return null;
     }
-    return parsed.data;
+    return parsed.data.map((u) => new URL(u).origin);
   } catch {
     toast.error("Invalid Input!");
     return null;

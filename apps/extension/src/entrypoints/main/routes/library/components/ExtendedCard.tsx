@@ -5,10 +5,13 @@ import { Check } from "lucide-react";
 import { memo, useCallback, useMemo } from "react"; // Fixed: Added missing imports
 import { confirm } from "@/components/craft/confirm-dialog";
 import {
+  updateContentUrlAtom,
   updateCoverAtom,
+  updateDownloadTypeAtom,
   updateExtraDataAtom,
   updateIdAtom,
   updateModalOpenAtom,
+  updatePresetAtom,
   updatePresetOptionsAtom,
   updateTagsAtom,
   updateTitleAtom,
@@ -36,7 +39,7 @@ function TagParentChildList({ tags }: { tags: string[] }) {
           {parent}:{" "}
           <span className="text-muted-foreground">
             {tags
-              .filter((k) => k.startsWith(parent))
+              .filter((k) => k.split(":")[0] === parent)
               .sort()
               .map((e) => e.replace(`${parent}:`, "").replaceAll("_", " "))
               .join(", ")}
@@ -62,6 +65,9 @@ const ExtendedCard = memo(
     const setUpdateTags = useSetAtom(updateTagsAtom);
     const setCover = useSetAtom(updateCoverAtom);
     const setPresetOptions = useSetAtom(updatePresetOptionsAtom);
+    const setContentUrl = useSetAtom(updateContentUrlAtom);
+    const setPreset = useSetAtom(updatePresetAtom);
+    const setDownloadType = useSetAtom(updateDownloadTypeAtom);
 
     // Selection Atoms
     const selectionOn = useAtomValue(selectionOnAtom);
@@ -99,9 +105,11 @@ const ExtendedCard = memo(
       setExtraData(contentDetails.extraData);
       setUpdateTags(contentDetails.tags.map((o) => ({ label: o, value: o })));
 
-      if (siteData?.download?.presets) {
-        setPresetOptions(siteData.download.presets);
-      }
+      // Load every field, otherwise saving blanks whatever the modal didn't show.
+      setContentUrl(contentDetails.contentUrl);
+      setPreset(contentDetails.download?.flags);
+      setDownloadType(contentDetails.download?.type);
+      setPresetOptions(siteData?.download?.presets);
 
       setUpdateModalOpen(true);
     }, [
@@ -114,6 +122,9 @@ const ExtendedCard = memo(
       setUpdateTags,
       setPresetOptions,
       setUpdateModalOpen,
+      setContentUrl,
+      setPreset,
+      setDownloadType,
     ]);
 
     const removeContent = useCallback(async () => {
@@ -126,7 +137,7 @@ const ExtendedCard = memo(
       // biome-ignore lint/a11y/useKeyWithClickEvents: card selection click handler contains nested controls
       <div
         onClick={() => selectionOn && selectEntry(contentDetails.id)} // Fixed: id -> contentDetails.id
-        className={`block p-2 h-fit relative text-left border rounded-sm transition-all ${
+        className={`block p-2 h-fit relative text-left border rounded-sm transition-all [content-visibility:auto] [contain-intrinsic-size:auto_28rem] ${
           selectedTrue
             ? "border-white opacity-80 bg-neutral-800/10"
             : "border-transparent"

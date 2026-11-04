@@ -23,24 +23,6 @@ export const supportedHostsIndexAtom = atomWithUserStorage<
   Record<string, string>
 >("supportedHostsIndex", {});
 
-const addSupportedHostsToIndexCallback = async (
-  get: Getter,
-  set: Setter,
-  siteName: string,
-  supportedSitesList: string[],
-) => {
-  const oldHostsIndex = await get(supportedHostsIndexAtom);
-  supportedSitesList.forEach((site) => {
-    oldHostsIndex[site] = siteName;
-  });
-  set(supportedHostsIndexAtom, oldHostsIndex);
-};
-
-export const useAddSupportedHostsToIndex = (supportedHostsIndex: any) =>
-  useAtomCallback(
-    useCallback(addSupportedHostsToIndexCallback, [supportedHostsIndex]),
-  );
-
 const refreshSupportedHostsIndexCallback = async (
   get: Getter,
   set: Setter,

@@ -14,13 +14,15 @@ import { useAtomCallback } from "jotai/utils";
 import { useCallback } from "react";
 import { constantsAtom, replaceWithKeyOnUpdateAtom } from "./constants";
 import { sanitizeTitleAtom } from "./settings";
-import { tagsAtom } from "./tags";
+import { parentTagsAtom, tagsAtom } from "./tags";
 import { atomWithUserStorage } from "./user";
 
 export const contentDataAtom = atomWithUserStorage<ContentWebDataType>(
   "contentData",
   {},
 );
+
+const parentOf = (tag: string) => tag.split(":")[0]!;
 
 const setContentCallback = async (
   get: Getter,
@@ -33,6 +35,7 @@ const setContentCallback = async (
 
   const contentData = structuredClone(await get(contentDataAtom));
   const tagsData = structuredClone(await get(tagsAtom));
+  const parentsData = structuredClone(await get(parentTagsAtom));
 
   const Time = Math.floor(Date.now() / 1000);
 
@@ -44,52 +47,35 @@ const setContentCallback = async (
       ? replaceWithConstantKey(input.cover, constants)
       : input.cover;
 
+  const tags = [...new Set(input.tags)];
   const oldDetails = contentData[input.id];
-
-  let newContent: ContentWebType;
-  if (!oldDetails) {
-    input.tags.forEach((tag) => {
-      tagsData[tag] ??= { count: 0 };
-      tagsData[tag].count++;
-    });
-    newContent = {
-      ...input,
-      title,
-      cover,
-      added: Time,
-      lastUpdated: Time,
-    };
-    contentData[input.id] = newContent;
-    set(contentDataAtom, contentData);
-    set(tagsAtom, tagsData);
-    return newContent;
-  }
+  const oldTags = oldDetails?.tags ?? [];
 
   // Handle Removed Tags
-  const deletedTags = oldDetails.tags.filter((a) => !input.tags.includes(a));
-  deletedTags.forEach((tag) => {
-    if (tagsData[tag]) tagsData[tag].count--;
-  });
+  oldTags
+    .filter((a) => !tags.includes(a))
+    .forEach((tag) => {
+      if (tagsData[tag])
+        tagsData[tag].count = Math.max(0, tagsData[tag].count - 1);
+    });
 
   // Handle Added Tags
-  const addedTags = input.tags.filter((a) => !oldDetails.tags.includes(a));
-  addedTags.forEach((tag) => {
-    tagsData[tag] ??= { count: 0 };
-    tagsData[tag].count++;
-  });
+  tags
+    .filter((a) => !oldTags.includes(a))
+    .forEach((tag) => {
+      tagsData[tag] ??= { count: 0 };
+      tagsData[tag].count++;
+      parentsData[parentOf(tag)] ??= {};
+    });
 
-  newContent = {
-    ...oldDetails,
-    ...input,
-    title,
-    cover,
-    lastUpdated: Time,
-  };
+  const newContent: ContentWebType = oldDetails
+    ? { ...oldDetails, ...input, tags, title, cover, lastUpdated: Time }
+    : { ...input, tags, title, cover, added: Time, lastUpdated: Time };
 
   contentData[newContent.id] = newContent;
-
   set(contentDataAtom, contentData);
   set(tagsAtom, tagsData);
+  set(parentTagsAtom, parentsData);
   return newContent;
 };
 
@@ -111,7 +97,8 @@ const removeContentsCallback = async (
     if (!contentDetails) return;
     removed.push(contentDetails);
     contentDetails.tags.forEach((tag) => {
-      if (tagsData[tag]) tagsData[tag].count--;
+      if (tagsData[tag])
+        tagsData[tag].count = Math.max(0, tagsData[tag].count - 1);
     });
     delete contentData[id];
   });
@@ -131,30 +118,39 @@ const bulkUpdateContentTagsCallback = async (
 ) => {
   const contentData = structuredClone(await get(contentDataAtom));
   const tagsData = structuredClone(await get(tagsAtom));
+  const parentsData = structuredClone(await get(parentTagsAtom));
 
-  input.ids.forEach((id) => {
-    const contentDetails = contentData[id];
+  // Validate first so a bad id can't leave counts half-updated.
+  for (const id of input.ids)
+    if (!contentData[id])
+      throw new Error(`Content with id ${id} doesn't exist`);
 
-    if (!contentDetails) throw new Error(`Content with id ${id} doesn't exist`);
-
-    input.removed.forEach((tag) => {
-      if (tagsData[tag]) tagsData[tag].count--;
-    });
-    contentDetails.tags = contentDetails.tags.filter(
-      (tag) => !input.removed.includes(tag),
+  const now = Math.floor(Date.now() / 1000);
+  for (const id of new Set(input.ids)) {
+    const content = contentData[id]!;
+    const removed = input.removed.filter((t) => content.tags.includes(t));
+    content.tags = content.tags.filter((t) => !removed.includes(t));
+    const added = [...new Set(input.added)].filter(
+      (t) => !content.tags.includes(t),
     );
+    content.tags.push(...added);
+    if (!removed.length && !added.length) continue;
 
-    input.added.forEach((tag) => {
+    removed.forEach((tag) => {
+      if (tagsData[tag])
+        tagsData[tag].count = Math.max(0, tagsData[tag].count - 1);
+    });
+    added.forEach((tag) => {
       tagsData[tag] ??= { count: 0 };
       tagsData[tag].count++;
+      parentsData[parentOf(tag)] ??= {};
     });
-    contentDetails.tags = [
-      ...new Set([...contentDetails.tags, ...input.added]),
-    ];
-  });
+    content.lastUpdated = now;
+  }
 
   set(contentDataAtom, contentData);
   set(tagsAtom, tagsData);
+  set(parentTagsAtom, parentsData);
   return input;
 };
 

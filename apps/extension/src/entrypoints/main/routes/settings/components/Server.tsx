@@ -29,7 +29,7 @@ export default function Server() {
       <Button
         size="sm"
         onClick={() => {
-          setServerUrl(serverUrlBuffer);
+          setServerUrl(serverUrlBuffer.trim().replace(/\/+$/, ""));
           toast.success("Successfully set Server address");
         }}
       >

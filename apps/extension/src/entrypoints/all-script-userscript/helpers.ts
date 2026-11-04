@@ -1,6 +1,9 @@
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export const toBase36 = (num: number | string) => Number(num).toString(36);
+export const toBase36 = (num: number | string) =>
+  typeof num === "string" && /^\d+$/.test(num)
+    ? BigInt(num).toString(36) // exact for ids beyond 2^53
+    : Number(num).toString(36);
 
 /**
  * FNV-1a 32-bit Hash

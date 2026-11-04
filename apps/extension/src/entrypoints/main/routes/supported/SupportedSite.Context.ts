@@ -1,15 +1,13 @@
 import { PresetSchema } from "@tagapp/utils/types";
 import constate from "constate";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 import { confirm } from "@/components/craft/confirm-dialog";
 import saveJsonFile from "@/lib/saveJsonFile";
 import {
-  supportedHostsIndexAtom,
   supportedSitesAtom,
-  useAddSupportedHostsToIndex,
   useRefreshSupportedHostsIndex,
 } from "../../atoms/supportedSites";
 
@@ -82,9 +80,6 @@ function useSupportedSite() {
   // Jotai atoms
   const [supportedSites, setSupportedSites] = useAtom(supportedSitesAtom);
   const refreshSupportedHostsIndex = useRefreshSupportedHostsIndex();
-  const supportedHostsIndex = useAtomValue(supportedHostsIndexAtom);
-  const addSupportedHostsToIndex =
-    useAddSupportedHostsToIndex(supportedHostsIndex);
 
   // File input ref for import
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -97,6 +92,8 @@ function useSupportedSite() {
   const addSite = useCallback(() => {
     setSiteData(DefaultSiteDataString);
     setSiteScript(defaultSiteScript);
+    setAfterAddScript("");
+    setAfterRemoveScript("");
     setSiteDataEditorOpen(true);
     setEditingSiteName(null);
   }, []);
@@ -108,15 +105,13 @@ function useSupportedSite() {
       tmp.afterAddScript = afterAddScript.trim() || undefined;
       tmp.afterRemoveScript = afterRemoveScript.trim() || undefined;
       const data = SiteDataSchema.parse(tmp);
-      setSupportedSites(async (old) => {
-        const New = { ...(await old) };
-        if (editingSiteName && editingSiteName !== data.name) {
-          delete New[editingSiteName];
-        }
-        New[data.name] = data;
-        return New;
-      });
-      addSupportedHostsToIndex(data.name, data.hosts);
+      const New = { ...supportedSites };
+      if (editingSiteName && editingSiteName !== data.name) {
+        delete New[editingSiteName];
+      }
+      New[data.name] = data;
+      setSupportedSites(New);
+      refreshSupportedHostsIndex(New);
       setEditingSiteName(data.name);
       toast.success("Script Updated Successfully");
     } catch (error: any) {
@@ -128,6 +123,7 @@ function useSupportedSite() {
     editingSiteName,
     afterAddScript,
     afterRemoveScript,
+    supportedSites,
   ]);
 
   const selectSite = useCallback((site: SiteData) => {
@@ -149,17 +145,16 @@ function useSupportedSite() {
     async (siteName: string) => {
       if (!(await confirm(`Are you sure you want to remove ${siteName}?`)))
         return;
-      setSupportedSites(async (old) => {
-        const New = { ...(await old) };
-        delete New[siteName];
-        return New;
-      });
+      const New = { ...supportedSites };
+      delete New[siteName];
+      await setSupportedSites(New);
+      await refreshSupportedHostsIndex(New);
       if (editingSiteName === siteName) {
         setSiteDataEditorOpen(false);
         setEditingSiteName(null);
       }
     },
-    [editingSiteName],
+    [editingSiteName, supportedSites],
   );
 
   const closeEditor = useCallback(() => {

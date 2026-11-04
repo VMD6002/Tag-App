@@ -9,19 +9,23 @@ export const currentUserAtom = atomWithStorage<string>(
   "currentUser",
   DEFAULT_USER,
   createWxtStorage(),
+  { getOnInit: true },
 );
 
 export const userListAtom = atomWithStorage<string[]>(
   "userList",
   ["DEFAULT"],
   createWxtStorage(),
+  { getOnInit: true },
 );
 
 // 2. Create the reusable factory function
 export function atomWithUserStorage<T>(key: string, initialValue: T) {
   // The family is scoped to this specific setting
   const settingFamily = atomFamily((username: string) =>
-    atomWithStorage<T>(`${username}:${key}`, initialValue, createWxtStorage()),
+    atomWithStorage<T>(`${username}:${key}`, initialValue, createWxtStorage(), {
+      getOnInit: true, // otherwise an unmounted atom reads the default and callers overwrite real data
+    }),
   );
 
   // Return the proxy atom that automatically routes to the current user

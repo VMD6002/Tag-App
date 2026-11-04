@@ -14,14 +14,16 @@ export default function ServerAffix({
   const filteredDataPostUrl = useAtomValue(filteredDataPostServerUrlAtom);
 
   const postMuation = useMutation({
-    mutationFn: (filtered: ContentWebType[]) => {
-      return fetch(filteredDataPostUrl, {
+    mutationFn: async (filtered: ContentWebType[]) => {
+      const res = await fetch(filteredDataPostUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(filtered),
       });
+      if (!res.ok) throw new Error(`Server responded ${res.status}`);
+      return res;
     },
     onSuccess: () => {
       toast.success("Filtered data posted successfully");
