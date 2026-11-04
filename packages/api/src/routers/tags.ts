@@ -1,9 +1,7 @@
 import { os } from "@orpc/server";
-import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
 import z from "zod";
 import { contentDataDB } from "../db/contentData";
-import { tagDB } from "../db/tags";
-import errorLog from "../lib/errorLog";
+import { recountTags, tagDB } from "../db/tags";
 
 // Strip the given tags from every content item so no item references a removed tag.
 const stripTagsFromContent = (shouldRemove: (tag: string) => boolean) => {
@@ -35,19 +33,7 @@ export const setTagCover = os
 export const addTags = os
   .input(z.object({ tags: z.array(z.string()) }))
   .handler(async ({ input: { tags } }) => {
-    try {
-      const tagsArray = Array.from(tags);
-      tagsArray.forEach((tag) => {
-        if (!tagDB.data.tags[tag]) {
-          tagDB.data.tags[tag] = { count: 0 };
-          console.log(`New tag created: ${tag}`);
-        }
-      });
-      tagsArray.length &&
-        console.log("All tag decrement operations completed.");
-    } catch (batchError) {
-      errorLog(batchError);
-    }
+    for (const tag of tags) tagDB.data.tags[tag] ??= { count: 0 };
     await tagDB.write();
     return tags;
   });
@@ -84,34 +70,7 @@ export const removeParentTags = os
   });
 
 export const fixTagCount = os.handler(async () => {
-  const updateTagData: TagsType = {};
-  const updateParentTagData: ParentTagsType = {};
-  for (const id in contentDataDB.data) {
-    contentDataDB.data[id]!.tags.forEach((tag) => {
-      const parentTag = tag.split(":")[0]!;
-      if (!tagDB.data.parentTags[parentTag])
-        updateParentTagData[parentTag] = {};
-
-      const newCount = (updateTagData[tag]?.count ?? 0) + 1;
-      if (!updateTagData[tag]) {
-        updateTagData[tag] = { count: newCount };
-        console.log(`New tag created: ${tag}`);
-      } else {
-        updateTagData[tag]!.count = newCount;
-        console.log(`Increment: New Count = ${newCount}, Tag = ${tag}`);
-      }
-    });
-  }
-
-  for (const tag in tagDB.data.tags) {
-    if (!updateTagData[tag]) {
-      updateTagData[tag] = { ...tagDB.data.tags[tag], count: 0 };
-    }
-  }
-  tagDB.data.tags = updateTagData;
-  tagDB.data.parentTags = { ...tagDB.data.parentTags, ...updateParentTagData };
-
+  recountTags();
   await tagDB.write();
-  console.log("Server Tag Count Fixed");
   return tagDB.data;
 });

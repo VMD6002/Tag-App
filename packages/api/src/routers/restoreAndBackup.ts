@@ -2,7 +2,7 @@ import { os } from "@orpc/server";
 import { BackUpSchema } from "@tagapp/utils/types";
 import z from "zod";
 import { contentDataDB } from "../db/contentData";
-import { tagDB } from "../db/tags";
+import { recountTags, tagDB } from "../db/tags";
 
 export const backup = os
   .input(
@@ -54,7 +54,8 @@ export const restore = os
       );
     }
 
+    recountTags();
     await Promise.all([tagDB.write(), contentDataDB.write()]);
 
-    return input;
+    return { type, overwrite };
   });

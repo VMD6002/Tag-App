@@ -88,7 +88,7 @@ bun --cwd apps/extension compile   # extension tsc --noEmit
 bun check            # Biome lint+format (check:fix / lint:fix / format to apply)
 ```
 
-Server port/prefix: `settings.json` (defaults `5000`, `/`). `--prefix` always overwrites the stored prefix; `--port` only applies if no port is stored, so effectively ignored. Extension placeholder text suggests `http://localhost:5001`. For a persistent extension ID in production builds set `EXTENSION_PUBLIC_KEY` in `.env` (warns if missing).
+Server port/prefix: `settings.json` only (defaults `5000`, `/`); the server takes no CLI flags. Extension placeholder text suggests `http://localhost:5001`. For a persistent extension ID in production builds set `EXTENSION_PUBLIC_KEY` in `.env` (warns if missing).
 
 ## Conventions
 

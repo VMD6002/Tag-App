@@ -1,6 +1,5 @@
 import { mkdirSync } from "node:fs";
 import { networkInterfaces } from "node:os";
-import { parseArgs } from "node:util";
 import { RPCHandler } from "@orpc/server/fetch";
 import { router, settingsDB } from "@tagapp/api";
 import { Hono } from "hono";
@@ -22,38 +21,12 @@ function getLocalIP(): string {
   return "127.0.0.1";
 }
 
-// 1. Add prefix to your schema
-const schema = {
-  port: { type: "string" },
-  prefix: { type: "string" },
-} as const;
-
-const { values } = parseArgs({
-  args: process.argv.slice(2),
-  options: schema,
-  strict: true,
-});
-
-const { port, prefix } = values;
-
-// --- Port Settings Logic ---
-if (port && !settingsDB.data.port) {
-  settingsDB.data.port = Number(port);
-  settingsDB.write();
-}
 const activePort: number = settingsDB.data.port;
-
-// --- Prefix Settings Logic ---
-if (prefix) {
-  // Sanitize the flag input: ensure it starts with "/" and has no trailing "/"
-  let cleanPrefix = prefix.startsWith("/") ? prefix : `/${prefix}`;
-  cleanPrefix = cleanPrefix.replace(/\/$/, "");
-
-  // Update DB if the flag was provided
-  settingsDB.data.prefix = cleanPrefix;
-  settingsDB.write();
-}
-const activePrefix = settingsDB.data.prefix;
+// Normalise: leading "/", no trailing "/"; the root prefix becomes "".
+const basePath = `/${settingsDB.data.prefix}`
+  .replace(/\/+/g, "/")
+  .replace(/\/$/, "");
+const activePrefix = basePath || "/";
 
 mkdirSync("DB", { recursive: true });
 
@@ -71,7 +44,6 @@ app.use(
       "Authorization",
     ],
     allowMethods: ["POST", "GET", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
     maxAge: 3600,
   }),
 );
@@ -109,17 +81,16 @@ app.use(
 
 // 4. Map static files to the dynamically configured prefix
 app.use(
-  `${activePrefix}/*`,
+  `${basePath}/*`,
   serveStatic({
     root: "./",
-    rewriteRequestPath: (path) =>
-      path.replace(new RegExp(`^${activePrefix}`), "/WebUI"),
+    rewriteRequestPath: (path) => `/WebUI${path.slice(basePath.length)}`,
   }),
 );
 
 // 5. The SPA Fallback (bound to the active prefix)
-app.get(`${activePrefix}`, serveStatic({ path: "./WebUI/index.html" }));
-app.get(`${activePrefix}/*`, serveStatic({ path: "./WebUI/index.html" }));
+app.get(activePrefix, serveStatic({ path: "./WebUI/index.html" }));
+app.get(`${basePath}/*`, serveStatic({ path: "./WebUI/index.html" }));
 
 const localIP = getLocalIP();
 console.log(`Server active on:`);

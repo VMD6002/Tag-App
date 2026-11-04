@@ -39,13 +39,15 @@ export const setContent = os
         ? replaceWithConstantKey(input.cover, constants)
         : input.cover;
 
+    const tags = [...new Set(input.tags)];
     const oldDetails = contentDataDB.data[input.id];
 
     let newContent: ContentWebType;
     if (!oldDetails) {
-      IncrementTagCount(input.tags);
+      IncrementTagCount(tags);
       newContent = {
         ...input,
+        tags,
         title,
         cover,
         added: Time,
@@ -58,16 +60,17 @@ export const setContent = os
     }
 
     // Handle Removed Tags
-    const removedTags = oldDetails.tags.filter((a) => !input.tags.includes(a));
+    const removedTags = oldDetails.tags.filter((a) => !tags.includes(a));
     DecrementTagCount(removedTags);
 
     // Handle Added Tags
-    const addedTags = input.tags.filter((a) => !oldDetails.tags.includes(a));
+    const addedTags = tags.filter((a) => !oldDetails.tags.includes(a));
     IncrementTagCount(addedTags);
 
     newContent = {
       ...oldDetails,
       ...input,
+      tags,
       title,
       cover,
       lastUpdated: Time,
@@ -80,7 +83,15 @@ export const setContent = os
   });
 
 export const setSettings = os
-  .input(z.record(z.string(), z.any()))
+  .input(
+    z
+      .object({
+        replaceWithKeyOnUpdate: z.boolean(),
+        sanitizeTitleOnSave: z.boolean(),
+        constants: z.record(z.string(), z.string()),
+      })
+      .partial(),
+  )
   .handler(async ({ input }) => {
     settingsDB.data = { ...settingsDB.data, ...input };
     await settingsDB.write();
@@ -96,24 +107,24 @@ export const bulkUpdateContentTags = os
     }),
   )
   .handler(async ({ input }) => {
-    input.ids.forEach((id) => {
-      const contentDetails = contentDataDB.data[id];
-
-      if (!contentDetails)
+    // Validate first so a bad id can't leave counts half-updated.
+    for (const id of input.ids)
+      if (!contentDataDB.data[id])
         throw new ORPCError("BAD_REQUEST", {
           message: `Content with id ${id} doesn't exist`,
         });
 
-      DecrementTagCount(input.removed);
-      contentDetails.tags = contentDetails.tags.filter(
-        (tag) => !input.removed.includes(tag),
+    for (const id of new Set(input.ids)) {
+      const content = contentDataDB.data[id]!;
+      const removed = input.removed.filter((t) => content.tags.includes(t));
+      content.tags = content.tags.filter((t) => !removed.includes(t));
+      const added = [...new Set(input.added)].filter(
+        (t) => !content.tags.includes(t),
       );
-
-      IncrementTagCount(input.added);
-      contentDetails.tags = [
-        ...new Set([...contentDetails.tags, ...input.added]),
-      ];
-    });
+      content.tags.push(...added);
+      DecrementTagCount(removed);
+      IncrementTagCount(added);
+    }
 
     await contentDataDB.write();
     await tagDB.write();
