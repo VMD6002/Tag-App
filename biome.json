@@ -16,6 +16,7 @@
       "!**/dist",
       "!**/.wxt",
       "!**/.output",
+      "!**/components/ui",
       "!bun.lock"
     ]
   },
@@ -36,21 +37,6 @@
       }
     }
   },
-  "overrides": [
-    {
-      "includes": ["**/components/ui/**"],
-      "linter": {
-        "rules": {
-          "a11y": {
-            "useSemanticElements": "off",
-            "useKeyWithClickEvents": "off",
-            "noLabelWithoutControl": "off"
-          },
-          "suspicious": { "noArrayIndexKey": "off" }
-        }
-      }
-    }
-  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "double"
