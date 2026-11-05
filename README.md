@@ -8,7 +8,7 @@ Browser-extension "web clipper" for saving and tagging content (videos, gallerie
 
 ## Stack
 
-Bun workspaces · WXT (extension, MV3, Chrome only) · Hono + oRPC (`/rpc`) · Vite + React + wouter (hash router) · LowDB (JSON) · Zod · Jotai + Constate + TanStack Query · Tailwind + shadcn/ui · Biome (lint/format).
+Bun workspaces · WXT (extension, MV3, Chrome only) · Hono + oRPC (`/rpc`) · Vite + React + wouter (hash router) · LowDB (JSON) · Zod · Jotai + Constate + TanStack Query · Tailwind + shadcn/ui (Base UI, `base-nova` preset `b2Pg`) · Biome (lint/format).
 
 ## Repo map
 
@@ -107,5 +107,6 @@ Server port/prefix: `settings.json` only (defaults `5000`, `/`); the server take
 - Tags with count 0 are intentional (kept so they stay selectable for future content); only explicit removal deletes a tag.
 - Removing a tag or parent tag must also strip it from all content (and bump `lastUpdated`). Implemented in `useRemoveTag`/`useRemoveParent` (extension) and `tags.removeTags`/`tags.removeParentTags` (server); keep them in sync.
 - `runUserCode` executes user-supplied JS with `vm` (not a security boundary) and the server has no auth: never expose it beyond a trusted network.
+- shadcn uses **Base UI** (`@base-ui/react`), not Radix: use `render={<X />}` instead of `asChild`, `data-open`/`data-closed` instead of `data-[state=...]`, and Select `onValueChange` can receive `null`. `PopoverContent` has local `anchor`/`container` props (MultiSelect portals into its wrapper so it works inside the extension's shadow-DOM overlay). `shadcn apply` can't detect the WXT extension app; create a temporary `vite.config.ts` in `apps/extension` while running it.
 - `apps/*/README.md` are untouched template READMEs; ignore them. `tmp/` and `.devtool/` are gitignored personal files.
 - `apps/web/src/routes/` has only library + tags; there is no per-item page.
