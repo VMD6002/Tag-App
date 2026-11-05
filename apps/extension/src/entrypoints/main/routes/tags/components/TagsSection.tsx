@@ -87,11 +87,19 @@ export default function TagsSection() {
           }}
           className="grid mb-3"
         >
-          <Select onValueChange={(selected) => setSelectedParent(selected)}>
+          <Select
+            onValueChange={(selected) =>
+              selected && setSelectedParent(String(selected))
+            }
+          >
             <SelectTrigger className="w-full rounded-b-none">
               <SelectValue placeholder="Select Parent" />
             </SelectTrigger>
-            <SelectContent className="data-[side=bottom]:translate-y-0 data-[side=left]:translate-x-0 data-[side=right]:translate-x-0 data-[side=top]:translate-y-0 rounded-t-none max-w-sm min-w-0">
+            <SelectContent
+              alignItemWithTrigger={false}
+              sideOffset={0}
+              className="rounded-t-none max-w-sm min-w-0"
+            >
               <SelectGroup>
                 {parentTagsArray.map((parent) => (
                   <SelectItem key={`Select-${parent}`} value={parent}>

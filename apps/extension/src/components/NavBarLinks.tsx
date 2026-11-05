@@ -35,7 +35,10 @@ function SelectActiveUser() {
   if (userList.length <= 1) return null;
 
   return (
-    <Select value={currentUser} onValueChange={(val) => setCurrentUser(val)}>
+    <Select
+      value={currentUser}
+      onValueChange={(val) => val && setCurrentUser(val)}
+    >
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Select active user" />
       </SelectTrigger>
@@ -66,17 +69,17 @@ export default function NavBarLinks() {
             className={"hidden min-[55rem]:block"}
           >
             <NavigationMenuLink
-              asChild
               className={navigationMenuTriggerStyle()}
+              render={
+                <Link
+                  className={
+                    currentUrl === path ? "underline underline-offset-2" : ""
+                  }
+                  href={path}
+                />
+              }
             >
-              <Link
-                className={
-                  currentUrl === path ? "underline underline-offset-2" : ""
-                }
-                href={path}
-              >
-                {name}
-              </Link>
+              {name}
             </NavigationMenuLink>
           </NavigationMenuItem>
         ))}
@@ -86,17 +89,20 @@ export default function NavBarLinks() {
             <ul className="grid gap-4">
               <li>
                 {NameAndPath.map(([name, path]) => (
-                  <NavigationMenuLink key={`Mobile-Nav-Link-${name}`} asChild>
-                    <Link
-                      className={`whitespace-nowrap ${
-                        currentUrl === path
-                          ? "underline underline-offset-2"
-                          : ""
-                      }`}
-                      href={path}
-                    >
-                      {name}
-                    </Link>
+                  <NavigationMenuLink
+                    key={`Mobile-Nav-Link-${name}`}
+                    render={
+                      <Link
+                        className={`whitespace-nowrap ${
+                          currentUrl === path
+                            ? "underline underline-offset-2"
+                            : ""
+                        }`}
+                        href={path}
+                      />
+                    }
+                  >
+                    {name}
                   </NavigationMenuLink>
                 ))}
               </li>

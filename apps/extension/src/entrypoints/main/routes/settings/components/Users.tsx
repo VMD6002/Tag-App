@@ -82,7 +82,7 @@ export default function Users() {
         <Label className="mb-2">Active User</Label>
         <Select
           value={currentUser}
-          onValueChange={(val) => setCurrentUser(val)}
+          onValueChange={(val) => val && setCurrentUser(val)}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select active user" />
