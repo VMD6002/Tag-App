@@ -100,6 +100,7 @@ Server port/prefix: `settings.json` only (defaults `5000`, `/`); the server take
 - Server runs on Bun; server code uses top-level `await` for LowDB init and cwd-relative paths (`./DB`, `./settings.json`).
 - Server handlers mutate the in-memory LowDB object then `await db.write()`; always write both `contentDataDB` and `tagDB` when tags change.
 - Extension local-mode atom callbacks `structuredClone` before mutating, then `set(...)`.
+- `components/ui` is immutable stock shadcn (never edit it, Biome ignores it); customisations go in `components/craft/ui`.
 
 ## Gotchas
 
@@ -107,6 +108,6 @@ Server port/prefix: `settings.json` only (defaults `5000`, `/`); the server take
 - Tags with count 0 are intentional (kept so they stay selectable for future content); only explicit removal deletes a tag.
 - Removing a tag or parent tag must also strip it from all content (and bump `lastUpdated`). Implemented in `useRemoveTag`/`useRemoveParent` (extension) and `tags.removeTags`/`tags.removeParentTags` (server); keep them in sync.
 - `runUserCode` executes user-supplied JS with `vm` (not a security boundary) and the server has no auth: never expose it beyond a trusted network.
-- shadcn uses **Base UI** (`@base-ui/react`), not Radix: use `render={<X />}` instead of `asChild`, `data-open`/`data-closed` instead of `data-[state=...]`, and Select `onValueChange` can receive `null`. `PopoverContent` has local `anchor`/`container` props (MultiSelect portals into its wrapper so it works inside the extension's shadow-DOM overlay). `shadcn apply` can't detect the WXT extension app; create a temporary `vite.config.ts` in `apps/extension` while running it.
+- shadcn uses **Base UI** (`@base-ui/react`), not Radix: use `render={<X />}` instead of `asChild`, `data-open`/`data-closed` instead of `data-[state=...]`, and Select `onValueChange` can receive `null`. `components/craft/ui/popover` adds `anchor`/`container` props to `PopoverContent` (MultiSelect portals into its wrapper so it works inside the extension's shadow-DOM overlay). `shadcn apply` can't detect the WXT extension app; create a temporary `vite.config.ts` in `apps/extension` while running it.
 - `apps/*/README.md` are untouched template READMEs; ignore them. `tmp/` and `.devtool/` are gitignored personal files.
 - `apps/web/src/routes/` has only library + tags; there is no per-item page.
