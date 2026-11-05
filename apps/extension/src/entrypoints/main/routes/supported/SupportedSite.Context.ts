@@ -13,26 +13,34 @@ import {
 
 // ─── Schema & Types ────────────────────────────────────────────────────────────
 
-export const SiteDataSchema = z.object({
-  name: z.string(),
-  hosts: z.array(z.string()).min(1),
-  script: z.string(),
-  afterAddScript: z.string().optional(),
-  afterRemoveScript: z.string().optional(),
-  matchPatterns: z.array(z.string()).optional(),
-  download: z
-    .object({
-      presets: z.array(PresetSchema),
-      defaultPreset: PresetSchema,
-    })
-    .optional(),
-});
+export const SiteDataSchema = z
+  .object({
+    name: z.string(),
+    hosts: z.array(z.string()).min(1),
+    script: z.string(),
+    afterAddScript: z.string().optional(),
+    afterRemoveScript: z.string().optional(),
+    matchPatterns: z.array(z.string()).optional(),
+    download: z
+      .object({
+        presets: z.array(PresetSchema),
+        defaultPreset: PresetSchema,
+      })
+      .optional(),
+  })
+  // The overlay only shows presets when downloadType is set.
+  // shortcut: text match on the script, so a commented-out assignment passes.
+  .refine((d) => !d.download?.presets.length || /downloadType/.test(d.script), {
+    message: "Presets are defined but the script never sets ctdls.downloadType",
+    path: ["script"],
+  });
 
 export type SiteData = z.infer<typeof SiteDataSchema>;
 
 // ─── Defaults ─────────────────────────────────────────────────────────────────
 
-export const defaultSiteScript = `ctdls.title = document.title
+export const defaultSiteScript = `ctdls.downloadType = "yt-dlp"
+ctdls.title = document.title
 ctdls.url = location.href
 ctdls.identifier = \`someSite_\${SomeID}\`
 ctdls.cover = sh.getOgImage()
@@ -115,7 +123,11 @@ function useSupportedSite() {
       setEditingSiteName(data.name);
       toast.success("Script Updated Successfully");
     } catch (error: any) {
-      toast.error(error?.message ?? "");
+      toast.error(
+        error instanceof z.ZodError
+          ? z.prettifyError(error)
+          : (error?.message ?? ""),
+      );
     }
   }, [
     siteData,
@@ -124,6 +136,8 @@ function useSupportedSite() {
     afterAddScript,
     afterRemoveScript,
     supportedSites,
+    refreshSupportedHostsIndex,
+    setSupportedSites,
   ]);
 
   const selectSite = useCallback((site: SiteData) => {
@@ -154,7 +168,12 @@ function useSupportedSite() {
         setEditingSiteName(null);
       }
     },
-    [editingSiteName, supportedSites],
+    [
+      editingSiteName,
+      supportedSites,
+      refreshSupportedHostsIndex,
+      setSupportedSites,
+    ],
   );
 
   const closeEditor = useCallback(() => {
@@ -193,7 +212,7 @@ function useSupportedSite() {
           console.error("Error reading or parsing the JSON file:", error);
         });
     },
-    [],
+    [refreshSupportedHostsIndex, setSupportedSites],
   );
 
   return {
