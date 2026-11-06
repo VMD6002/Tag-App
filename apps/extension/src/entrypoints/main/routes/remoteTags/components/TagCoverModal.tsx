@@ -1,48 +1,65 @@
 import { useDeferredValue } from "react";
+import ModalShell from "@/components/craft/ModalShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useRemoteTagContext } from "../Remote.Tags.Context";
 
 export default function TagCoverModal() {
-  const { cover, toggleModal, setCover, setTagCover, open, removeCover } =
-    useRemoteTagContext();
+  const {
+    currentTag,
+    cover,
+    toggleModal,
+    setCover,
+    setTagCover,
+    open,
+    removeCover,
+  } = useRemoteTagContext();
 
   const coverURL = useDeferredValue(cover);
 
-  if (!open) return <></>;
-
   return (
-    <div
-      style={{ zIndex: 2147483647 }}
-      className="grid fixed h-screen top-0 right-0 w-full place-items-center"
+    <ModalShell
+      open={open}
+      onClose={toggleModal}
+      title="Tag cover"
+      description={<span className="break-all">{currentTag}</span>}
+      className="max-w-xl"
+      footer={
+        <>
+          <Button variant="outline" onClick={toggleModal}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={removeCover}>
+            Remove cover
+          </Button>
+          <Button onClick={setTagCover}>Save cover</Button>
+        </>
+      }
     >
-      <button
-        type="button"
-        aria-label="Close modal"
-        onClick={toggleModal}
-        className="h-screen absolute w-full bg-black/10 backdrop-blur-xs cursor-default"
-      />
-      <div className="max-w-3xl absolute w-11/12 grid bg-secondary rounded shadow px-8 py-10">
-        <div className="w-11/12 bg-input/50 overflow-hidden rounded-sm border-2 mx-auto mb-3">
+      <div className="flex min-h-40 items-center justify-center overflow-hidden border bg-muted/40">
+        {coverURL ? (
           <img
             alt="Tag cover preview"
-            className="object-contain m-auto max-h-[max(16rem,55vh)] w-full min-h-64"
-            src={coverURL ? coverURL : undefined}
+            className="max-h-[max(16rem,50vh)] w-full object-contain"
+            src={coverURL}
           />
-        </div>
+        ) : (
+          <span className="text-xs text-muted-foreground">
+            Paste an image URL to preview it
+          </span>
+        )}
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="tag-cover-url">Cover image URL</Label>
         <Input
+          id="tag-cover-url"
           value={cover}
           onChange={(e) => setCover(e.target.value)}
-          className="mb-3"
           type="text"
+          placeholder="https://…"
         />
-        <div className="mx-auto flex gap-2">
-          <Button onClick={setTagCover}>Set</Button>
-          <Button variant="destructive" onClick={removeCover}>
-            Remove
-          </Button>
-        </div>
       </div>
-    </div>
+    </ModalShell>
   );
 }

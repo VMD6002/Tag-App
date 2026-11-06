@@ -2,9 +2,9 @@ import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { confirm } from "@/components/craft/confirm-dialog";
+import { TagGroups, TagSearchInput } from "@/components/craft/tags/TagGroups";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -19,16 +19,18 @@ import {
   useFixTagCount,
   useRemoveTag,
 } from "@/entrypoints/main/atoms/tags";
-import TagGroup from "./TagGroup";
+import { useTagContext } from "../Tags.Context";
 
 export default function TagsSection() {
   const removeTag = useRemoveTag();
   const fixTagCount = useFixTagCount();
+  const { openCoverModal } = useTagContext();
   const parentTags = useAtomValue(parentTagsAtom);
   const [tags, setTags] = useAtom(tagsAtom);
 
   const [selectedParent, setSelectedParent] = useState("");
   const [tagString, setTagString] = useState("");
+  const [query, setQuery] = useState("");
 
   const addTagFunc = useCallback(() => {
     if (!selectedParent) {
@@ -57,99 +59,100 @@ export default function TagsSection() {
 
   const removeTagFunc = useCallback(
     (tag: string) =>
-      confirm.destructive(`Confirm deletion of tag ${tag}`).then((ok) => {
-        if (ok) removeTag(tag);
-      }),
+      confirm
+        .destructive({
+          title: "Delete this tag?",
+          description: `"${tag}" will be deleted and removed from every item that uses it. This can't be undone.`,
+          confirmText: "Delete tag",
+        })
+        .then((ok) => {
+          if (ok) removeTag(tag);
+        }),
     [removeTag],
   );
 
-  const tagsArray = Object.keys(tags);
+  const tagCount = Object.keys(tags).length;
   const parentTagsArray = Object.keys(parentTags);
 
   return (
-    <div className="grid gap-6">
-      <div className="grid w-full h-fit max-w-sm mx-auto items-center">
-        <div className="flex justify-between mb-1 items-center">
-          <Label>Add Tags</Label>
-          <Button
-            onClick={fixTagCount}
-            size="sm"
-            variant="ghost"
-            className="text-xs text-muted-foreground"
+    <div className="grid grid-cols-1 gap-5">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          addTagFunc();
+        }}
+        className="grid gap-2 border bg-card/40 p-3 sm:grid-cols-[minmax(9rem,13rem)_1fr_auto]"
+      >
+        <div className="sm:col-span-3">
+          <h2 className="text-sm font-semibold">Add tags</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Pick a group, then type one or more tag names separated by spaces.
+          </p>
+        </div>
+        <Select
+          onValueChange={(selected) =>
+            selected && setSelectedParent(String(selected))
+          }
+        >
+          <SelectTrigger className="w-full" aria-label="Group for the new tags">
+            <SelectValue placeholder="Choose group" />
+          </SelectTrigger>
+          <SelectContent
+            alignItemWithTrigger={false}
+            className="max-w-sm min-w-0"
           >
-            Fix Tag Count
+            <SelectGroup>
+              {parentTagsArray.map((parent) => (
+                <SelectItem key={`Select-${parent}`} value={parent}>
+                  {parent}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+            {!parentTagsArray.length ? (
+              <p className="mx-auto w-11/12 max-w-xs py-4 text-center text-xs text-muted-foreground">
+                No groups yet. Add a group first.
+              </p>
+            ) : (
+              <></>
+            )}
+          </SelectContent>
+        </Select>
+        <Input
+          value={tagString}
+          onChange={(o) => setTagString(o.target.value)}
+          type="text"
+          aria-label="New tag names"
+          placeholder="Tag names, e.g. Cooking Travel"
+        />
+        <Button type="submit">Add tags</Button>
+      </form>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <TagSearchInput value={query} onChange={setQuery} />
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-muted-foreground tabular-nums">
+            {tagCount} {tagCount === 1 ? "tag" : "tags"}
+          </span>
+          <Button
+            onClick={async () => {
+              await fixTagCount();
+              toast.success("Tag counts recalculated");
+            }}
+            size="sm"
+            variant="outline"
+            title="Recount every tag from the items that use it. Use this if a number looks wrong."
+          >
+            Fix tag counts
           </Button>
         </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            addTagFunc();
-          }}
-          className="grid mb-3"
-        >
-          <Select
-            onValueChange={(selected) =>
-              selected && setSelectedParent(String(selected))
-            }
-          >
-            <SelectTrigger className="w-full rounded-b-none">
-              <SelectValue placeholder="Select Parent" />
-            </SelectTrigger>
-            <SelectContent
-              alignItemWithTrigger={false}
-              sideOffset={0}
-              className="rounded-t-none max-w-sm min-w-0"
-            >
-              <SelectGroup>
-                {parentTagsArray.map((parent) => (
-                  <SelectItem key={`Select-${parent}`} value={parent}>
-                    {parent}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-              {!parentTagsArray.length ? (
-                <p className="max-w-xs w-11/12 mx-auto text-center py-4 text-muted-foreground">
-                  No tags are present. Add tags <br /> to view them here...
-                </p>
-              ) : (
-                <></>
-              )}
-            </SelectContent>
-          </Select>
-          <Input
-            className="rounded-t-none"
-            value={tagString}
-            onChange={(o) => setTagString(o.target.value)}
-            type="text"
-            placeholder="Tags, eg: Halo Melo"
-          />
-        </form>
-        <Button onClick={addTagFunc} className="w-11/12 mx-auto">
-          Add
-        </Button>
       </div>
-      {!tagsArray.length ? (
-        <span className="text-muted-foreground text-xs text-center">
-          No tags, add tags to view here...
-        </span>
-      ) : (
-        <></>
-      )}
-      <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 mb-10 rounded">
-        <h1 className="text-3xl mb-5 text-foreground">
-          Tags ({tagsArray.length})
-        </h1>
-        {[...new Set(tagsArray.map((k) => k.split(":")[0]))]
-          .sort()
-          .map((parent) => (
-            <TagGroup
-              tagsArray={tagsArray}
-              key={parent}
-              parent={parent!}
-              removeTagFunc={removeTagFunc}
-            />
-          ))}
-      </div>
+
+      <TagGroups
+        tags={tags}
+        query={query}
+        onCover={openCoverModal}
+        onRemove={removeTagFunc}
+      />
     </div>
   );
 }

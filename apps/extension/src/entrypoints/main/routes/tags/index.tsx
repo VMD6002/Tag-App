@@ -11,12 +11,17 @@ export default function TagPage() {
   useAtomValue(contentDataAtom);
   return (
     <>
-      <TitleHeader Title="Tags" />
-      <ParentTagsSection />
-      <TagContextProvider>
-        <TagCoverModal />
-        <TagsSection />
-      </TagContextProvider>
+      <TitleHeader
+        Title="Tags"
+        description="Tags are grouped by the part before the colon. The number beside a tag is how many items use it."
+      />
+      <div className="grid grid-cols-1 gap-5 pb-10">
+        <ParentTagsSection />
+        <TagContextProvider>
+          <TagCoverModal />
+          <TagsSection />
+        </TagContextProvider>
+      </div>
     </>
   );
 }

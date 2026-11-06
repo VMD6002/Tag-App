@@ -138,6 +138,7 @@ export function useRemoteTag() {
       onSuccess: (res) => {
         setTags(res.tags);
         setParentTags(res.parentTags);
+        toast.success("Tag counts recalculated");
       },
     }),
   );
@@ -156,6 +157,14 @@ export function useRemoteTag() {
   }, [orpc]);
 
   return {
+    loadState: {
+      isPending: getTagDataMutation.isPending || getTagDataMutation.isIdle,
+      isError: getTagDataMutation.isError,
+      message: getTagDataMutation.error?.message,
+      retry: () => getTagDataMutation.mutate({}),
+    },
+    fixingCounts: fixTagsMutation.isPending,
+    currentTag,
     open,
     cover,
     addTags,

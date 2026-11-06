@@ -45,6 +45,7 @@ export function useTag() {
   }, [currentTag]);
 
   return {
+    currentTag,
     open,
     cover,
     setCover,
