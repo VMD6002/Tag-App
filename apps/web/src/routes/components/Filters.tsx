@@ -1,4 +1,4 @@
-import { useAtom, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useMemo } from "react"; // Fixed: Added missing imports
 import {
   allAtom,
@@ -9,12 +9,17 @@ import {
   resetFilterAtom,
   searchAtom,
 } from "@/atom";
+import {
+  FilterField,
+  FilterPanel,
+  ResultsBar,
+} from "@/components/craft/library/FilterPanel";
 import MultiSelect from "@/components/craft/MultiSelect";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { filteredAtom, useRemoteContext } from "../Remote.Context";
+
+const filteredLengthAtom = atom((get) => get(filteredAtom).length);
 
 export default function Filters() {
   const { filterData, tags } = useRemoteContext();
@@ -59,66 +64,79 @@ export default function Filters() {
     ];
   }, [allTagsForMultiSelectComponent]);
 
+  const activeCount =
+    any.length + none.length + all.length + (search.trim() ? 1 : 0);
+
+  const applyFilters = () => {
+    injectFilterDataIntoURL();
+    filterData();
+  };
+
+  const filteredLength = useAtomValue(filteredLengthAtom);
+
   return (
     <>
-      <Input
-        value={search}
-        onChange={(a) => setSearch(a.target.value)}
-        placeholder="Search"
-        className="mb-4"
-      />
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-        <MultiSelect
-          value={any}
-          onChange={setAny}
-          options={anyAndNoneTagsForMuliSelectComponent}
-          placeholder="Any of these tags"
-        />
-        <MultiSelect
-          value={none}
-          onChange={setNone}
-          options={anyAndNoneTagsForMuliSelectComponent}
-          placeholder="None of these tags"
-        />
-        <MultiSelect
-          value={all}
-          onChange={setAll}
-          options={allTagsForMultiSelectComponent}
-          placeholder="All of these tags"
-        />
-      </div>
-      <div className="flex justify-between mb-4 items-center">
-        <div className="mb-4 flex items-center">
-          <Button
-            onClick={() => {
-              injectFilterDataIntoURL();
-              filterData();
-            }}
-            className="w-full max-w-2xs"
-          >
-            Filter
-          </Button>
-          <button
-            type="button"
-            className="text-muted-foreground underline ml-4 cursor-pointer text-sm bg-transparent border-none"
-            onClick={reset}
-          >
-            Clear Filters
-          </button>
-        </div>
-        <div className="flex items-center space-x-3">
-          <Label htmlFor="order-latest-switch">Order By Latest</Label>
-          <Switch
-            id="order-latest-switch"
-            checked={orderByLatest}
-            onCheckedChange={(a) => {
-              setFiltered((old) => [...old].reverse()); // Safe reverse execution clone
-              setOrderByLatest(a);
-            }}
+      <FilterPanel
+        search={search}
+        onSearchChange={setSearch}
+        onApply={applyFilters}
+        onClear={reset}
+        activeCount={activeCount}
+      >
+        <FilterField label="Any of" hint="at least one">
+          <MultiSelect
+            value={any}
+            onChange={setAny}
+            options={anyAndNoneTagsForMuliSelectComponent}
+            placeholder="Choose tags"
+            label="Any of these tags"
           />
-        </div>
-      </div>
-      <div className="mb-10" />
+        </FilterField>
+        <FilterField label="None of" hint="exclude these">
+          <MultiSelect
+            value={none}
+            onChange={setNone}
+            options={anyAndNoneTagsForMuliSelectComponent}
+            placeholder="Choose tags"
+            label="None of these tags"
+          />
+        </FilterField>
+        <FilterField label="All of" hint="must have every one">
+          <MultiSelect
+            value={all}
+            onChange={setAll}
+            options={allTagsForMultiSelectComponent}
+            placeholder="Choose tags"
+            label="All of these tags"
+          />
+        </FilterField>
+      </FilterPanel>
+
+      <ResultsBar
+        left={
+          <p aria-live="polite" className="text-sm text-muted-foreground">
+            <span className="font-semibold tabular-nums text-foreground">
+              {filteredLength}
+            </span>{" "}
+            {filteredLength === 1 ? "item" : "items"}
+          </p>
+        }
+        right={
+          <>
+            <Label htmlFor="order-latest-switch" className="text-sm">
+              Newest first
+            </Label>
+            <Switch
+              id="order-latest-switch"
+              checked={orderByLatest}
+              onCheckedChange={(a) => {
+                setFiltered((old) => [...old].reverse()); // Safe reverse execution clone
+                setOrderByLatest(a);
+              }}
+            />
+          </>
+        }
+      />
     </>
   );
 }

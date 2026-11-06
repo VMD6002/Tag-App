@@ -57,6 +57,12 @@ function useRemoteContextCore() {
   }, [orpc]);
 
   return {
+    loadState: {
+      isPending:
+        getFilteredDataMutation.isPending || getFilteredDataMutation.isIdle,
+      isError: getFilteredDataMutation.isError,
+      message: getFilteredDataMutation.error?.message,
+    },
     tags,
     constants,
     filterData,

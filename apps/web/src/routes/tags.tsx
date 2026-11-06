@@ -1,55 +1,15 @@
 import type { TagsType } from "@tagapp/utils/types";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { ErrorState, LoadingState } from "@/components/craft/EmptyState";
 import TitleHeader from "@/components/craft/TitleHeader";
+import { TagGroups, TagSearchInput } from "@/components/craft/tags/TagGroups";
 import { Button } from "@/components/ui/button";
 import { orpc } from "@/lib/orpc";
 
-function TagGroup({
-  tags,
-  tagsArray,
-  parent,
-}: {
-  tags: TagsType;
-  tagsArray: string[];
-  parent: string;
-}) {
-  const Children = useMemo(
-    () => tagsArray.filter((k) => k.split(":")[0] === parent).sort(),
-    [tagsArray, parent],
-  );
-
-  return (
-    <div key={parent} className="mb-3">
-      <h1 className="text-xl mb-3 text-foreground">
-        {parent.replaceAll("_", " ")} ({Children.length})
-      </h1>
-      <div className="grid gap-y-3 text-sm">
-        {Children.map((tag) => (
-          <div key={`${parent}-${tag}`} className="break-inside-avoid-column">
-            {tags[tag].cover ? (
-              <img
-                alt={`${tag} cover`}
-                loading="lazy"
-                className="w-full"
-                src={tags[tag].cover}
-              />
-            ) : null}
-            <div className="bg-secondary flex place-items-center justify-between">
-              <span className="mx-3 w-full">
-                {String(tags[tag].count).padStart(3, "0")} |{" "}
-                {tag.replace(`${parent}:`, "").replaceAll("_", " ")}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function RemoteTags() {
   const [tags, setTags] = useState<TagsType>({});
+  const [query, setQuery] = useState("");
 
   const getTagsMutation = useMutation(
     orpc.tags.getTagData.mutationOptions({
@@ -69,31 +29,41 @@ export default function RemoteTags() {
     getTagsMutation.mutate({});
   }, [orpc]);
 
-  const taags = useMemo(() => Object.keys(tags), [tags]);
+  const tagCount = Object.keys(tags).length;
+  const loading = getTagsMutation.isPending || getTagsMutation.isIdle;
 
   return (
     <>
-      <TitleHeader Title="Server Tags" />
-      <Button
-        variant="secondary"
-        className="rounded-none"
-        onClick={() => fixTagCountMutation.mutate({})}
+      <TitleHeader
+        Title="Tags"
+        description={`${tagCount} ${tagCount === 1 ? "tag" : "tags"} on the server, grouped by the part before the colon. The number is how many items use the tag.`}
       >
-        Fix Count
-      </Button>
-      <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 mb-10 rounded">
-        <h1 className="text-3xl mb-5 text-foreground">Tags ({taags.length})</h1>
-        {[...new Set(taags.map((tag) => tag.split(":")[0]))]
-          .sort()
-          .map((parent: string) => (
-            <TagGroup
-              key={parent}
-              parent={parent}
-              tags={tags}
-              tagsArray={taags}
-            />
-          ))}
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={fixTagCountMutation.isPending}
+          title="Recount every tag from the items that use it. Use this if a number looks wrong."
+          onClick={() => fixTagCountMutation.mutate({})}
+        >
+          {fixTagCountMutation.isPending ? "Recounting…" : "Fix tag counts"}
+        </Button>
+      </TitleHeader>
+
+      <div className="mb-6">
+        <TagSearchInput value={query} onChange={setQuery} />
       </div>
+
+      {getTagsMutation.isError ? (
+        <ErrorState
+          title="Couldn't load tags"
+          message={getTagsMutation.error?.message}
+          onRetry={() => getTagsMutation.mutate({})}
+        />
+      ) : loading && !tagCount ? (
+        <LoadingState label="Loading tags…" />
+      ) : (
+        <TagGroups tags={tags} query={query} />
+      )}
     </>
   );
 }

@@ -1,14 +1,6 @@
-import { Link } from "wouter";
-import { useHashLocation } from "wouter/use-hash-location";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
+import { Link, useLocation } from "wouter";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ModeToggle } from "./mode-toggle";
 
 const Links = [
@@ -17,65 +9,28 @@ const Links = [
 ];
 
 export default function NavBarLinks() {
-  const currentUrl = useHashLocation()[0];
+  const [currentUrl] = useLocation();
   return (
-    <NavigationMenu>
-      <NavigationMenuList>
+    <div className="flex items-center gap-1.5">
+      <nav aria-label="Main" className="flex items-center gap-1">
         {Links.map((link) => (
-          <NavigationMenuItem
-            key={`Desktop-Nav-Link-${link.Name}`}
-            className={"hidden sm:block"}
+          <Link
+            key={`Nav-Link-${link.Name}`}
+            href={link.Path}
+            aria-current={currentUrl === link.Path ? "page" : undefined}
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "h-8 px-3",
+              currentUrl === link.Path
+                ? "bg-muted text-foreground"
+                : "text-muted-foreground",
+            )}
           >
-            <NavigationMenuLink
-              className={navigationMenuTriggerStyle()}
-              render={
-                <Link
-                  className={
-                    currentUrl === link.Path
-                      ? "underline underline-offset-2"
-                      : ""
-                  }
-                  href={link.Path}
-                />
-              }
-            >
-              {link.Name}
-            </NavigationMenuLink>
-          </NavigationMenuItem>
+            {link.Name}
+          </Link>
         ))}
-        <div className={"hidden sm:block"}>
-          <ModeToggle />
-        </div>
-        <NavigationMenuItem className={"w-32 sm:hidden"}>
-          <NavigationMenuTrigger className="ml-11">Menu</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid gap-4">
-              <li>
-                {Links.map((link) => (
-                  <NavigationMenuLink
-                    key={`Mobile-Nav-Link-${link.Name}`}
-                    render={
-                      <Link
-                        className={`whitespace-nowrap ${
-                          currentUrl === link.Path
-                            ? "underline underline-offset-2"
-                            : ""
-                        }`}
-                        href={link.Path}
-                      />
-                    }
-                  >
-                    {link.Name}
-                  </NavigationMenuLink>
-                ))}
-              </li>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <div className={"ml-2 sm:hidden"}>
-          <ModeToggle />
-        </div>
-      </NavigationMenuList>
-    </NavigationMenu>
+      </nav>
+      <ModeToggle />
+    </div>
   );
 }

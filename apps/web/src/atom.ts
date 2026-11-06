@@ -24,6 +24,15 @@ export const FilterQueryAtom = atom((get) => ({
   orderByLatest: get(orderByLatestAtom),
 }));
 
+/** True when a search or any tag filter is set (tells "empty library" from "no results"). */
+export const filterActiveAtom = atom(
+  (get) =>
+    !!get(searchAtom).trim() ||
+    get(allAtom).length > 0 ||
+    get(anyAtom).length > 0 ||
+    get(noneAtom).length > 0,
+);
+
 export const injectFilterDataIntoURLAtom = atom(null, (get) => {
   const fd = get(FilterQueryAtom);
   const url = new URL(location.href);
