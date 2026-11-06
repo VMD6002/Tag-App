@@ -21,7 +21,7 @@ function App() {
     <Router hook={useHashLocation}>
       <ThemeProvider>
         <NavBar />
-        <main className="max-w-5xl w-[calc(100%-4rem)] mx-auto relative">
+        <main className="relative mx-auto w-[calc(100%-2rem)] max-w-6xl sm:w-[calc(100%-4rem)]">
           <MyQueryProvider>
             <Switch>
               <Route path={"/"}>
