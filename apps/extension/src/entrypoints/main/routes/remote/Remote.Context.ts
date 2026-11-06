@@ -246,6 +246,12 @@ function useRemoteContextCore() {
   }, [orpc, remoteTagsUpdated]);
 
   return {
+    loadState: {
+      isPending:
+        getFilteredDataMutation.isPending || getFilteredDataMutation.isIdle,
+      isError: getFilteredDataMutation.isError,
+      message: getFilteredDataMutation.error?.message,
+    },
     tags,
     iframeRef,
     supportedSiteData,

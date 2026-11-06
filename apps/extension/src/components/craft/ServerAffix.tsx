@@ -41,12 +41,14 @@ export default function ServerAffix({
 
   return (
     <Button
-      size="icon-lg"
       variant="outline"
-      className="fixed top-auto bottom-5 left-auto right-5"
+      className="fixed top-auto right-5 bottom-5 left-auto z-30 h-9 gap-2 bg-background px-3 shadow-lg"
       onClick={onClick}
+      disabled={postMuation.isPending}
+      title={`Send the ${filtered.length} filtered items as JSON (POST) to ${filteredDataPostUrl}`}
     >
       <ServerIcon />
+      {postMuation.isPending ? "Sending…" : `Send ${filtered.length} to server`}
     </Button>
   );
 }

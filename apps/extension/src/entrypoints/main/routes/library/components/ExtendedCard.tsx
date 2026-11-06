@@ -1,9 +1,9 @@
 import { applyConstants } from "@tagapp/utils";
 import type { ContentWebType } from "@tagapp/utils/types";
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { Check } from "lucide-react";
 import { memo, useCallback, useMemo } from "react"; // Fixed: Added missing imports
 import { confirm } from "@/components/craft/confirm-dialog";
+import ContentCard from "@/components/craft/library/ContentCard";
 import {
   updateContentUrlAtom,
   updateCoverAtom,
@@ -16,7 +16,6 @@ import {
   updateTagsAtom,
   updateTitleAtom,
 } from "@/components/craft/UpdateModal/atom";
-import { Button } from "@/components/ui/button";
 import { constantsAtom } from "@/entrypoints/main/atoms/constants";
 import {
   selectionEntriesAtom, // Added for atomic selection check
@@ -25,30 +24,6 @@ import {
 } from "@/entrypoints/main/atoms/selection";
 import { supportedSitesAtom } from "@/entrypoints/main/atoms/supportedSites"; // Adjust path if needed
 import { useLibraryContext } from "../Library.Context";
-
-function TagParentChildList({ tags }: { tags: string[] }) {
-  const parentTags = useMemo(
-    () => [...new Set(tags.map((k) => k.split(":")[0]))],
-    [tags],
-  ) as string[];
-
-  return (
-    <>
-      {parentTags.sort().map((parent) => (
-        <div key={parent} className="text-xs">
-          {parent}:{" "}
-          <span className="text-muted-foreground">
-            {tags
-              .filter((k) => k.split(":")[0] === parent)
-              .sort()
-              .map((e) => e.replace(`${parent}:`, "").replaceAll("_", " "))
-              .join(", ")}
-          </span>
-        </div>
-      ))}
-    </>
-  );
-}
 
 const ExtendedCard = memo(
   ({ contentDetails }: { contentDetails: ContentWebType }) => {
@@ -128,98 +103,30 @@ const ExtendedCard = memo(
     ]);
 
     const removeContent = useCallback(async () => {
-      if (!(await confirm.destructive("Confirm Deletion"))) return;
+      if (
+        !(await confirm.destructive({
+          title: "Remove this item?",
+          description: `"${contentDetails.title}" will be removed from your library.`,
+          confirmText: "Remove",
+        }))
+      )
+        return;
       removeContents([contentDetails.id]);
     }, [contentDetails, removeContents]);
 
     return (
-      // biome-ignore lint/a11y/noStaticElementInteractions: card selection click handler contains nested controls
-      // biome-ignore lint/a11y/useKeyWithClickEvents: card selection click handler contains nested controls
-      <div
-        onClick={() => selectionOn && selectEntry(contentDetails.id)} // Fixed: id -> contentDetails.id
-        className={`block p-2 h-fit relative text-left border rounded-sm transition-all [content-visibility:auto] [contain-intrinsic-size:auto_28rem] ${
-          selectedTrue
-            ? "border-white opacity-80 bg-neutral-800/10"
-            : "border-transparent"
-        }`}
-      >
-        <div className="w-full mb-5 bg-input/50 overflow-hidden rounded-sm">
-          {memoisedUrls.cover && (
-            <img
-              loading="lazy"
-              className="object-contain m-auto max-h-[max(8.25rem,55vh)] w-full min-h-33"
-              src={memoisedUrls.cover}
-              alt={contentDetails.title}
-            />
-          )}
-        </div>
-
-        <div className="w-full break-all">
-          <div className="mb-3 flex">
-            <Button
-              disabled={selectionOn}
-              onClick={(e) => {
-                e.stopPropagation(); // Avoid triggering selection click handler
-                updateSetupFunc();
-              }}
-              className="w-1/2 rounded-r-none hover:bg-neutral-300/20 bg-neutral-300/10 dark:bg-neutral-800/30 dark:hover:bg-neutral-700/30"
-              variant="outline"
-            >
-              Edit
-            </Button>
-            <Button
-              disabled={selectionOn}
-              onClick={(e) => {
-                e.stopPropagation();
-                removeContent();
-              }}
-              className="w-1/2 rounded-l-none text-red-500 bg-red-600/10 dark:bg-red-950/20"
-              variant="outline"
-            >
-              Remove
-            </Button>
-          </div>
-
-          <a
-            href={memoisedUrls.url}
-            target="_blank"
-            rel="noreferrer"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h1 className="mb-1 text-lg font-semibold font-stretch-condensed hover:underline">
-              {contentDetails.title}
-            </h1>
-          </a>
-
-          <div className="text-muted-foreground text-xs mb-4">
-            {new Date(contentDetails.added * 1000).toLocaleString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
-            })}
-          </div>
-
-          <div className="text-sm space-y-1">
-            <div>
-              ID:{" "}
-              <span className="text-muted-foreground">{contentDetails.id}</span>
-            </div>
-            <TagParentChildList tags={contentDetails.tags} />
-          </div>
-        </div>
-
-        {selectionOn && (
-          <div className="absolute top-4 left-4 z-10">
-            {selectedTrue ? (
-              <Check className="bg-foreground border-background border text-background rounded-sm h-5 w-5 p-0.5" />
-            ) : (
-              <div className="bg-background border-foreground border aspect-square h-5 text-background rounded-sm" />
-            )}
-          </div>
-        )}
-      </div>
+      <ContentCard
+        content={contentDetails}
+        url={memoisedUrls.url}
+        cover={memoisedUrls.cover}
+        selection={{
+          on: selectionOn,
+          selected: selectedTrue,
+          onToggle: () => selectEntry(contentDetails.id),
+        }}
+        onEdit={updateSetupFunc}
+        onRemove={removeContent}
+      />
     );
   },
 );

@@ -217,6 +217,12 @@ function useLibraryContextCore() {
   }, []);
 
   return {
+    loadState: {
+      isPending:
+        getFilteredDataMutation.isPending || getFilteredDataMutation.isIdle,
+      isError: getFilteredDataMutation.isError,
+      message: getFilteredDataMutation.error?.message,
+    },
     iframeRef,
     supportedSiteData,
     afterAddRemoveScript,

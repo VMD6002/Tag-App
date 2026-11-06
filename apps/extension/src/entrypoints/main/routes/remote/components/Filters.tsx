@@ -1,13 +1,17 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { Pencil, Trash2 } from "lucide-react";
+import { CheckSquare, Pencil, Trash2, X } from "lucide-react";
 import { useCallback, useMemo } from "react"; // Fixed: Added missing imports
 import { bulkUpdateModalOpenAtom } from "@/components/craft/BulkUpdateModal";
 import { confirm } from "@/components/craft/confirm-dialog";
+import {
+  FilterField,
+  FilterPanel,
+  ResultsBar,
+} from "@/components/craft/library/FilterPanel";
 import MultiSelect from "@/components/craft/MultiSelect";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -84,14 +88,18 @@ export default function Filters() {
     useCallback(
       (get, set) => {
         const selectedEntries = get(selectionEntriesAtom);
-        confirm(
-          `Are you sure you want to remove ${selectedEntries.length} items?`,
-        ).then((ok) => {
-          if (ok) {
-            removeContents(selectedEntries);
-            set(selectionEntriesAtom, []);
-          }
-        });
+        confirm
+          .destructive({
+            title: "Remove selected items?",
+            description: `${selectedEntries.length} ${selectedEntries.length === 1 ? "item" : "items"} will be removed from your library. This can't be undone.`,
+            confirmText: "Remove",
+          })
+          .then((ok) => {
+            if (ok) {
+              removeContents(selectedEntries);
+              set(selectionEntriesAtom, []);
+            }
+          });
       },
       [selectionEntriesAtom, removeContents],
     ),
@@ -138,125 +146,146 @@ export default function Filters() {
     ),
   );
 
+  const activeCount =
+    any.length + none.length + all.length + (search.trim() ? 1 : 0);
+
+  const applyFilters = () => {
+    injectFilterDataIntoURL();
+    filterData();
+  };
+
   return (
     <>
-      <Input
-        value={search}
-        onChange={(a) => setSearch(a.target.value)}
-        onKeyDown={(e) => {
-          if (e.key !== "Enter") return;
+      <FilterPanel
+        search={search}
+        onSearchChange={setSearch}
+        onApply={applyFilters}
+        onClear={() => {
+          reset();
           injectFilterDataIntoURL();
-          filterData();
         }}
-        placeholder="Search"
-        className="mb-4"
-      />
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-        <MultiSelect
-          value={any}
-          onChange={setAny}
-          options={anyAndNoneTagsForMuliSelectComponent}
-          placeholder="Any of these tags"
-        />
-        <MultiSelect
-          value={none}
-          onChange={setNone}
-          options={anyAndNoneTagsForMuliSelectComponent}
-          placeholder="None of these tags"
-        />
-        <MultiSelect
-          value={all}
-          onChange={setAll}
-          options={allTagsForMultiSelectComponent}
-          placeholder="All of these tags"
-        />
-      </div>
-      <div className="mb-4 flex items-center">
-        <Button
-          onClick={() => {
-            injectFilterDataIntoURL();
-            filterData();
-          }}
-          className="w-full max-w-2xs"
-        >
-          Filter
-        </Button>
-        <button
-          type="button"
-          className="text-muted-foreground underline ml-4 cursor-pointer text-sm bg-transparent border-none"
-          onClick={() => {
-            reset();
-            injectFilterDataIntoURL();
-          }}
-        >
-          Clear Filters
-        </button>
-      </div>
-
-      <div className="sticky top-17 z-10 bg-background py-2 mb-4 flex justify-between items-center flex-wrap-reverse gap-y-3">
-        <div className="flex items-center space-x-3">
-          <Button
-            onClick={toggleSelectionMode}
-            variant={selectionOn ? "default" : "outline"}
-          >
-            Toggle Selection
-          </Button>
-
-          {selectionOn && (
-            <>
-              <Button
-                disabled={selectedEntries.length < 1}
-                onClick={toggleBulkUpdateModal}
-                variant="outline"
-                size="icon"
-                title="Update Selected"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <Button
-                disabled={selectedEntries.length < 1}
-                onClick={removeSelected}
-                variant="outline"
-                size="icon"
-                title="Remove Selected"
-              >
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-
-              <div className="flex items-center space-x-2 pl-2">
-                <Label htmlFor="select-all-checkbox">Select All</Label>
-                <Checkbox
-                  id="select-all-checkbox"
-                  checked={isAllSelected}
-                  onCheckedChange={(checked) =>
-                    handleSelectAllChange(!!checked)
-                  }
-                />
-              </div>
-              <span className="font-mono text-sm text-muted-foreground">
-                ({selectedEntries.length}/{filteredLength})
-              </span>
-            </>
-          )}
-
-          {!selectionOn && (
-            <span className="font-mono text-base">{filteredLength}</span>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-3">
-          <Label htmlFor="order-latest-switch">Order By Latest</Label>
-          <Switch
-            id="order-latest-switch"
-            checked={orderByLatest}
-            onCheckedChange={(a) => {
-              setFiltered((old) => [...old].reverse());
-              setOrderByLatest(a);
-            }}
+        activeCount={activeCount}
+      >
+        <FilterField label="Any of" hint="at least one">
+          <MultiSelect
+            value={any}
+            onChange={setAny}
+            options={anyAndNoneTagsForMuliSelectComponent}
+            placeholder="Choose tags"
+            label="Any of these tags"
           />
-        </div>
-      </div>
-      <div className="mb-10" />
+        </FilterField>
+        <FilterField label="None of" hint="exclude these">
+          <MultiSelect
+            value={none}
+            onChange={setNone}
+            options={anyAndNoneTagsForMuliSelectComponent}
+            placeholder="Choose tags"
+            label="None of these tags"
+          />
+        </FilterField>
+        <FilterField label="All of" hint="must have every one">
+          <MultiSelect
+            value={all}
+            onChange={setAll}
+            options={allTagsForMultiSelectComponent}
+            placeholder="Choose tags"
+            label="All of these tags"
+          />
+        </FilterField>
+      </FilterPanel>
+
+      <ResultsBar
+        left={
+          <>
+            <Button
+              onClick={toggleSelectionMode}
+              variant={selectionOn ? "default" : "outline"}
+              size="sm"
+              aria-pressed={selectionOn}
+              title={
+                selectionOn
+                  ? "Leave selection mode"
+                  : "Select several items to edit tags or remove them together"
+              }
+            >
+              {selectionOn ? (
+                <>
+                  <X /> Done selecting
+                </>
+              ) : (
+                <>
+                  <CheckSquare /> Select items
+                </>
+              )}
+            </Button>
+
+            {selectionOn ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="select-all-checkbox"
+                    checked={isAllSelected}
+                    onCheckedChange={(checked) =>
+                      handleSelectAllChange(!!checked)
+                    }
+                  />
+                  <Label htmlFor="select-all-checkbox" className="text-sm">
+                    Select all
+                  </Label>
+                </div>
+                <span
+                  aria-live="polite"
+                  className="text-sm tabular-nums text-muted-foreground"
+                >
+                  {selectedEntries.length} of {filteredLength} selected
+                </span>
+                <Button
+                  disabled={selectedEntries.length < 1}
+                  onClick={toggleBulkUpdateModal}
+                  variant="outline"
+                  size="sm"
+                  title="Add or remove tags on the selected items"
+                >
+                  <Pencil /> Edit tags
+                </Button>
+                <Button
+                  disabled={selectedEntries.length < 1}
+                  onClick={removeSelected}
+                  variant="outline"
+                  size="sm"
+                  title="Remove the selected items from the library"
+                  className="hover:text-destructive"
+                >
+                  <Trash2 /> Remove
+                </Button>
+              </>
+            ) : (
+              <p aria-live="polite" className="text-sm text-muted-foreground">
+                <span className="font-semibold tabular-nums text-foreground">
+                  {filteredLength}
+                </span>{" "}
+                {filteredLength === 1 ? "item" : "items"}
+              </p>
+            )}
+          </>
+        }
+        right={
+          <>
+            <Label htmlFor="order-latest-switch" className="text-sm">
+              Newest first
+            </Label>
+            <Switch
+              id="order-latest-switch"
+              checked={orderByLatest}
+              onCheckedChange={(a) => {
+                setFiltered((old) => [...old].reverse());
+                setOrderByLatest(a);
+              }}
+            />
+          </>
+        }
+      />
     </>
   );
 }
