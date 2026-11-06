@@ -3,6 +3,7 @@ import { useAtomValue } from "jotai";
 import {
   Download,
   FileCode,
+  Minus,
   Plus,
   Save,
   Settings,
@@ -21,11 +22,14 @@ import {
   useSupportedSites,
 } from "../SupportedSite.Context";
 
+type Tab = "script" | "metadata" | "afterAdd" | "afterRemove";
+
+const FONT =
+  "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace";
+
 export default function ScriptEditor() {
   const { theme } = useTheme();
-  const [activeTab, setActiveTab] = useState<
-    "script" | "metadata" | "afterAdd" | "afterRemove"
-  >("script");
+  const [activeTab, setActiveTab] = useState<Tab>("script");
 
   const supportedSites = useSupportedSites();
   const {
@@ -49,256 +53,184 @@ export default function ScriptEditor() {
 
   if (!siteDataEditorOpen) {
     return (
-      <div className="flex flex-col items-center justify-center border border-dashed border-border rounded-lg bg-card/50 p-12 text-center min-h-112.5">
-        <div className="p-4 bg-muted rounded-full mb-4 text-muted-foreground border border-border">
-          <FileCode className="size-8" />
+      <div className="flex min-h-96 flex-col items-center justify-center border border-dashed bg-card/20 p-10 text-center lg:h-[calc(100dvh-14rem)]">
+        <div className="mb-4 grid size-10 place-items-center border bg-muted/50 text-muted-foreground">
+          <FileCode className="size-5" />
         </div>
-        <h3 className="text-lg font-semibold mb-1">No Script Selected</h3>
-        <p className="text-sm text-muted-foreground max-w-sm mb-6">
-          Select an existing userscript from the sidebar to view/edit it, or
-          create a brand new one to customize tag download selectors.
+        <h2 className="mb-1 text-base font-semibold">No script open</h2>
+        <p className="mb-6 max-w-sm text-sm text-muted-foreground">
+          Pick a script from the list to edit it, start a new one, or import a
+          site list you exported earlier.
         </p>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={addSite}
-            className="gap-1.5 shadow-xs cursor-pointer"
-          >
-            <Plus className="size-4" />
-            <span>New Userscript</span>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Button onClick={addSite} className="cursor-pointer">
+            <Plus />
+            New script
           </Button>
           <Button
             variant="outline"
             onClick={handleFileClick}
-            className="gap-1.5 cursor-pointer"
+            className="cursor-pointer"
           >
-            <Download className="size-4" />
-            <span>Import JSON</span>
+            <Download />
+            Import site list
           </Button>
         </div>
       </div>
     );
   }
 
+  const tabs: {
+    id: Tab;
+    label: string;
+    icon: typeof FileCode;
+    title: string;
+    hint: string;
+    value: string;
+    set: (v: string) => void;
+    language: string;
+    placeholder: string;
+  }[] = [
+    {
+      id: "script",
+      label: "Script",
+      icon: FileCode,
+      title: "JavaScript for this site",
+      hint: "Runs on matching pages and reads the title, cover and tags",
+      value: siteScript,
+      set: setSiteScript,
+      language: "js",
+      placeholder: "// Write the site script here...",
+    },
+    {
+      id: "metadata",
+      label: "Site settings (JSON)",
+      icon: Settings,
+      title: "Site settings",
+      hint: "Name, hosts, URL patterns and download presets",
+      value: siteData,
+      set: setSiteData,
+      language: "json",
+      placeholder: "{ ... }",
+    },
+    ...(enableAfterAddRemoveScripts
+      ? ([
+          {
+            id: "afterAdd",
+            label: "After add",
+            icon: Plus,
+            title: "After add script",
+            hint: "Runs after an item from this site is saved",
+            value: afterAddScript,
+            set: setAfterAddScript,
+            language: "js",
+            placeholder: "// Write the after add script here...",
+          },
+          {
+            id: "afterRemove",
+            label: "After remove",
+            icon: Minus,
+            title: "After remove script",
+            hint: "Runs after an item from this site is removed",
+            value: afterRemoveScript,
+            set: setAfterRemoveScript,
+            language: "js",
+            placeholder: "// Write the after remove script here...",
+          },
+        ] as const)
+      : []),
+  ];
+  const current = tabs.find((t) => t.id === activeTab) ?? tabs[0]!;
+
   return (
-    <div className="border border-border rounded-lg bg-card text-card-foreground shadow-xs overflow-hidden">
-      {/* Editor Title & Action bar */}
-      <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-primary/10 rounded-md text-primary">
-            <FileCode className="size-4" />
-          </div>
-          <div>
-            <h2 className="font-semibold text-sm leading-none">
-              {editingSiteName
-                ? `Editing: ${editingSiteName}`
-                : "New Userscript"}
-            </h2>
-            {editingSiteName && (
-              <span className="text-[10px] text-muted-foreground font-mono mt-1 block">
-                {supportedSites[editingSiteName]?.hosts[0] || ""}
-              </span>
-            )}
-          </div>
+    <div className="flex min-h-96 min-w-0 flex-col border bg-card/40 lg:h-[calc(100dvh-14rem)] lg:min-h-[30rem]">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-3 py-2.5">
+        <div className="min-w-0">
+          <h2 className="truncate text-sm font-semibold">
+            {editingSiteName ?? "New script"}
+          </h2>
+          <p className="truncate font-mono text-[11px] text-muted-foreground">
+            {editingSiteName
+              ? supportedSites[editingSiteName]?.hosts[0] || "no host set"
+              : "Not saved yet"}
+          </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            onClick={saveScript}
-            className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white border-0 cursor-pointer"
-          >
-            <Save className="size-4" />
-            <span>Save</span>
+        <div className="flex items-center gap-1.5">
+          <Button size="sm" onClick={saveScript} className="cursor-pointer">
+            <Save />
+            Save script
           </Button>
           {editingSiteName && (
             <Button
-              variant="destructive"
+              variant="outline"
               size="sm"
               onClick={() => removeSite(editingSiteName)}
-              className="gap-1.5 cursor-pointer"
+              className="cursor-pointer text-destructive hover:text-destructive"
             >
-              <Trash2 className="size-4" />
-              <span>Delete</span>
+              <Trash2 />
+              Delete
             </Button>
           )}
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-sm"
             onClick={closeEditor}
-            title="Close Editor"
-            className="size-8"
+            title="Close editor"
+            aria-label="Close editor"
           >
-            <X className="size-4" />
+            <X />
           </Button>
         </div>
       </div>
 
-      {/* Tab Selection */}
-      <div className="flex border-b border-border bg-muted/10 px-4">
-        <button
-          type="button"
-          onClick={() => setActiveTab("script")}
-          className={cn(
-            "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",
-            activeTab === "script"
-              ? "border-primary text-foreground"
-              : "border-transparent text-muted-foreground hover:text-foreground",
-          )}
-        >
-          <FileCode className="size-3.5" />
-          Userscript Code
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("metadata")}
-          className={cn(
-            "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",
-            activeTab === "metadata"
-              ? "border-primary text-foreground"
-              : "border-transparent text-muted-foreground hover:text-foreground",
-          )}
-        >
-          <Settings className="size-3.5" />
-          Site Metadata (JSON)
-        </button>
-        {enableAfterAddRemoveScripts && (
-          <>
-            <button
-              type="button"
-              onClick={() => setActiveTab("afterAdd")}
-              className={cn(
-                "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",
-                activeTab === "afterAdd"
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <Plus className="size-3.5" />
-              After Add
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("afterRemove")}
-              className={cn(
-                "px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors flex items-center gap-1.5 cursor-pointer",
-                activeTab === "afterRemove"
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <Trash2 className="size-3.5" />
-              After Remove
-            </button>
-          </>
-        )}
+      <div
+        role="tablist"
+        aria-label="Script parts"
+        className="flex shrink-0 overflow-x-auto overflow-y-hidden border-b px-2"
+      >
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={current.id === tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              "-mb-px flex cursor-pointer items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2.5 text-xs font-medium outline-none transition-colors focus-visible:bg-muted",
+              current.id === tab.id
+                ? "border-foreground text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <tab.icon className="size-3.5" />
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* Editor Body */}
-      <div className="p-4">
-        {activeTab === "script" ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold text-muted-foreground">
-                JavaScript Userscript Body
-              </Label>
-              <span className="text-[10px] text-muted-foreground font-mono">
-                Runs in context of target pages
-              </span>
-            </div>
-            <div className="border border-border rounded-md overflow-hidden bg-background h-137.5 overflow-y-auto">
-              <CodeEditor
-                value={siteScript}
-                language="js"
-                placeholder="// Write userscript here..."
-                onChange={(evn) => setSiteScript(evn.target.value)}
-                padding={15}
-                className="text-sm! min-h-full"
-                style={{
-                  fontFamily:
-                    "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-                }}
-                data-color-mode={theme === "light" ? "light" : "dark"}
-              />
-            </div>
-          </div>
-        ) : activeTab === "metadata" ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold text-muted-foreground">
-                JSON Metadata Configuration
-              </Label>
-              <span className="text-[10px] text-muted-foreground font-mono">
-                Contains site name, hosts, presets
-              </span>
-            </div>
-            <div className="border border-border rounded-md overflow-hidden bg-background h-137.5 overflow-y-auto">
-              <CodeEditor
-                value={siteData}
-                language="json"
-                placeholder="{ ... }"
-                onChange={(evn) => setSiteData(evn.target.value)}
-                padding={15}
-                className="text-sm! min-h-full"
-                style={{
-                  fontFamily:
-                    "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-                }}
-                data-color-mode={theme === "light" ? "light" : "dark"}
-              />
-            </div>
-          </div>
-        ) : activeTab === "afterAdd" ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold text-muted-foreground">
-                After Add
-              </Label>
-              <span className="text-[10px] text-muted-foreground font-mono">
-                Runs after adding a tag
-              </span>
-            </div>
-            <div className="border border-border rounded-md overflow-hidden bg-background h-137.5 overflow-y-auto">
-              <CodeEditor
-                value={afterAddScript}
-                language="js"
-                placeholder="// Write after add script here..."
-                onChange={(evn) => setAfterAddScript(evn.target.value)}
-                padding={15}
-                className="text-sm! min-h-full"
-                style={{
-                  fontFamily:
-                    "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-                }}
-                data-color-mode={theme === "light" ? "light" : "dark"}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold text-muted-foreground">
-                After Remove
-              </Label>
-              <span className="text-[10px] text-muted-foreground font-mono">
-                Runs after removing a tag
-              </span>
-            </div>
-            <div className="border border-border rounded-md overflow-hidden bg-background h-137.5 overflow-y-auto">
-              <CodeEditor
-                value={afterRemoveScript}
-                language="js"
-                placeholder="// Write after remove script here..."
-                onChange={(evn) => setAfterRemoveScript(evn.target.value)}
-                padding={15}
-                className="text-sm! min-h-full"
-                style={{
-                  fontFamily:
-                    "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-                }}
-                data-color-mode={theme === "light" ? "light" : "dark"}
-              />
-            </div>
-          </div>
-        )}
+      <div className="flex min-h-0 flex-1 flex-col gap-2 p-3">
+        <div className="flex shrink-0 flex-wrap items-baseline justify-between gap-x-3">
+          <Label className="text-xs font-semibold">{current.title}</Label>
+          <span className="text-[11px] text-muted-foreground">
+            {current.hint}
+          </span>
+        </div>
+        <div
+          role="tabpanel"
+          className="h-96 min-h-0 flex-1 overflow-y-auto border bg-background lg:h-auto"
+        >
+          <CodeEditor
+            key={current.id}
+            value={current.value}
+            language={current.language}
+            placeholder={current.placeholder}
+            onChange={(evn) => current.set(evn.target.value)}
+            padding={15}
+            className="min-h-full text-sm!"
+            style={{ fontFamily: FONT }}
+            data-color-mode={theme === "light" ? "light" : "dark"}
+          />
+        </div>
       </div>
     </div>
   );

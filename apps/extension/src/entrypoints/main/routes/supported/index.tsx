@@ -1,13 +1,27 @@
 import { useSetAtom } from "jotai";
-import { BookOpen, Download, RefreshCw, Upload } from "lucide-react";
+import {
+  BookOpen,
+  ChevronDown,
+  Download,
+  FolderSync,
+  Plus,
+  Upload,
+} from "lucide-react";
 import TitleHeader from "@/components/craft/TitleHeader";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import GuideDialog, { guideOpenAtom } from "./components/GuideDialog";
 import ScriptEditor from "./components/ScriptEditor";
 import SitesSidebar from "./components/SitesSidebar";
 import {
   SupportedSiteProvider,
   useImportExportActions,
+  useSiteActions,
   useSupportedSites,
 } from "./SupportedSite.Context";
 
@@ -16,6 +30,7 @@ export type { SiteData } from "./SupportedSite.Context";
 function Toolbar() {
   const supportedSites = useSupportedSites();
   const setGuideOpen = useSetAtom(guideOpenAtom);
+  const { addSite } = useSiteActions();
   const {
     exportSiteList,
     handleFileClick,
@@ -23,75 +38,59 @@ function Toolbar() {
     fileInputRef,
     refreshSupportedHostsIndex,
   } = useImportExportActions();
+  const count = Object.keys(supportedSites).length;
 
   return (
-    <div className="flex flex-col gap-4 border-b border-border pb-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <TitleHeader Title="Supported Sites" />
-          <span className="text-xs bg-muted text-muted-foreground px-2.5 py-1 rounded-full font-semibold border border-border">
-            {Object.keys(supportedSites).length} Total
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <input
-            className="hidden"
-            type="file"
-            ref={fileInputRef}
-            accept=".json,application/json"
-            onChange={importSiteList}
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleFileClick}
-            className="gap-1.5 h-9"
-          >
-            <Download className="size-4" />
-            <span>Import</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={exportSiteList}
-            className="gap-1.5 h-9"
-          >
-            <Upload className="size-4" />
-            <span>Export</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refreshSupportedHostsIndex()}
-            className="gap-1.5 h-9"
-          >
-            <RefreshCw className="size-4" />
-            <span>Refresh Index</span>
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setGuideOpen(true)}
-            className="gap-1.5 h-9"
-          >
-            <BookOpen className="size-4" />
-            <span>Guide</span>
-          </Button>
-        </div>
-      </div>
-    </div>
+    <TitleHeader
+      Title="Supported Sites"
+      description={`${count} ${count === 1 ? "site" : "sites"} with a clip script. A script tells TagApp how to read the title, cover and tags from a page.`}
+    >
+      <input
+        className="hidden"
+        type="file"
+        ref={fileInputRef}
+        accept=".json,application/json"
+        onChange={importSiteList}
+      />
+      <Button size="sm" onClick={addSite}>
+        <Plus />
+        New script
+      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
+          Site list
+          <ChevronDown />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-56">
+          <DropdownMenuItem onClick={handleFileClick}>
+            <Download />
+            Import site list (JSON)
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={exportSiteList}>
+            <Upload />
+            Export site list (JSON)
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => refreshSupportedHostsIndex()}>
+            <FolderSync />
+            Rebuild host index
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Button variant="ghost" size="sm" onClick={() => setGuideOpen(true)}>
+        <BookOpen />
+        Scripting guide
+      </Button>
+    </TitleHeader>
   );
 }
 
 function SupportedLayout() {
   return (
-    <div className="space-y-6">
+    <div className="pb-10">
       <Toolbar />
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
-        <div className="lg:col-span-3 flex flex-col gap-4">
-          <ScriptEditor />
-        </div>
+      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-[19rem_minmax(0,1fr)]">
         <SitesSidebar />
+        <ScriptEditor />
       </div>
       <GuideDialog />
     </div>
