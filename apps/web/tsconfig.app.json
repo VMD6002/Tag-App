@@ -28,5 +28,7 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  // Mock pages render real extension components (different `@/` root and WXT globals), so tsc skips them.
+  "exclude": ["src/mock/real"]
 }

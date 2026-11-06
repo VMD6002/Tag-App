@@ -52,6 +52,15 @@ The DOM `<script type="application/json">` handoff (`CONTENT_DETAILS_ELEMENT_ID`
 
 `/` library (local or remote by mode) · `/tags` (local or remote) · `/supported` site-script editor + import/export · `/settings` (server URL, app mode, users, hostnames, constants, backup/restore, filtered-data post URL). Popup (`entrypoints/popup`) is just links to these. Per-route state lives in `routes/<name>/*.Context.ts(x)` (Constate providers); `components/ui` = shadcn, `components/craft` = custom pieces (confirm dialog, update/bulk-update modals). `ServerAffix` POSTs the current filtered data to `filteredDataPostServerUrl` if set.
 
+## Mock pages (dev only, for checking extension UI without loading the extension)
+
+`apps/web/src/mock/` renders the **real extension components** (library, remote library, tags, remote tags, settings, supported sites, popup, clip overlay / update modal incl. a shadow-DOM variant, bulk update modal) inside the web app, on stubbed WXT storage and a fake TagApp server (a patched `fetch` answers oRPC calls to `http://mock.invalid`). Use them whenever you change extension UI; loading the unpacked extension is slow and not needed for layout, states, dark/light or narrow-width checks.
+
+- Open: `bun dev:web`, then `http://localhost:5173/#/mock` (index) or `#/mock/<page>?s=<scenario>`. Each page has a scenario bar (normal, stress with long titles/IDs/many tags/many sites, empty, no results, loading, server error). Changing page or scenario reloads the tab on purpose: the extension's storage-backed atoms read their initial value once per page load.
+- Dev only: `App.tsx` loads `./mock` behind `import.meta.env.DEV` with a lazy import, so `vite build` contains none of it (`grep -ril mock apps/server/dist/WebUI` should find nothing). `vite.mock.ts` (dev-only aliases) makes `@/` resolve to the extension src for files that live in `apps/extension`, and serves the Notes `.md` guide.
+- Layout: `data.ts` invented placeholder data (CSS-gradient covers as data URIs, no network; a CSP meta blocks image requests while a mock page is open), `stubs.ts` fake `storage`/`browser`/server, `MockShell.tsx` scenario bar, `real/ExtFrame.tsx` mounts nav + providers like `entrypoints/main/App.tsx`, `real/pages/*.tsx` one file per page. Files under `real/` import extension code, so `tsconfig.app.json` excludes them from `tsc` (Vite compiles them); `real/globals.ts` must be the first import of each page. To add a page: add a file in `real/pages/`, then an entry in `MOCK_PAGES` and `FILE_FOR_SLUG` in `mock/index.tsx`.
+- Not covered: the content-script plumbing (`GetDetailsFromPage`, hidden forms, userscript runner), real `chrome.storage`, real server logic. Keep mock data neutral and invented.
+
 ## Server API (oRPC, mounted at `/rpc`, `packages/api/src/routers`)
 
 - `main`: `setContent`, `bulkUpdateContentTags`, `removeContents`, `getContent`, `getFilteredData` (`FilterQuerySchema`: `any/all/none` tags, `search`, `orderByLatest`), `getSettings`, `setSettings`, `runUserCode`

@@ -1,0 +1,3 @@
+/* The extension's own stylesheet, plus a scan of its sources so every utility it uses is generated here. */
+@import "../../../../extension/src/assets/tailwind.css";
+@source "../../../../extension/src";
