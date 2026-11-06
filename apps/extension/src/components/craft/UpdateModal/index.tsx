@@ -1,13 +1,13 @@
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import { useAtom, useAtomValue } from "jotai";
 import { Redo2 } from "lucide-react";
-import { useEffect } from "react";
+import { type ReactNode, useCallback } from "react";
+import ModalShell from "@/components/craft/ModalShell";
 import MultiSelect from "@/components/craft/MultiSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { tagsAtom } from "@/entrypoints/main/atoms/tags";
-import { cn } from "@/lib/utils";
 import {
   updateContentUrlAtom,
   updateCoverAtom,
@@ -21,6 +21,39 @@ import {
 } from "./atom";
 import PresetsMenu from "./PresetsMenu";
 import SeeMore from "./SeeMore";
+
+/** Label row with the optional "reset to the value found on the page" button. */
+function Field({
+  label,
+  htmlFor,
+  onReset,
+  children,
+}: {
+  label: string;
+  htmlFor?: string;
+  onReset?: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="grid gap-2">
+      <div className="flex min-h-6 items-center justify-between">
+        <Label htmlFor={htmlFor}>{label}</Label>
+        {onReset && (
+          <Button
+            onClick={onReset}
+            size="icon-xs"
+            variant="ghost"
+            aria-label={`Reset ${label.toLowerCase()} to the page value`}
+            title="Reset to the page value"
+          >
+            <Redo2 />
+          </Button>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}
 
 export default function UpdateModal({
   className = "",
@@ -43,159 +76,128 @@ export default function UpdateModal({
   const isDisabled = useAtomValue(updateInputDisabledAtom);
   const exists = useAtomValue(updateExistsAtom);
   const resetFuntions = useAtomValue(updateResetOptionsAtom);
-
-  useEffect(() => {
-    if (!modalOpen) return;
-    const onKey = (e: KeyboardEvent) =>
-      e.key === "Escape" && setModalOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [modalOpen, setModalOpen]);
-
-  if (!modalOpen) return null;
+  const close = useCallback(() => setModalOpen(false), [setModalOpen]);
 
   return (
-    <div
-      style={{ zIndex: 2147483647 }}
-      className="grid fixed min-h-screen top-0 right-0 w-full place-items-center overflow-y-auto overflow-x-clip"
+    <ModalShell
+      open={modalOpen}
+      onClose={close}
+      title={exists ? "Edit item" : "Add to library"}
+      className={className}
+      footer={
+        <>
+          <Button variant="outline" onClick={close}>
+            Cancel
+          </Button>
+          <Button disabled={isDisabled} onClick={updateContentFunc}>
+            {exists ? "Save changes" : "Add to library"}
+          </Button>
+        </>
+      }
     >
-      <button
-        type="button"
-        aria-label="Close modal"
-        onClick={() => setModalOpen(false)}
-        className="h-screen absolute w-full bg-black/10 backdrop-blur-xs cursor-default"
-      />
-      <div
-        className={cn(
-          "max-w-md absolute w-full grid bg-secondary rounded shadow px-8 py-10",
-          className,
-        )}
-      >
-        <div className="flex justify-between mb-2 items-center">
-          <Label>Name</Label>
-          {resetFuntions?.title && (
-            <Button
-              onClick={() => {
+      <Field
+        label="Name"
+        htmlFor="update-title"
+        onReset={
+          resetFuntions?.title
+            ? () => {
                 const val = resetFuntions.title?.();
                 if (val !== undefined) setTitle(val);
-              }}
-              size="icon"
-              variant="outline"
-              className="scale-80"
-            >
-              <Redo2 />
-            </Button>
-          )}
-        </div>
+              }
+            : undefined
+        }
+      >
         <Input
+          id="update-title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Name"
-          className="mb-4"
         />
-        <div className="flex justify-between mb-2 items-center">
-          <Label>Tags</Label>
-          {resetFuntions?.tags && (
-            <Button
-              onClick={() => {
+      </Field>
+      <Field
+        label="Tags"
+        onReset={
+          resetFuntions?.tags
+            ? () => {
                 const val = resetFuntions.tags?.();
                 if (val !== undefined) setUpdateTags(val);
-              }}
-              size="icon"
-              variant="outline"
-              className="scale-80"
-            >
-              <Redo2 />
-            </Button>
-          )}
-        </div>
+              }
+            : undefined
+        }
+      >
         <MultiSelect
           options={tagsArray.map((o) => ({
             label: o,
             value: o,
           }))}
-          className="mb-4"
-          placeholder="Tags"
+          placeholder="Choose tags"
+          label="Tags"
           value={updateTags}
           onChange={setUpdateTags}
         />
-        <SeeMore>
-          <PresetsMenu />
-          {cover !== undefined && (
-            <>
-              <div className="flex justify-between mb-2 items-center">
-                <Label>Cover</Label>
-                {resetFuntions?.cover && (
-                  <Button
-                    onClick={() => {
-                      const val = resetFuntions.cover?.();
-                      if (val !== undefined) setCover(val);
-                    }}
-                    size="icon"
-                    variant="outline"
-                    className="scale-80"
-                  >
-                    <Redo2 />
-                  </Button>
-                )}
-              </div>
-              <Input
-                value={cover}
-                onChange={(e) => setCover(e.target.value)}
-                placeholder="Cover URL"
-                className="mb-4"
-              />
-            </>
-          )}
-          {contentUrl !== undefined && (
-            <>
-              <div className="flex justify-between mb-2 items-center">
-                <Label>Content Url</Label>
-                {resetFuntions?.contentUrl && (
-                  <Button
-                    onClick={() => {
-                      const val = resetFuntions.contentUrl?.();
-                      if (val !== undefined) setContentUrl(val);
-                    }}
-                    size="icon"
-                    variant="outline"
-                    className="scale-80"
-                  >
-                    <Redo2 />
-                  </Button>
-                )}
-              </div>
-              <Input
-                value={contentUrl}
-                onChange={(e) => setContentUrl(e.target.value)}
-                placeholder="Content Url"
-                className="mb-4"
-              />
-            </>
-          )}
-          <div className="flex justify-between mb-2 items-center">
-            <Label>Extra Data</Label>
-            {resetFuntions?.extraData && (
-              <Button
-                onClick={() => {
+      </Field>
+      <SeeMore>
+        <PresetsMenu />
+        {cover !== undefined && (
+          <Field
+            label="Cover"
+            htmlFor="update-cover"
+            onReset={
+              resetFuntions?.cover
+                ? () => {
+                    const val = resetFuntions.cover?.();
+                    if (val !== undefined) setCover(val);
+                  }
+                : undefined
+            }
+          >
+            <Input
+              id="update-cover"
+              value={cover}
+              onChange={(e) => setCover(e.target.value)}
+              placeholder="Cover image URL"
+            />
+          </Field>
+        )}
+        {contentUrl !== undefined && (
+          <Field
+            label="Content URL"
+            htmlFor="update-content-url"
+            onReset={
+              resetFuntions?.contentUrl
+                ? () => {
+                    const val = resetFuntions.contentUrl?.();
+                    if (val !== undefined) setContentUrl(val);
+                  }
+                : undefined
+            }
+          >
+            <Input
+              id="update-content-url"
+              value={contentUrl}
+              onChange={(e) => setContentUrl(e.target.value)}
+              placeholder="Content URL"
+            />
+          </Field>
+        )}
+        <Field
+          label="Notes"
+          onReset={
+            resetFuntions?.extraData
+              ? () => {
                   const val = resetFuntions.extraData?.();
                   if (val !== undefined) setExtraData(val);
-                }}
-                size="icon"
-                variant="outline"
-                className="scale-80"
-              >
-                <Redo2 />
-              </Button>
-            )}
-          </div>
-          <div className="max-h-36 overflow-y-scroll mb-4">
+                }
+              : undefined
+          }
+        >
+          <div className="max-h-40 overflow-y-auto border border-input">
             <CodeEditor
               value={extraData}
               language="md"
-              placeholder="Extra data."
+              placeholder="Notes (markdown)"
               onChange={(evn) => setExtraData(evn.target.value)}
-              padding={15}
+              padding={12}
               className="bg-background/80"
               style={{
                 fontFamily:
@@ -204,15 +206,8 @@ export default function UpdateModal({
               data-color-mode={theme === "system" ? "dark" : theme}
             />
           </div>
-        </SeeMore>
-        <Button
-          disabled={isDisabled}
-          onClick={updateContentFunc}
-          className="max-w-sm w-11/12 mx-auto"
-        >
-          {exists ? "Update" : "Add"}
-        </Button>
-      </div>
-    </div>
+        </Field>
+      </SeeMore>
+    </ModalShell>
   );
 }

@@ -1,5 +1,6 @@
 import { atom, useAtom, useAtomValue } from "jotai";
-import { useEffect } from "react";
+import { useCallback } from "react";
+import ModalShell from "@/components/craft/ModalShell";
 import MultiSelect from "@/components/craft/MultiSelect";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -21,47 +22,36 @@ export default function BlukUpdateModal({
   const [modalOpen, setModalOpen] = useAtom(bulkUpdateModalOpenAtom);
 
   const [selectionTags, setSelectionTags] = useAtom(selectionTagsAtom);
-
-  useEffect(() => {
-    if (!modalOpen) return;
-    const onKey = (e: KeyboardEvent) =>
-      e.key === "Escape" && setModalOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [modalOpen, setModalOpen]);
-
-  if (!modalOpen) return null;
+  const close = useCallback(() => setModalOpen(false), [setModalOpen]);
 
   return (
-    <div
-      style={{ zIndex: 2147483647 }}
-      className="grid fixed h-screen top-0 right-0 w-full place-items-center"
+    <ModalShell
+      open={modalOpen}
+      onClose={close}
+      title="Edit tags on selected items"
+      description="Tags shared by every selected item are pre-filled. Add tags to give them to all items, or remove one to take it off all items."
+      footer={
+        <>
+          <Button variant="outline" onClick={close}>
+            Cancel
+          </Button>
+          <Button onClick={bulkUpdateContentFunc}>Save tags</Button>
+        </>
+      }
     >
-      <button
-        type="button"
-        aria-label="Close modal"
-        onClick={() => setModalOpen(false)}
-        className="h-screen absolute w-full bg-black/10 backdrop-blur-xs cursor-default"
-      />
-      <div className="max-w-md absolute w-full grid bg-secondary rounded shadow px-8 py-10">
-        <Label className="mb-2">Tags</Label>
+      <div className="grid gap-2">
+        <Label>Tags</Label>
         <MultiSelect
           options={tagsArray.map((o) => ({
             label: o,
             value: o,
           }))}
-          className="mb-4"
-          placeholder="Tags"
+          placeholder="Choose tags"
+          label="Tags for the selected items"
           value={selectionTags}
           onChange={setSelectionTags}
         />
-        <Button
-          onClick={bulkUpdateContentFunc}
-          className="max-w-sm w-11/12 mx-auto"
-        >
-          Update
-        </Button>
       </div>
-    </div>
+    </ModalShell>
   );
 }

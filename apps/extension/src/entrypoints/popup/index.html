@@ -3,15 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Popup</title>
+    <title>TagApp</title>
     <meta name="manifest.type" content="browser_action" />
     <link rel="stylesheet" href="./style.css" />
   </head>
 
   <body>
-    <a href="/main.html" target="_blank">Library</a>
-    <a href="/main.html#/tags" target="_blank">Tags</a>
-    <a href="/main.html#/settings" target="_blank">Settings</a>
-    <a href="/main.html#/supported" target="_blank">Supported Sites</a>
+    <header>
+      <span class="mark" aria-hidden="true">#</span>
+      <span class="name">TagApp</span>
+    </header>
+    <nav aria-label="TagApp pages">
+      <a href="/main.html" target="_blank">
+        Library <span class="hint">Browse and filter saved items</span>
+      </a>
+      <a href="/main.html#/tags" target="_blank">
+        Tags <span class="hint">Groups, tags and covers</span>
+      </a>
+      <a href="/main.html#/settings" target="_blank">
+        Settings <span class="hint">Profiles, mode, backup</span>
+      </a>
+      <a href="/main.html#/supported" target="_blank">
+        Supported Sites <span class="hint">Clip scripts per site</span>
+      </a>
+    </nav>
   </body>
 </html>

@@ -19,22 +19,24 @@ export default function PresetsMenu() {
   if (!presetOptions || presetOptions.length <= 0) return null;
 
   return (
-    <>
-      <div className="flex justify-between mb-1 items-center">
-        <Label>Presets</Label>
+    <div className="grid gap-2">
+      <div className="flex min-h-6 items-center justify-between">
+        <Label htmlFor="update-preset">Download preset</Label>
         {resetOptions?.preset && (
           <Button
             onClick={() => setPreset(resetOptions.preset?.())}
-            size="icon"
-            variant="outline"
-            className="scale-80"
+            size="icon-xs"
+            variant="ghost"
+            aria-label="Reset download preset to the page value"
+            title="Reset to the page value"
           >
             <Redo2 />
           </Button>
         )}
       </div>
       <select
-        className="mb-4 w-full appearance-none rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30 dark:hover:bg-input/50"
+        id="update-preset"
+        className="w-full appearance-none rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30 dark:hover:bg-input/50"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
           backgroundPosition: "right 0.5rem center",
@@ -58,6 +60,6 @@ export default function PresetsMenu() {
           </option>
         ))}
       </select>
-    </>
+    </div>
   );
 }
