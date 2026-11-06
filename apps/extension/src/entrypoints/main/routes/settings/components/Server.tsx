@@ -1,9 +1,8 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { SaveRow, SettingField } from "@/components/craft/Settings";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { serverUrlAtom } from "../../../atoms/settings";
 
 export default function Server() {
@@ -14,27 +13,29 @@ export default function Server() {
     setServerUrlBuffer(serverUrl);
   }, [serverUrl]);
 
+  const cleaned = serverUrlBuffer.trim().replace(/\/+$/, "");
+
   return (
-    <section className="max-w-xs w-full">
-      <div className="grid w-full items-center">
-        <Label className="text-lg">Server Address</Label>
-        <Input
-          className="my-2"
-          type="url"
-          value={serverUrlBuffer}
-          onChange={(o) => setServerUrlBuffer(o.target.value)}
-          placeholder="server address, eg: http://localhost:5001"
-        />
-      </div>
-      <Button
-        size="sm"
-        onClick={() => {
-          setServerUrl(serverUrlBuffer.trim().replace(/\/+$/, ""));
-          toast.success("Successfully set Server address");
+    <SettingField
+      label="Server address"
+      htmlFor="server-url"
+      help="Where your TagApp server runs, for example http://localhost:5001. Remote mode can't load anything until this is set."
+    >
+      <Input
+        id="server-url"
+        className="max-w-md"
+        type="url"
+        value={serverUrlBuffer}
+        onChange={(o) => setServerUrlBuffer(o.target.value)}
+        placeholder="http://localhost:5001"
+      />
+      <SaveRow
+        dirty={cleaned !== serverUrl}
+        onSave={() => {
+          setServerUrl(cleaned);
+          toast.success("Server address saved");
         }}
-      >
-        Update
-      </Button>
-    </section>
+      />
+    </SettingField>
   );
 }

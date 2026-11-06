@@ -2,8 +2,7 @@ import { atom, useAtom } from "jotai";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import z from "zod";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { SaveRow, SettingField } from "@/components/craft/Settings";
 import { Textarea } from "@/components/ui/textarea";
 import { hostNamesAtom } from "../../../atoms/settings";
 
@@ -54,25 +53,28 @@ export default function Hostnames() {
     const parsed = validateHostnames(hostnamesBuffer);
     if (!parsed) return;
     setHostNames(parsed);
-    toast.success("Successfully set Hostnames");
+    toast.success("Hostnames saved");
   };
 
   return (
-    <section className="max-w-xs w-full">
-      <div className="grid w-full mb-3">
-        <Label className="text-lg mb-2">Hostnames</Label>
-        <Textarea
-          value={hostnamesBuffer}
-          onChange={(e) => setHostnamesBuffer(e.target.value)}
-          className="font-mono tracking-wide [line-break:anywhere]"
-          spellCheck={false}
-          placeholder="e.g.&#10;https://localhost:5000&#10;https://example.com"
-          rows={6}
-        />
-      </div>
-      <Button size="sm" onClick={updateHostnames}>
-        Update
-      </Button>
-    </section>
+    <SettingField
+      label="Share my tags with these websites"
+      htmlFor="hostnames"
+      help="Pages on these addresses don't get the clip button. Instead they receive your tag list, so a web UI (such as your TagApp server's page) can suggest your tags. One address per line."
+    >
+      <Textarea
+        id="hostnames"
+        value={hostnamesBuffer}
+        onChange={(e) => setHostnamesBuffer(e.target.value)}
+        className="max-w-md font-mono tracking-wide [line-break:anywhere]"
+        spellCheck={false}
+        placeholder="e.g.&#10;https://localhost:5000&#10;https://example.com"
+        rows={4}
+      />
+      <SaveRow
+        dirty={hostnamesBuffer !== hostnamesToFormat(hostNames)}
+        onSave={updateHostnames}
+      />
+    </SettingField>
   );
 }

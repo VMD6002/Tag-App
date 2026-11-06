@@ -1,6 +1,8 @@
 import type { BackUpType } from "@tagapp/utils/types";
 import { useAtomValue } from "jotai";
+import { Download } from "lucide-react";
 import { useCallback } from "react";
+import { SettingField } from "@/components/craft/Settings";
 import { Button } from "@/components/ui/button";
 import { contentDataAtom } from "@/entrypoints/main/atoms";
 import { parentTagsAtom, tagsAtom } from "@/entrypoints/main/atoms/tags";
@@ -62,17 +64,24 @@ export default function Backup() {
   }, [contentData]);
 
   return (
-    <section className="max-w-xs w-full grid gap-3">
-      <h3 className="text-xl mb-3">Backup Data</h3>
-      <Button onClick={handleAll} variant={"outline"}>
-        Backup All
-      </Button>
-      <Button onClick={handleContentData} variant={"outline"}>
-        Backup ContentData only
-      </Button>
-      <Button onClick={handleTags} variant={"outline"}>
-        Backup Tags only
-      </Button>
-    </section>
+    <SettingField
+      label="Back up"
+      help="Downloads a JSON file you can restore later or on another profile."
+    >
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={handleAll} variant="outline" size="sm">
+          <Download />
+          Everything
+        </Button>
+        <Button onClick={handleContentData} variant="outline" size="sm">
+          <Download />
+          Items only
+        </Button>
+        <Button onClick={handleTags} variant="outline" size="sm">
+          <Download />
+          Tags only
+        </Button>
+      </div>
+    </SettingField>
   );
 }

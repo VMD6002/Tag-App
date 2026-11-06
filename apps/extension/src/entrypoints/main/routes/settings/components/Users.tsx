@@ -3,9 +3,9 @@ import { Trash2, UserPlus } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { confirm } from "@/components/craft/confirm-dialog";
+import { SettingField } from "@/components/craft/Settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -24,11 +24,11 @@ export default function Users() {
   const handleAddUser = useCallback(() => {
     const trimmed = newUsername.trim();
     if (!trimmed) {
-      toast.warning("Username cannot be empty");
+      toast.warning("Enter a profile name");
       return;
     }
     if (userList.includes(trimmed)) {
-      toast.warning("User already exists");
+      toast.warning("That profile already exists");
       return;
     }
     setUserList([...userList, trimmed]);
@@ -38,18 +38,18 @@ export default function Users() {
   const handleRemoveUser = useCallback(
     async (userToRemove: string) => {
       if (userList.length <= 1) {
-        toast.warning("Cannot remove the only user left");
+        toast.warning("You can't remove the only profile");
         return;
       }
 
       // Double confirmation
       const firstConfirm = await confirm.warning(
-        `Are you sure you want to remove user "${userToRemove}"?`,
+        `Remove the profile "${userToRemove}"?`,
       );
       if (!firstConfirm) return;
 
       const secondConfirm = await confirm.destructive(
-        `WARNING: This will permanently delete settings scoped to "${userToRemove}" in this browser. Do you really want to proceed?`,
+        `This permanently deletes the library, tags and settings of "${userToRemove}" from this browser. Continue?`,
       );
       if (!secondConfirm) return;
 
@@ -75,16 +75,19 @@ export default function Users() {
   );
 
   return (
-    <section className="max-w-xs w-full grid gap-4">
-      <h3 className="text-xl mb-1">User Management</h3>
-
-      <div className="grid w-full items-center">
-        <Label className="mb-2">Active User</Label>
+    <>
+      <SettingField
+        label="Active profile"
+        help="Each profile keeps its own library, tags and settings in this browser."
+      >
         <Select
           value={currentUser}
           onValueChange={(val) => val && setCurrentUser(val)}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger
+            className="w-full max-w-xs"
+            aria-label="Active profile"
+          >
             <SelectValue placeholder="Select active user" />
           </SelectTrigger>
           <SelectContent className="max-w-sm min-w-0">
@@ -97,54 +100,66 @@ export default function Users() {
             </SelectGroup>
           </SelectContent>
         </Select>
-      </div>
+      </SettingField>
 
-      <div className="grid w-full items-center">
-        <Label className="mb-2">Add New User</Label>
-        <div className="flex gap-2">
+      <SettingField
+        label="Add a profile"
+        htmlFor="new-profile-name"
+        help="Create a separate set of data, for example one per person or purpose."
+      >
+        <div className="flex max-w-xs gap-2">
           <Input
+            id="new-profile-name"
             value={newUsername}
             onChange={(e) => setNewUsername(e.target.value)}
-            placeholder="Username..."
+            placeholder="Profile name"
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleAddUser();
               }
             }}
           />
-          <Button onClick={handleAddUser} size="icon" variant="outline">
-            <UserPlus className="size-4" />
+          <Button onClick={handleAddUser} variant="outline">
+            <UserPlus />
+            Add
           </Button>
         </div>
-      </div>
+      </SettingField>
 
-      <div className="grid w-full items-center mt-2">
-        <Label className="mb-2">All Users</Label>
-        <div className="border border-border rounded-md p-2 space-y-1 max-h-36 overflow-y-auto">
+      <SettingField
+        label="All profiles"
+        help="Removing a profile permanently deletes its data from this browser."
+      >
+        <ul className="max-h-44 max-w-md divide-y overflow-y-auto border">
           {userList.map((user) => (
-            <div
+            <li
               key={`user-list-${user}`}
-              className="flex items-center justify-between py-1 px-2 hover:bg-muted/50 rounded-md transition-colors"
+              className="flex items-center justify-between gap-2 py-1 pr-1 pl-3"
             >
-              <span
-                className={`text-sm truncate mr-2 ${currentUser === user ? "font-semibold text-primary" : ""}`}
-              >
-                {user} {currentUser === user && "(Active)"}
+              <span className="min-w-0 truncate text-sm">
+                {user}
+                {currentUser === user && (
+                  <span className="ml-2 border bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
+                    Active
+                  </span>
+                )}
               </span>
               {userList.length > 1 && (
                 <Button
                   onClick={() => handleRemoveUser(user)}
                   variant="ghost"
-                  size="icon"
-                  className="size-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  size="icon-sm"
+                  aria-label={`Remove profile ${user}`}
+                  title="Remove profile"
+                  className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                 >
-                  <Trash2 className="size-3.5" />
+                  <Trash2 />
                 </Button>
               )}
-            </div>
+            </li>
           ))}
-        </div>
-      </div>
-    </section>
+        </ul>
+      </SettingField>
+    </>
   );
 }

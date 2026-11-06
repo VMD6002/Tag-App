@@ -1,4 +1,6 @@
 import { useAtom } from "jotai";
+import { toast } from "sonner";
+import { SettingField } from "@/components/craft/Settings";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { enableAfterAddRemoveScriptsAtom } from "@/entrypoints/main/atoms/supportedSites";
@@ -8,17 +10,24 @@ export default function SiteScripts() {
     useAtom(enableAfterAddRemoveScriptsAtom);
 
   return (
-    <section className="max-w-xs w-full">
-      <h3 className="text-xl mb-3">Site Scripts</h3>
-      <div className="flex gap-2 mb-3">
+    <SettingField
+      label="After add / after remove scripts"
+      htmlFor="enable-after-scripts"
+      help="A site script can include optional code that runs right after you save or remove one of its items. Turn this on to let them run."
+    >
+      <div className="flex items-center gap-2">
         <Checkbox
+          id="enable-after-scripts"
           checked={enableAfterAddRemoveScripts}
           onCheckedChange={(newVal) => {
             setEnableAfterAddRemoveScriptsAtom(newVal as boolean);
+            toast.success(`After add/remove scripts ${newVal ? "on" : "off"}`);
           }}
         />
-        <Label>Enable after add/remov Scripts</Label>
+        <Label htmlFor="enable-after-scripts" className="text-sm font-normal">
+          Run after add/remove scripts
+        </Label>
       </div>
-    </section>
+    </SettingField>
   );
 }

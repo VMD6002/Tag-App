@@ -1,6 +1,8 @@
 import type { BackUpType } from "@tagapp/utils/types";
 import { useMutation } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
+import { Download } from "lucide-react";
+import { SettingField } from "@/components/craft/Settings";
 import { Button } from "@/components/ui/button";
 import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
 import saveJsonFile from "@/lib/saveJsonFile";
@@ -36,26 +38,36 @@ export default function RemoteBackup() {
   );
 
   return (
-    <section className="max-w-xs w-full grid gap-3">
-      <h3 className="text-xl mb-3">Backup Data (Remote)</h3>
-      <Button
-        onClick={() => getAllDataMutation.mutate({ type: "All" })}
-        variant={"outline"}
-      >
-        Backup All
-      </Button>
-      <Button
-        onClick={() => getAllDataMutation.mutate({ type: "contentData" })}
-        variant={"outline"}
-      >
-        Backup ContentData only
-      </Button>
-      <Button
-        onClick={() => getAllDataMutation.mutate({ type: "tags" })}
-        variant={"outline"}
-      >
-        Backup Tags only
-      </Button>
-    </section>
+    <SettingField
+      label="Back up"
+      help="Downloads a JSON copy of what's on the server. You can restore it later or into another server."
+    >
+      <div className="flex flex-wrap gap-2">
+        <Button
+          onClick={() => getAllDataMutation.mutate({ type: "All" })}
+          variant="outline"
+          size="sm"
+        >
+          <Download />
+          Everything
+        </Button>
+        <Button
+          onClick={() => getAllDataMutation.mutate({ type: "contentData" })}
+          variant="outline"
+          size="sm"
+        >
+          <Download />
+          Items only
+        </Button>
+        <Button
+          onClick={() => getAllDataMutation.mutate({ type: "tags" })}
+          variant="outline"
+          size="sm"
+        >
+          <Download />
+          Tags only
+        </Button>
+      </div>
+    </SettingField>
   );
 }

@@ -1,9 +1,8 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { SaveRow, SettingField } from "@/components/craft/Settings";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { filteredDataPostServerUrlAtom } from "../../../atoms/settings";
 
 export default function FilteredDataPost() {
@@ -17,26 +16,26 @@ export default function FilteredDataPost() {
   }, [filteredDataPostUrl]);
 
   return (
-    <section className="max-w-xs w-full">
-      <div className="grid w-full items-center">
-        <Label className="text-lg">Filtered data post server address</Label>
-        <Input
-          className="my-2"
-          type="url"
-          value={buffer}
-          onChange={(o) => setBuffer(o.target.value)}
-          placeholder="filtered data post server, eg: http://localhost:5001"
-        />
-      </div>
-      <Button
-        size="sm"
-        onClick={() => {
+    <SettingField
+      label="Send filtered results to"
+      htmlFor="filtered-data-post-url"
+      help="Optional. When set, the library shows a button that sends the currently filtered items to this address as JSON (an HTTP POST). Leave it empty to hide the button."
+    >
+      <Input
+        id="filtered-data-post-url"
+        className="max-w-md"
+        type="url"
+        value={buffer}
+        onChange={(o) => setBuffer(o.target.value)}
+        placeholder="http://localhost:5001/filtered"
+      />
+      <SaveRow
+        dirty={buffer !== filteredDataPostUrl}
+        onSave={() => {
           setFilteredDataPostUrl(buffer);
-          toast.success("Successfully set Filtered data post server address");
+          toast.success("Results address saved");
         }}
-      >
-        Update
-      </Button>
-    </section>
+      />
+    </SettingField>
   );
 }

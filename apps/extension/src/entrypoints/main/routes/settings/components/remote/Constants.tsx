@@ -3,7 +3,7 @@ import { atom, useAtom, useAtomValue } from "jotai";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import z from "zod";
-import { Button } from "@/components/ui/button";
+import { SaveRow, SettingField } from "@/components/craft/Settings";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -78,7 +78,7 @@ export default function RemoteConstants() {
       onSuccess: (data) => {
         setConstants(data.constants);
         setReplaceWithKeyOnUpdate(data.replaceWithKeyOnUpdate);
-        toast.success("Successfully set Constants");
+        toast.success("Constants saved");
       },
       onError: (error) => {
         toast.error(error.message);
@@ -92,29 +92,51 @@ export default function RemoteConstants() {
   };
 
   return (
-    <section className="max-w-xs w-full">
-      <div className="grid w-full mb-3">
-        <Label className="text-lg mb-1">Constants (Remote)</Label>
-        <div className="flex gap-2 mb-3">
+    <>
+      <SettingField
+        label="Constants"
+        htmlFor="constants"
+        help={
+          <>
+            Short names for the start of a URL{" (stored on the server)"}. Write
+            one per line as <code>Name: value</code>, then use{" "}
+            <code>$Name</code> in a URL to expand it, e.g.{" "}
+            <code>$YT/watch</code>.
+          </>
+        }
+      >
+        <Textarea
+          id="constants"
+          placeholder="e.g.&#10;YT: https://www.youtube.com&#10;Twitter: https://twitter.com"
+          value={constantsBuffer}
+          onChange={(e) => setConstantsBuffer(e.target.value)}
+          className="max-w-md font-mono tracking-wide [line-break:anywhere]"
+          spellCheck={false}
+          rows={5}
+        />
+        <SaveRow
+          dirty={constantsBuffer !== objectToCustomFormat(constants)}
+          onSave={updateConstants}
+        />
+      </SettingField>
+      <SettingField
+        label="Shorten URLs when saving"
+        htmlFor="replace-with-key"
+        help="When on, a cover URL that contains a constant's value is stored with its $Name instead, so changing the constant later updates every item."
+      >
+        <div className="flex items-center gap-2">
           <Checkbox
+            id="replace-with-key"
             checked={replaceWithKeyOnUpdate}
             onCheckedChange={(newVal) => {
               setSettingsMutation.mutate({ replaceWithKeyOnUpdate: newVal });
             }}
           />
-          <Label>Repalce value with key on Update</Label>
+          <Label htmlFor="replace-with-key" className="text-sm font-normal">
+            Replace matching URL prefixes with their constant name
+          </Label>
         </div>
-        <Textarea
-          placeholder="e.g.&#10;YT: https://www.youtube.com&#10;Twitter: https://twitter.com"
-          value={constantsBuffer}
-          onChange={(e) => setConstantsBuffer(e.target.value)}
-          className="font-mono tracking-wide [line-break:anywhere]"
-          spellCheck={false}
-        />
-      </div>
-      <Button size="sm" onClick={updateConstants}>
-        Update
-      </Button>
-    </section>
+      </SettingField>
+    </>
   );
 }
