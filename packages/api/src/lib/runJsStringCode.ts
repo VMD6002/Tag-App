@@ -16,7 +16,22 @@ export async function runPersonalScript(userCode: string, data: any) {
   // 3. Wrap script in an async IIFE to support top-level await/fetch
   const wrappedCode = `(async () => { ${userCode} })()`;
 
-  // 4. Run with a sync execution timeout (e.g., 2000ms)
+  // 4. The vm timeout only covers sync execution, so race the whole async run against the same 5s
+  const TIMEOUT_MS = 5000;
   const script = new vm.Script(wrappedCode);
-  return await script.runInContext(context, { timeout: 5000 });
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error(`Script timed out after ${TIMEOUT_MS}ms`)),
+      TIMEOUT_MS,
+    );
+  });
+  try {
+    return await Promise.race([
+      script.runInContext(context, { timeout: TIMEOUT_MS }),
+      timeout,
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
 }
