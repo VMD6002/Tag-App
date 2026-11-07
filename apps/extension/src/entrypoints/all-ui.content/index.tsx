@@ -131,14 +131,16 @@ async function injectSiteDataIntoPage() {
       await sendTagsWithHandshake(tags.sort());
     };
 
-    // 1. Initial tag fetch and handshake broadcast on load
-    await fetchAndBroadcastTags();
+    // Serialise broadcasts so an update during the first handshake runs after it, with fresh tags
+    let queue = Promise.resolve();
+    const broadcast = () => {
+      queue = queue.then(fetchAndBroadcastTags);
+    };
 
-    // 2. Storage watcher to re-run handshake whenever remote tags update
-    storage.watch<boolean>(
-      `local:${currentUser}:remoteTagsUpdated`,
-      async () => await fetchAndBroadcastTags(),
-    );
+    // Watch from the start: the first handshake can take ~10 s and updates in that window must not be missed
+    storage.watch<boolean>(`local:${currentUser}:remoteTagsUpdated`, broadcast);
+    broadcast();
+    await queue;
 
     return false;
   }
