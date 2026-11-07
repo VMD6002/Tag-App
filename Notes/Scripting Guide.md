@@ -47,7 +47,7 @@ TagAppExt comes with some build helper functions for that can be accessed by `sh
   Gets the pages cover photo given in meta tags with property 'og:image'
 
 - `getUniqueIdFromString(str: string)`
-  Generates a 13 digit base 36 number given a string input, Use this for sites that don't have any other identification other than long titles and such
+  Generates a base 36 id of at most 7 characters from a 32-bit FNV-1a hash of a string input, Use this for sites that don't have any other identification other than long titles and such
 
 - `decodeHtmlEntities(str: string)`
   Decode's html entieties. eg: decodeHtmlEntities("\&lt;") // returns "<"
