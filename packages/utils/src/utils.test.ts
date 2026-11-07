@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { ArrayHasAnyModified } from "./ArrayHelperFunctions";
+import { computeTagCounts } from "./computeTagCounts";
 import { filterData } from "./filterData";
 import {
   applyConstants,
@@ -54,4 +55,20 @@ test("constants round trip", () => {
   const short = replaceWithConstantKey("https://cdn.example.com/a.jpg", c);
   expect(short).toBe("$cdn/a.jpg");
   expect(applyConstants(short, c)).toBe("https://cdn.example.com/a.jpg");
+});
+
+describe("computeTagCounts", () => {
+  test("counts a duplicated tag once, rebuilds parents, keeps covers and zero-count tags", () => {
+    const r = computeTagCounts(
+      [{ tags: ["A:x", "A:x", "B:y"] }, { tags: ["A:x"] }],
+      { "A:x": { count: 9, cover: "c" }, "Z:old": { count: 3 } },
+      { Z: { cover: "pc" } },
+    );
+    expect(r.tags).toEqual({
+      "A:x": { count: 2, cover: "c" },
+      "B:y": { count: 1 },
+      "Z:old": { count: 0 },
+    });
+    expect(r.parentTags).toEqual({ A: {}, B: {}, Z: { cover: "pc" } });
+  });
 });

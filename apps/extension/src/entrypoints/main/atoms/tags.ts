@@ -1,3 +1,4 @@
+import { computeTagCounts } from "@tagapp/utils";
 import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
 import type { Getter, Setter } from "jotai";
 import { useAtomCallback } from "jotai/utils";
@@ -81,37 +82,14 @@ export const useRemoveTag = () =>
   useAtomCallback(useCallback(removeTagCallback, []));
 
 const fixTagCountCallback = async (get: Getter, set: Setter) => {
-  const contentData = { ...(await get(contentDataAtom)) };
-  const tagsData = structuredClone(await get(tagsAtom));
-
-  const CalculatedTags = new Map<string, number>();
-  const AllTags = new Set(Object.keys(tagsData));
-
-  Object.values(contentData).forEach((entry) => {
-    entry.tags.forEach((tag) => {
-      CalculatedTags.set(tag, (CalculatedTags.get(tag) || 0) + 1);
-    });
-  });
-
-  const newTagsData: TagsType = {};
-
-  CalculatedTags.forEach((count, tag) => {
-    if (tagsData[tag]) {
-      newTagsData[tag] = { ...tagsData[tag], count: count };
-    } else {
-      newTagsData[tag] = { count: count };
-    }
-  });
-
-  AllTags.forEach((tag) => {
-    if (!CalculatedTags.has(tag)) {
-      if (!newTagsData[tag]) {
-        newTagsData[tag] = { ...tagsData[tag], count: 0 };
-      }
-    }
-  });
-
-  set(tagsAtom, newTagsData);
+  const contentData = await get(contentDataAtom);
+  const result = computeTagCounts(
+    Object.values(contentData),
+    structuredClone(await get(tagsAtom)),
+    structuredClone(await get(parentTagsAtom)),
+  );
+  set(tagsAtom, result.tags);
+  set(parentTagsAtom, result.parentTags);
 };
 
 export const useFixTagCount = () =>

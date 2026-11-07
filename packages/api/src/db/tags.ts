@@ -1,3 +1,4 @@
+import { computeTagCounts } from "@tagapp/utils";
 import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
 import { JSONFilePreset } from "lowdb/node";
 import { contentDataDB } from "./contentData";
@@ -26,20 +27,14 @@ const IncrementTagCount = (tags: Iterable<string>) => {
   }
 };
 
-// Rebuild every tag count from content; keeps covers and zero-count tags.
 const recountTags = () => {
-  const counted: TagsType = {};
-  const parents: ParentTagsType = {};
-  for (const content of Object.values(contentDataDB.data)) {
-    for (const tag of new Set(content.tags)) {
-      counted[tag] = { count: (counted[tag]?.count ?? 0) + 1 };
-      parents[parentOf(tag)] = {};
-    }
-  }
-  for (const tag in tagDB.data.tags)
-    counted[tag] = { ...tagDB.data.tags[tag], count: counted[tag]?.count ?? 0 };
-  tagDB.data.tags = counted;
-  tagDB.data.parentTags = { ...parents, ...tagDB.data.parentTags };
+  const result = computeTagCounts(
+    Object.values(contentDataDB.data),
+    tagDB.data.tags,
+    tagDB.data.parentTags,
+  );
+  tagDB.data.tags = result.tags;
+  tagDB.data.parentTags = result.parentTags;
 };
 
 export { DecrementTagCount, IncrementTagCount, recountTags, tagDB };
