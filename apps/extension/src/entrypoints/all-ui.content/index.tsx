@@ -1,4 +1,5 @@
 import "@/assets/tailwind.css";
+import { pickOwner } from "@tagapp/utils";
 import ReactDOM from "react-dom/client";
 import type { ContentScriptContext } from "wxt/utils/content-script-context";
 import {
@@ -7,6 +8,7 @@ import {
   SITE_DATA_ELEMENT_ID,
 } from "@/lib/CONSTANTS";
 import { generateJsonScriptElement } from "@/lib/generateJsonScriptElement";
+import { setContentScriptUser } from "../main/atoms/user";
 import type { SiteData } from "../main/routes/supported";
 import App from "./AllModal";
 
@@ -89,29 +91,41 @@ const sendTagsWithHandshake = (
 async function injectSiteDataIntoPage() {
   const currentUser =
     (await storage.getItem<string>("local:currentUser")) ?? DEFAULT_USER;
+  const crossUser =
+    (await storage.getItem<boolean>("local:crossUserScripts")) ?? false;
 
-  const hostNames: string[] | null = await storage.getItem(
-    `local:${currentUser}:hostNames`,
+  // Cross user scripts: any profile may own the host-page broadcast, current one first
+  const userList = crossUser
+    ? ((await storage.getItem<string[]>("local:userList")) ?? [DEFAULT_USER])
+    : [currentUser];
+  const hostNamesItems = await storage.getItems(
+    userList.map((u) => `local:${u}:hostNames` as const),
+  );
+  const hostUser = pickOwner(
+    userList.filter((_, i) =>
+      (hostNamesItems[i]?.value as string[] | null)?.includes(location.origin),
+    ),
+    currentUser,
   );
 
-  const appMode: "local" | "remote" =
-    (await storage.getItem<"local" | "remote">(
-      `local:${currentUser}:appMode`,
-    )) ?? "local"; // defaults are never written to storage
-
   // Check if its one of the hostnames defined by user and if it is then inject tag data and exit
-  if (hostNames?.includes(location.origin)) {
+  if (hostUser) {
+    const appMode: "local" | "remote" =
+      (await storage.getItem<"local" | "remote">(
+        `local:${hostUser}:appMode`,
+      )) ?? "local"; // defaults are never written to storage
+
     const fetchAndBroadcastTags = async () => {
       let tags: string[];
 
       try {
         if (appMode === "local") {
           tags = Object.keys(
-            (await storage.getItem(`local:${currentUser}:tags`)) ?? {},
+            (await storage.getItem(`local:${hostUser}:tags`)) ?? {},
           );
         } else {
           const serverUrl =
-            (await storage.getItem(`local:${currentUser}:serverUrl`)) ?? "";
+            (await storage.getItem(`local:${hostUser}:serverUrl`)) ?? "";
           if (!serverUrl) {
             console.error("Server URL not found");
             return;
@@ -138,21 +152,33 @@ async function injectSiteDataIntoPage() {
     };
 
     // Watch from the start: the first handshake can take ~10 s and updates in that window must not be missed
-    storage.watch<boolean>(`local:${currentUser}:remoteTagsUpdated`, broadcast);
+    storage.watch<boolean>(`local:${hostUser}:remoteTagsUpdated`, broadcast);
     broadcast();
     await queue;
 
     return false;
   }
 
+  const owner = crossUser
+    ? pickOwner(
+        (
+          await storage.getItem<Record<string, string[]>>(
+            "local:crossUserHostsIndex",
+          )
+        )?.[location.host] ?? [],
+        currentUser,
+      )
+    : currentUser;
+  if (!owner) return false;
+
   const supportedHostsIndex: Record<string, string> =
-    (await storage.getItem(`local:${currentUser}:supportedHostsIndex`)) ?? {};
+    (await storage.getItem(`local:${owner}:supportedHostsIndex`)) ?? {};
 
   const SiteName = supportedHostsIndex[location.host];
   if (!SiteName) return false;
 
   const SupportedSites: Record<string, SiteData> =
-    (await storage.getItem(`local:${currentUser}:supportedSites`)) ?? {};
+    (await storage.getItem(`local:${owner}:supportedSites`)) ?? {};
   const siteData = SupportedSites[SiteName];
   if (!siteData || !checkMatchPatterns(siteData)) return false;
 
@@ -161,6 +187,7 @@ async function injectSiteDataIntoPage() {
     siteData,
   );
   document.documentElement.append(siteDataScriptEle);
+  if (crossUser) setContentScriptUser(owner); // the overlay runs as the owner
   return true;
 }
 
