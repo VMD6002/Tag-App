@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { rebuildCrossUserHostsIndex } from "../../../atoms/supportedSites";
 import {
   currentUserAtom,
   effectiveUserAtom,
@@ -70,6 +71,7 @@ export default function Users() {
       );
       const nextList = userList.filter((u) => u !== userToRemove);
       setUserList(nextList);
+      await rebuildCrossUserHostsIndex(nextList);
 
       // Removing the stored or the shown profile: fall back to another remaining one
       if (currentUser === userToRemove) setCurrentUser(nextList[0]!);

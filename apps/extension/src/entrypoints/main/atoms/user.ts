@@ -40,9 +40,17 @@ urlUserAtom.onMount = (set) => {
   };
 };
 
+// Content script only: the profile that owns the page's site script (cross user scripts).
+let contentScriptUser: string | null = null;
+export const setContentScriptUser = (user: string) => {
+  contentScriptUser = user;
+};
+
 // The profile this tab shows: the URL's if it exists, else the stored one.
-// Never writes currentUserAtom, so other tabs and the content script are unaffected.
+// Never writes currentUserAtom, so other tabs are unaffected. On host pages the content
+// script's owner (setContentScriptUser) wins.
 export const effectiveUserAtom = atom(async (get) => {
+  if (contentScriptUser) return contentScriptUser;
   const urlUser = get(urlUserAtom);
   const stored = await get(currentUserAtom);
   if (!urlUser) return stored;
