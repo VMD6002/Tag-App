@@ -48,6 +48,7 @@ function Demo({ state }: { state: OverlayState }) {
   const open = useAtomValue(updateModalOpenAtom);
   const [ready, setReady] = useState(false);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: set only when the scenario changes
   useEffect(() => {
     const saved = state !== "new" && state !== "add";
     set.id("sample_demo1");
@@ -85,7 +86,6 @@ function Demo({ state }: { state: OverlayState }) {
     });
     set.open(state === "edit" || state === "add");
     setReady(true);
-    // biome-ignore lint/correctness/useExhaustiveDependencies: set only when the scenario changes
   }, [state]);
 
   if (!ready) return null;

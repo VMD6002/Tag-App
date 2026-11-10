@@ -92,8 +92,7 @@ const ContentCard = memo(
     const added = new Date(content.added * 1000);
 
     return (
-      // biome-ignore lint/a11y/noStaticElementInteractions: whole-card click is a mouse shortcut; the checkbox button is the accessible control
-      // biome-ignore lint/a11y/useKeyWithClickEvents: see above
+      // biome-ignore lint/a11y/useKeyWithClickEvents: whole-card click is a mouse shortcut; the checkbox button is the accessible control
       <article
         onClick={() => selectionOn && selection?.onToggle()}
         className={cn(

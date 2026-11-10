@@ -1,5 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
-import { atom, useAtom, useAtomValue } from "jotai";
+import { atom, useAtom } from "jotai";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import z from "zod";
@@ -11,7 +10,6 @@ import {
   constantsAtom,
   replaceWithKeyOnUpdateAtom,
 } from "@/entrypoints/main/atoms/constants";
-import { orpcAtom } from "@/entrypoints/main/atoms/orpc";
 
 const constantsBufferAtom = atom<string>("");
 
@@ -62,7 +60,6 @@ const validateConstants = (constants: string) => {
 };
 
 export default function Constants() {
-  const orpc = useAtomValue(orpcAtom);
   const [constants, setConstants] = useAtom(constantsAtom);
   const [replaceWithKeyOnUpdate, setReplaceWithKeyOnUpdate] = useAtom(
     replaceWithKeyOnUpdateAtom,
@@ -71,19 +68,8 @@ export default function Constants() {
 
   useEffect(() => {
     setConstantsBuffer(objectToCustomFormat(constants));
-  }, [constants]);
+  }, [constants, setConstantsBuffer]);
 
-  const setSettingsMutation = useMutation(
-    orpc.main.setSettings.mutationOptions({
-      onSuccess: (data) => {
-        setConstants(data.constants);
-        setReplaceWithKeyOnUpdate(data.replaceWithKeyOnUpdate);
-      },
-      onError: (error) => {
-        toast.error(error.message);
-      },
-    }),
-  );
   const updateConstants = () => {
     const parsed = validateConstants(constantsBuffer);
     if (!parsed) return;
