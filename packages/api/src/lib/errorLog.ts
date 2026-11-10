@@ -1,12 +1,11 @@
-export default function errorLog(error: Error | any) {
+// biome-ignore lint/suspicious/noExplicitAny: accepts any thrown value
+export default function errorLog(error: any) {
   console.error("--- An Error Occurred ---");
   console.error("Error Name:", error?.name);
   console.error("Error Message:", error?.message);
 
   // Log Node.js specific error code if present
-  // @ts-expect-error
   if (error?.code) {
-    // @ts-expect-error
     console.error("Error Code (Node.js):", error?.code);
   }
 
