@@ -24,10 +24,13 @@
     "check": "biome check",
     "check:fix": "biome check --write",
     "format": "biome format --write",
+    "doctor:web": "react-doctor --no-telemetry --yes --project apps/web",
+    "doctor:ext": "react-doctor --no-telemetry --yes --project apps/extension",
     "update:all": "bun -r update"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.4",
-    "@types/node": "^24.13.3"
+    "@types/node": "^24.13.3",
+    "react-doctor": "^0.9.22"
   }
 }
