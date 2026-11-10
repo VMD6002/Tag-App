@@ -27,6 +27,8 @@ Both atoms are in `apps/extension/src/entrypoints/main/atoms/supportedSites.ts`,
 - `supportedSitesAtom`: `Record<siteName, SiteData>` (storage key `supportedSites`).
 - `supportedHostsIndexAtom`: `Record<host, siteName>` (key `supportedHostsIndex`). This is a derived copy the content script reads for fast lookup, so it must be rebuilt whenever sites change. If two sites share a host, the later one in iteration order wins.
 - Rebuild with `useRefreshSupportedHostsIndex()`. Pass the new sites object when you have it (`refresh(newSites)`), otherwise it reads `supportedSitesAtom`. Currently called after save, remove and import in `SupportedSite.Context.ts`; any new code that writes `supportedSitesAtom` must call it too.
+- `crossUserHostsIndex` (key `local:crossUserHostsIndex`, not per profile): `Record<host, profileName[]>`, the profiles whose `supportedHostsIndex` has that host, in `userList` order. Built by `rebuildCrossUserHostsIndex(users, fresh?)` (plain async, reads every profile's index from storage; `fresh` is the index just computed for the profile being refreshed, because its atom write may not have landed). Rebuilt at the end of every `useRefreshSupportedHostsIndex()` refresh, when a profile is removed (`Users.tsx`), and when Cross User Scripts is switched on.
+- `crossUserScriptsAtom` (`local:crossUserScripts`, default `false`): global switch, not per profile (like `currentUserAtom`). When on, the content script runs a site script from any profile ([clip flow](clip-flow.md)). UI: `settings/components/CrossUserScripts.tsx`.
 - Same file: `enableAfterAddRemoveScriptsAtom` and `runAfterAddRemoveScriptsInServerAtom` (both default `false`).
 
 ## `sh.*` helpers
