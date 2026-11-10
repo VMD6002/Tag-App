@@ -90,6 +90,7 @@ export function atomWithUserStorage<T>(key: string, initialValue: T) {
               return (update as (prev: T) => T | Promise<T>)(prev);
             }
           : update;
+      // biome-ignore lint/suspicious/noExplicitAny: jotai atomFamily setter type cannot express the wrapped updater
       set(settingFamily(username), action as any);
     },
   );

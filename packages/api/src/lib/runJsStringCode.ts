@@ -1,6 +1,6 @@
 import vm from "node:vm";
 
-export async function runPersonalScript(userCode: string, data: any) {
+export async function runPersonalScript(userCode: string, data: unknown) {
   // 1. Define only what the script is allowed to see
   const sandbox = {
     fetch: globalThis.fetch, // Pass native fetch

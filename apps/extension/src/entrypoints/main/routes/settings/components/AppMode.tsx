@@ -91,8 +91,8 @@ export default function AppMode() {
       });
       toast.success("Server settings replaced with this profile's settings");
     } catch (err) {
-      toast.error((err as any).message);
-      console.log((err as any).message);
+      toast.error(err instanceof Error ? err.message : String(err));
+      console.log(err instanceof Error ? err.message : String(err));
     }
   };
 

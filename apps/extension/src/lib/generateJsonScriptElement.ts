@@ -1,7 +1,4 @@
-export function generateJsonScriptElement(
-  id: string,
-  data: Record<string, any>,
-) {
+export function generateJsonScriptElement(id: string, data: unknown) {
   const scriptElement = document.createElement("script");
   scriptElement.type = "application/json";
   scriptElement.id = id;

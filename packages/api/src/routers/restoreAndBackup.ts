@@ -35,6 +35,7 @@ export const restore = os
     const { type, overwrite, data } = input;
 
     // Helper to merge or overwrite data based on the flag
+    // biome-ignore lint/suspicious/noExplicitAny: generic merge helper, result is assigned to several differently typed DBs
     const updateData = (current: any, incoming: any) => {
       return overwrite ? incoming : { ...current, ...incoming };
     };

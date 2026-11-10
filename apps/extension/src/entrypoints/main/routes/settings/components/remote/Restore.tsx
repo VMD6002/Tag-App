@@ -1,7 +1,7 @@
 import { BackUpSchema } from "@tagapp/utils/types";
 import { useMutation } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
-import { useCallback, useState } from "react";
+import { type ChangeEvent, useCallback, useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 import { confirm } from "@/components/craft/confirm-dialog";
@@ -24,7 +24,10 @@ export default function RemoteRestore() {
   );
 
   const restore = useCallback(
-    async (event: any, type: "All" | "contentData" | "tags") => {
+    async (
+      event: ChangeEvent<HTMLInputElement>,
+      type: "All" | "contentData" | "tags",
+    ) => {
       if (
         overwrite &&
         !(await confirm.destructive({
@@ -33,7 +36,7 @@ export default function RemoteRestore() {
           confirmText: "Replace",
         }))
       ) {
-        event.target.value = null;
+        event.target.value = "";
         return;
       }
       const file = event.target.files?.[0];
@@ -42,7 +45,7 @@ export default function RemoteRestore() {
       file
         .text()
         .then((text: string) => JSON.parse(text))
-        .then((parsedData: Record<string, any>) => {
+        .then((parsedData: unknown) => {
           const validator = BackUpSchema.safeParse(parsedData);
           if (!validator.success) {
             toast.error(z.prettifyError(validator.error));
@@ -52,12 +55,12 @@ export default function RemoteRestore() {
 
           restoreMutation.mutate({ data, type, overwrite });
         })
-        .catch((error: any) => {
+        .catch((error: unknown) => {
           console.error("Error reading or parsing the JSON file:", error);
         });
-      event.target.value = null;
+      event.target.value = "";
     },
-    [overwrite],
+    [overwrite, restoreMutation.mutate],
   );
 
   return (

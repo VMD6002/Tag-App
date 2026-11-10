@@ -122,11 +122,13 @@ function useSupportedSite() {
       refreshSupportedHostsIndex(New);
       setEditingSiteName(data.name);
       toast.success("Script Updated Successfully");
-    } catch (error: any) {
+    } catch (error) {
       toast.error(
         error instanceof z.ZodError
           ? z.prettifyError(error)
-          : (error?.message ?? ""),
+          : error instanceof Error
+            ? error.message
+            : "",
       );
     }
   }, [
@@ -207,7 +209,7 @@ function useSupportedSite() {
             return New;
           });
         })
-        .catch((error: any) => {
+        .catch((error) => {
           toast.error("Error reading or parsing the JSON file");
           console.error("Error reading or parsing the JSON file:", error);
         });

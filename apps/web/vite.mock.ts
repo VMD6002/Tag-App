@@ -11,6 +11,7 @@ export const mockAliases: AliasOptions = [
   {
     find: /^@\//,
     replacement: `${webSrc}/`,
+    // biome-ignore lint/suspicious/noExplicitAny: Vite customResolver `this` is the plugin context
     customResolver(this: any, updated: string, importer?: string) {
       const target =
         importer?.startsWith(extSrc) && updated.startsWith(webSrc)

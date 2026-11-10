@@ -113,6 +113,7 @@ const recount = () => {
     server.tags[t] = { ...server.tags[t], count: counts[t] ?? 0 };
 };
 
+// biome-ignore lint/suspicious/noExplicitAny: mock handlers receive arbitrary RPC inputs
 const handlers: Record<string, (input: any) => unknown> = {
   "main/getSettings": () => server.settings,
   "main/setSettings": (i) => Object.assign(server.settings, i),
@@ -160,7 +161,7 @@ const handlers: Record<string, (input: any) => unknown> = {
     parentTags: server.parentTags,
   }),
   "tags/setTagCover": (i: { tag: string; cover?: string }) => {
-    server.tags[i.tag] = { ...server.tags[i.tag]!, cover: i.cover };
+    server.tags[i.tag] = { ...server.tags[i.tag], cover: i.cover };
     return i;
   },
   "tags/addTags": (i: { tags: string[] }) => {
