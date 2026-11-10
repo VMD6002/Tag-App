@@ -134,6 +134,10 @@ async function injectSiteDataIntoPage() {
             body: '{"json":{}}',
             method: "POST",
           });
+          if (!res.ok) {
+            console.error("Couldn't load tags to broadcast", res.status);
+            return;
+          }
           tags = Object.keys((await res.json())?.json?.tags ?? {});
         }
       } catch (error) {

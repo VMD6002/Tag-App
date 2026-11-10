@@ -1,6 +1,13 @@
 // The clip overlay's real pieces (UpdateModal, FloatingButtons) over a fake page.
 import { Provider, useAtomValue, useSetAtom, useStore } from "jotai";
-import { type ReactNode, Suspense, useEffect, useRef, useState } from "react";
+import {
+  type ReactNode,
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { createRoot } from "react-dom/client";
 import UpdateModal from "../../../../extension/src/components/craft/UpdateModal";
 import {
@@ -119,7 +126,10 @@ function ShadowHost({ children }: { children: ReactNode }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const store = useStore();
   const childrenRef = useRef(children);
-  childrenRef.current = children;
+  // Layout effect, not render: refs must not be written during render. Runs before the mount effect below.
+  useLayoutEffect(() => {
+    childrenRef.current = children;
+  });
 
   useEffect(() => {
     const host = hostRef.current as HTMLDivElement;
