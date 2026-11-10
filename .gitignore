@@ -44,3 +44,4 @@ pnpm-debug.log*
 
 # Dev tools
 .devtool/
+.work/
