@@ -28,9 +28,11 @@ const setContentCallback = async (
   set: Setter,
   input: ContentWebBaseType,
 ) => {
-  const santizeTitle = await get(sanitizeTitleAtom);
-  const replaceWithKeyOnUpdate = await get(replaceWithKeyOnUpdateAtom);
-  const constants = await get(constantsAtom);
+  const [santizeTitle, replaceWithKeyOnUpdate, constants] = await Promise.all([
+    get(sanitizeTitleAtom),
+    get(replaceWithKeyOnUpdateAtom),
+    get(constantsAtom),
+  ]);
 
   const contentData = structuredClone(await get(contentDataAtom));
   const tagsData = structuredClone(await get(tagsAtom));
