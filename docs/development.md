@@ -25,9 +25,9 @@ Scope: project status, commands, lint and type conventions, import rules, git wo
 | `bun --cwd apps/web check`           | Web `tsc -b` (not covered by root `type:check`)                      |
 | `bun test`                           | `bun test packages/utils`                                            |
 | `bun check` / `bun check:fix`        | Biome lint and format check / apply fixes                            |
-| `bun doctor:web` / `bun doctor:ext`  | React Doctor scan of `apps/web` / `apps/extension` (telemetry off, so no score) |
+| `bun doctor:web` / `bun doctor:ext`  | React Doctor scan of `apps/web` / `apps/extension` |
 
-- React Doctor (`react-doctor`, root devDependency) is installed; its config is `doctor.config.json` (ignores `components/ui`, `.wxt/` and `dist/`). Report only: nothing runs it automatically. A score needs telemetry on: run `bunx react-doctor --yes --project apps/web` (without `--no-telemetry`).
+- React Doctor (`react-doctor`, root devDependency) is installed; its config is `doctor.config.json` (ignores `components/ui`, `.wxt/` and `dist/`). Report only: nothing runs it automatically; run `bun doctor:web` / `bun doctor:ext`.
 - Server port and prefix are not flags: see [server API](./server-api.md). `EXTENSION_PUBLIC_KEY` for production builds: see [extension UI](./extension-ui.md).
 
 ## Code conventions

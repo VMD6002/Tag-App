@@ -24,8 +24,8 @@
     "check": "biome check",
     "check:fix": "biome check --write",
     "format": "biome format --write",
-    "doctor:web": "react-doctor --no-telemetry --yes --project apps/web",
-    "doctor:ext": "react-doctor --no-telemetry --yes --project apps/extension",
+    "doctor:web": "react-doctor --yes --project apps/web",
+    "doctor:ext": "react-doctor --yes --project apps/extension",
     "update:all": "bun -r update"
   },
   "devDependencies": {
