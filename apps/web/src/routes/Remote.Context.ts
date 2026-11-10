@@ -55,7 +55,7 @@ function useRemoteContextCore() {
   useEffect(() => {
     const initialFilterQuery = initializeFilterDataFromURL();
     getFilteredDataMutation.mutate(initialFilterQuery);
-  }, [orpc]);
+  }, [orpc]); // react-doctor-disable-line react-doctor/exhaustive-deps
 
   return {
     loadState: {

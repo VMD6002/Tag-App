@@ -224,12 +224,12 @@ function useRemoteContextCore() {
   useEffect(() => {
     const initialFilterQuery = initializeFilterDataFromURL();
     getFilteredDataMutation.mutate(initialFilterQuery);
-  }, [orpc]);
+  }, [orpc]); // react-doctor-disable-line react-doctor/exhaustive-deps
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: refetch tags when the server or tags change
   useEffect(() => {
     getTagsMutation.mutate({});
-  }, [orpc, remoteTagsUpdated]);
+  }, [orpc, remoteTagsUpdated]); // react-doctor-disable-line react-doctor/exhaustive-deps
 
   return {
     loadState: {

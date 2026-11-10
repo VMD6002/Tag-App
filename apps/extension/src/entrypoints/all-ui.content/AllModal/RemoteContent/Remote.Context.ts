@@ -267,13 +267,13 @@ function useRemoteContextCore() {
     checkExistance();
     const presetOptions = siteData.download?.presets;
     setPresetOptions(presetOptions);
-  }, [contentData, siteData, orpc]);
+  }, [contentData, siteData, orpc]); // react-doctor-disable-line react-doctor/exhaustive-deps
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: refetch tags when the server or tags change
   useEffect(() => {
     log("Remote Tags Updated");
     getTagsMutation.mutate({});
-  }, [orpc, remoteTagsUpdated]);
+  }, [orpc, remoteTagsUpdated]); // react-doctor-disable-line react-doctor/exhaustive-deps
 
   return {
     iframeRef,

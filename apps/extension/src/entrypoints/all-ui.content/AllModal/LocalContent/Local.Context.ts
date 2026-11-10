@@ -235,7 +235,7 @@ function useLocalContextCore() {
     checkExistance();
     const presetOptions = siteData.download?.presets;
     setPresetOptions(presetOptions);
-  }, [contentData, siteData]);
+  }, [contentData, siteData]); // react-doctor-disable-line react-doctor/exhaustive-deps
 
   return {
     iframeRef,

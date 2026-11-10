@@ -159,7 +159,7 @@ export function useRemoteTag() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: reload tag data when the server changes
   useEffect(() => {
     getTagDataMutation.mutate({});
-  }, [orpc]);
+  }, [orpc]); // react-doctor-disable-line react-doctor/exhaustive-deps
 
   return {
     loadState: {
