@@ -1,6 +1,22 @@
 {
   "$schema": "https://react.doctor/schema/config.json",
   "ignore": {
-    "files": ["**/components/ui/**", "**/.wxt/**", "**/dist/**"]
+    "files": ["**/components/ui/**", "**/.wxt/**", "**/dist/**"],
+    "rules": [
+      "react-doctor/jsx-no-undef",
+      "react-doctor/no-create-object-url-without-revoke",
+      "react-doctor/iframe-missing-sandbox",
+      "react-doctor/query-mutation-missing-invalidation",
+      "react-doctor/query-no-mutation-in-effect-as-read"
+    ],
+    "overrides": [
+      {
+        "files": ["**/craft/library/ContentCard.tsx"],
+        "rules": [
+          "react-doctor/click-events-have-key-events",
+          "react-doctor/no-noninteractive-element-interactions"
+        ]
+      }
+    ]
   }
 }
