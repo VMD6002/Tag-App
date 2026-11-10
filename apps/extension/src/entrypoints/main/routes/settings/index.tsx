@@ -5,6 +5,7 @@ import { appModeAtom } from "../../atoms/settings";
 import AppMode, { SanitizeTitle } from "./components/AppMode";
 import Backup from "./components/Backup";
 import Constants from "./components/Constants";
+import CrossUserScripts from "./components/CrossUserScripts";
 import FilteredDataPost from "./components/FilteredDataPost";
 import Hostnames from "./components/Hostnames";
 import Restore from "./components/Restore";
@@ -50,6 +51,7 @@ export default function Settings() {
         description="Optional code attached to a supported site. Write the scripts on the Supported Sites page."
       >
         {remote ? <RemoteSiteScripts /> : <SiteScripts />}
+        <CrossUserScripts />
       </SettingsSection>
       <SettingsSection
         title="Connected pages"
