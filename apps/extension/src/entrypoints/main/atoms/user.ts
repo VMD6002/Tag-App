@@ -1,6 +1,7 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { atomFamily } from "jotai-family";
+import { useLocation } from "wouter";
 import { DEFAULT_USER } from "@/lib/CONSTANTS";
 import { createWxtStorage } from "./storage";
 
@@ -19,6 +20,45 @@ export const userListAtom = atomWithStorage<string[]>(
   { getOnInit: true },
 );
 
+// Per-tab profile override: `main.html?user=<name>#/path`. wouter's hash router keeps a
+// real query string (`location.search`) across navigation, so Links preserve it.
+// Extension pages only: the content script runs on host pages whose URL must not be read.
+const readUrlUser = () =>
+  location.protocol === "chrome-extension:"
+    ? new URLSearchParams(location.search).get("user")
+    : null;
+
+const urlUserAtom = atom(readUrlUser());
+urlUserAtom.onMount = (set) => {
+  const sync = () => set(readUrlUser());
+  sync();
+  addEventListener("hashchange", sync); // wouter navigate() dispatches this
+  addEventListener("popstate", sync);
+  return () => {
+    removeEventListener("hashchange", sync);
+    removeEventListener("popstate", sync);
+  };
+};
+
+// The profile this tab shows: the URL's if it exists, else the stored one.
+// Never writes currentUserAtom, so other tabs and the content script are unaffected.
+export const effectiveUserAtom = atom(async (get) => {
+  const urlUser = get(urlUserAtom);
+  const stored = await get(currentUserAtom);
+  if (!urlUser) return stored;
+  return (await get(userListAtom)).includes(urlUser) ? urlUser : stored;
+});
+
+// Sets `?user=` on the current page, keeping other params and the hash route.
+export function useSetUrlUser() {
+  const [path, navigate] = useLocation();
+  return (user: string) => {
+    const params = new URLSearchParams(location.search);
+    params.set("user", user);
+    navigate(`${path}?${params}`, { replace: true });
+  };
+}
+
 // 2. Create the reusable factory function
 export function atomWithUserStorage<T>(key: string, initialValue: T) {
   // The family is scoped to this specific setting
@@ -28,11 +68,11 @@ export function atomWithUserStorage<T>(key: string, initialValue: T) {
     }),
   );
 
-  // Return the proxy atom that automatically routes to the current user
+  // Return the proxy atom that automatically routes to the effective user
   return atom(
-    async (get) => get(settingFamily(await get(currentUserAtom))),
+    async (get) => get(settingFamily(await get(effectiveUserAtom))),
     async (get, set, update: T | ((prev: Promise<T>) => Promise<T>)) => {
-      const username = await get(currentUserAtom);
+      const username = await get(effectiveUserAtom);
       const action =
         typeof update === "function"
           ? (prev: Promise<T>) => {

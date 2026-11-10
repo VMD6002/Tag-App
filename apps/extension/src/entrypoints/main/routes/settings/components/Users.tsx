@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { Trash2, UserPlus } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -14,10 +14,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { currentUserAtom, userListAtom } from "../../../atoms/user";
+import {
+  currentUserAtom,
+  effectiveUserAtom,
+  userListAtom,
+  useSetUrlUser,
+} from "../../../atoms/user";
 
 export default function Users() {
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
+  const setUrlUser = useSetUrlUser();
+  const activeUser = useAtomValue(effectiveUserAtom);
   const [userList, setUserList] = useAtom(userListAtom);
   const [newUsername, setNewUsername] = useState("");
 
@@ -64,14 +71,18 @@ export default function Users() {
       const nextList = userList.filter((u) => u !== userToRemove);
       setUserList(nextList);
 
-      // If we are removing the currently selected user, switch to another remaining user
-      if (currentUser === userToRemove) {
-        if (nextList.length > 0) {
-          setCurrentUser(nextList[0]!);
-        }
-      }
+      // Removing the stored or the shown profile: fall back to another remaining one
+      if (currentUser === userToRemove) setCurrentUser(nextList[0]!);
+      if (activeUser === userToRemove) setUrlUser(nextList[0]!);
     },
-    [userList, currentUser, setCurrentUser, setUserList],
+    [
+      userList,
+      currentUser,
+      activeUser,
+      setCurrentUser,
+      setUrlUser,
+      setUserList,
+    ],
   );
 
   return (
@@ -81,8 +92,12 @@ export default function Users() {
         help="Each profile keeps its own library, tags and settings in this browser."
       >
         <Select
-          value={currentUser}
-          onValueChange={(val) => val && setCurrentUser(val)}
+          value={activeUser}
+          onValueChange={(val) => {
+            if (!val) return;
+            setCurrentUser(val);
+            setUrlUser(val);
+          }}
         >
           <SelectTrigger
             className="w-full max-w-xs"
@@ -138,7 +153,7 @@ export default function Users() {
             >
               <span className="min-w-0 truncate text-sm">
                 {user}
-                {currentUser === user && (
+                {activeUser === user && (
                   <span className="ml-2 border bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
                     Active
                   </span>

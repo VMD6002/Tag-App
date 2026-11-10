@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { Menu, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -8,7 +8,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { currentUserAtom, userListAtom } from "@/entrypoints/main/atoms/user";
+import {
+  currentUserAtom,
+  effectiveUserAtom,
+  userListAtom,
+  useSetUrlUser,
+} from "@/entrypoints/main/atoms/user";
 import { cn } from "@/lib/utils";
 import { ModeToggle } from "./mode-toggle";
 import {
@@ -29,15 +34,21 @@ const Links = {
 };
 
 function SelectActiveUser() {
-  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
+  const setCurrentUser = useSetAtom(currentUserAtom);
+  const setUrlUser = useSetUrlUser();
+  const activeUser = useAtomValue(effectiveUserAtom);
   const userList = useAtomValue(userListAtom);
 
   if (userList.length <= 1) return null;
 
   return (
     <Select
-      value={currentUser}
-      onValueChange={(val) => val && setCurrentUser(val)}
+      value={activeUser}
+      onValueChange={(val) => {
+        if (!val) return;
+        setCurrentUser(val);
+        setUrlUser(val);
+      }}
     >
       <SelectTrigger
         size="sm"
