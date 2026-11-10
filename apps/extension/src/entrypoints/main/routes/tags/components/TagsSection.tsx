@@ -55,7 +55,7 @@ export default function TagsSection() {
       return { ...temp };
     });
     setTagString("");
-  }, [tagString, selectedParent]);
+  }, [tagString, selectedParent, setTags]);
 
   const removeTagFunc = useCallback(
     (tag: string) =>

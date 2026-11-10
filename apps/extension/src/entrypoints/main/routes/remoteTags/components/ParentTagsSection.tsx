@@ -19,7 +19,7 @@ export default function ParentTagsSection() {
 
   const addParentFunc = useCallback(() => {
     addParentTags(parentString.trim().split(/\s+/).filter(Boolean));
-  }, [parentString]);
+  }, [parentString, addParentTags]);
 
   const removeParentFunc = useCallback(
     (parent: string) => () =>

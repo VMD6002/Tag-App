@@ -71,7 +71,7 @@ function useRemoteContextCore() {
   );
   const runUserCodeMutation = useMutation(
     orpc.main.runUserCode.mutationOptions({
-      onSuccess: (res) => {
+      onSuccess: () => {
         log("User After Scripts Executed");
       },
     }),
@@ -82,7 +82,7 @@ function useRemoteContextCore() {
     runAfterAddRemoveScriptsInServerAtom,
   );
   const runScript = useCallback(
-    (script: string, data: any) => {
+    (script: string, data: unknown) => {
       if (!afterAddRemoveScript) return;
       const input = {
         script: replaceWithKeyOnUpdate
@@ -101,6 +101,7 @@ function useRemoteContextCore() {
       constants,
       afterAddRemoveScript,
       runAfterAddRemoveScriptsInServer,
+      runUserCodeMutation.mutate,
     ],
   );
 
@@ -160,7 +161,7 @@ function useRemoteContextCore() {
       return;
     }
     getContentDetailsMutation.mutate({ id });
-  }, []);
+  }, [getContentDetailsMutation.mutate, setExists]);
 
   const setContentMutation = useMutation(
     orpc.main.setContent.mutationOptions({
@@ -226,7 +227,17 @@ function useRemoteContextCore() {
     };
 
     setContentMutation.mutate(newContent);
-  }, [title, tags, cover, extraData, preset, contentUrl, exists, siteData]);
+  }, [
+    title,
+    tags,
+    cover,
+    extraData,
+    preset,
+    contentUrl,
+    exists,
+    setTags,
+    setContentMutation.mutate,
+  ]);
 
   const removeContentsMutation = useMutation(
     orpc.main.removeContents.mutationOptions({
@@ -249,14 +260,16 @@ function useRemoteContextCore() {
     const { identifier } = GetDetailsFromPage();
 
     removeContentsMutation.mutate({ ids: [identifier] });
-  }, []);
+  }, [removeContentsMutation.mutate]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-check existence whenever content, site data or the server changes
   useEffect(() => {
     checkExistance();
     const presetOptions = siteData.download?.presets;
     setPresetOptions(presetOptions);
   }, [contentData, siteData, orpc]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refetch tags when the server or tags change
   useEffect(() => {
     log("Remote Tags Updated");
     getTagsMutation.mutate({});

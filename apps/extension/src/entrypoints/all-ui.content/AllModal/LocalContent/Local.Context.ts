@@ -66,7 +66,7 @@ function useLocalContextCore() {
 
   const afterAddRemoveScript = useAtomValue(enableAfterAddRemoveScriptsAtom);
   const runScript = useCallback(
-    (script: string, data: any) => {
+    (script: string, data: unknown) => {
       if (!afterAddRemoveScript) return;
       iframeRef.current?.contentWindow?.postMessage(
         {
@@ -136,10 +136,11 @@ function useLocalContextCore() {
       return;
     }
     getContentDetailsMutation.mutate({ id });
-  }, [contentData, siteData]);
+  }, [setExists, getContentDetailsMutation.mutate]);
 
   const setContentMutation = useMutation({
-    mutationFn: async (vars: any) => await setContentAction(vars),
+    mutationFn: async (vars: Parameters<typeof setContentAction>[0]) =>
+      await setContentAction(vars),
     onSuccess: (res) => {
       if (exists) log(`${res.id} Updated`);
       else {
@@ -194,7 +195,17 @@ function useLocalContextCore() {
     };
 
     setContentMutation.mutate(newContent);
-  }, [title, tags, cover, extraData, preset, contentUrl, exists, siteData]);
+  }, [
+    title,
+    tags,
+    cover,
+    extraData,
+    preset,
+    contentUrl,
+    exists,
+    setTags,
+    setContentMutation.mutate,
+  ]);
 
   const removeContentsMutation = useMutation({
     mutationFn: async (vars: { ids: string[] }) =>
@@ -217,8 +228,9 @@ function useLocalContextCore() {
     const { identifier } = GetDetailsFromPage();
 
     removeContentsMutation.mutate({ ids: [identifier] });
-  }, [siteData, contentData]);
+  }, [removeContentsMutation.mutate]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-check existence whenever the stored content or site data changes
   useEffect(() => {
     checkExistance();
     const presetOptions = siteData.download?.presets;

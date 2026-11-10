@@ -46,11 +46,12 @@ function useRemoteContextCore() {
         const query = get(FilterQueryAtom);
         getFilteredDataMutation.mutate(query);
       },
-      [getFilteredDataMutation, FilterQueryAtom],
+      [getFilteredDataMutation],
     ),
   );
 
   // 5. Initial load sequence
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reload filtered data when the server changes
   useEffect(() => {
     const initialFilterQuery = initializeFilterDataFromURL();
     getFilteredDataMutation.mutate(initialFilterQuery);

@@ -62,7 +62,7 @@ export default function Filters() {
       },
       ...tagParentsConverted,
     ];
-  }, [allTagsForMultiSelectComponent]);
+  }, [allTagsForMultiSelectComponent, tags]);
 
   const activeCount =
     any.length + none.length + all.length + (search.trim() ? 1 : 0);

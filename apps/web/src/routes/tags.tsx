@@ -25,6 +25,7 @@ export default function RemoteTags() {
     }),
   );
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refetch tags when the server changes
   useEffect(() => {
     getTagsMutation.mutate({});
   }, [orpc]);

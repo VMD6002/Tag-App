@@ -58,7 +58,7 @@ function useRemoteContextCore() {
 
   const runUserCodeMutation = useMutation(
     orpc.main.runUserCode.mutationOptions({
-      onSuccess: (res) => {
+      onSuccess: () => {
         log("User After Scripts Executed");
       },
     }),
@@ -68,7 +68,7 @@ function useRemoteContextCore() {
     runAfterAddRemoveScriptsInServerAtom,
   );
   const runScript = useCallback(
-    (script: string, data: any) => {
+    (script: string, data: unknown) => {
       if (!afterAddRemoveScript) return;
       const input = {
         script: replaceWithKeyOnUpdate
@@ -87,6 +87,7 @@ function useRemoteContextCore() {
       constants,
       afterAddRemoveScript,
       runAfterAddRemoveScriptsInServer,
+      runUserCodeMutation.mutate,
     ],
   );
 
@@ -121,14 +122,7 @@ function useRemoteContextCore() {
         }
         getFilteredDataMutation.mutate(query);
       },
-      [
-        FilterQueryAtom,
-        getFilteredDataMutation,
-        selectionEntriesAtom,
-        selectionOnAtom,
-        selectionTagsAtom,
-        selectionTagsInitialAtom,
-      ],
+      [getFilteredDataMutation],
     ),
   );
 
@@ -145,14 +139,15 @@ function useRemoteContextCore() {
 
   const setContentFunc = useAtomCallback(
     useCallback(
-      async (get, set) => {
-        const updateId = get(updateIdAtom)!;
+      async (get) => {
+        const updateId = get(updateIdAtom);
         const updateData = get(updateDataAtom);
         const preset = get(updatePresetAtom);
 
-        const contentDetails = (await getContentDetailsMutation.mutateAsync({
+        const contentDetails = await getContentDetailsMutation.mutateAsync({
           id: updateId,
-        }))!;
+        });
+        if (!contentDetails) return;
 
         const newContent = {
           ...contentDetails,
@@ -164,13 +159,7 @@ function useRemoteContextCore() {
 
         setContentMutation.mutate(newContent);
       },
-      [
-        updateIdAtom,
-        updateDataAtom,
-        updatePresetAtom,
-        getContentDetailsMutation,
-        setContentMutation,
-      ],
+      [getContentDetailsMutation, setContentMutation],
     ),
   );
 
@@ -226,21 +215,18 @@ function useRemoteContextCore() {
 
         bulkUpdateTagsMuation.mutate({ ids: selectionEntries, added, removed });
       },
-      [
-        selectionEntriesAtom,
-        selectionTagsAtom,
-        selectionTagsInitialAtom,
-        bulkUpdateTagsMuation,
-      ],
+      [bulkUpdateTagsMuation],
     ),
   );
 
   // 5. Initial load sequence
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reload filtered data when the server changes
   useEffect(() => {
     const initialFilterQuery = initializeFilterDataFromURL();
     getFilteredDataMutation.mutate(initialFilterQuery);
   }, [orpc]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refetch tags when the server or tags change
   useEffect(() => {
     getTagsMutation.mutate({});
   }, [orpc, remoteTagsUpdated]);

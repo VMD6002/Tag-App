@@ -25,7 +25,7 @@ export default function ParentTagsSection() {
       return { ...old };
     });
     setTimeout(() => setParentString(""), 0);
-  }, [parentString]);
+  }, [parentString, setParentTags]);
 
   const removeParentFunc = useCallback(
     (parent: string) => () =>

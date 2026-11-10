@@ -68,20 +68,17 @@ export default function Filters() {
 
   // Performance Fix: Read current filtered items atomically on-demand instead of mapping over rendering dependencies
   const handleSelectAllChange = useAtomCallback(
-    useCallback(
-      async (get, set, checked: boolean) => {
-        if (checked) {
-          const currentFiltered = get(filteredAtom);
-          set(
-            selectionEntriesAtom,
-            currentFiltered.map((o) => o.id),
-          );
-        } else {
-          set(selectionEntriesAtom, []);
-        }
-      },
-      [filteredAtom, selectionEntriesAtom],
-    ),
+    useCallback(async (get, set, checked: boolean) => {
+      if (checked) {
+        const currentFiltered = get(filteredAtom);
+        set(
+          selectionEntriesAtom,
+          currentFiltered.map((o) => o.id),
+        );
+      } else {
+        set(selectionEntriesAtom, []);
+      }
+    }, []),
   );
 
   const removeSelected = useAtomCallback(
@@ -101,7 +98,7 @@ export default function Filters() {
             }
           });
       },
-      [selectionEntriesAtom, removeContents],
+      [removeContents],
     ),
   );
 
@@ -131,7 +128,7 @@ export default function Filters() {
       },
       ...tagParentsConverted,
     ];
-  }, [allTagsForMultiSelectComponent]);
+  }, [allTagsForMultiSelectComponent, tags]);
 
   // Is selection fully complete? Check atomically.
   const isAllSelected = useAtomValue(

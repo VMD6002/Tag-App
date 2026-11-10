@@ -61,7 +61,7 @@ export default function Filters() {
   // Wired code but the set here actually runs a function for syncSelectTagsAtom
   const toggleBulkUpdateModal = useAtomCallback(
     useCallback(
-      async (get, set) => {
+      async (_get, set) => {
         await syncSelectedTags();
         set(bulkUpdateModalOpenAtom, true);
       },
@@ -71,20 +71,17 @@ export default function Filters() {
 
   // Performance Fix: Read current filtered items atomically on-demand instead of mapping over rendering dependencies
   const handleSelectAllChange = useAtomCallback(
-    useCallback(
-      (get, set, checked: boolean) => {
-        if (checked) {
-          const currentFiltered = get(filteredAtom);
-          set(
-            selectionEntriesAtom,
-            currentFiltered.map((o) => o.id),
-          );
-        } else {
-          set(selectionEntriesAtom, []);
-        }
-      },
-      [filteredAtom, selectionEntriesAtom],
-    ),
+    useCallback((get, set, checked: boolean) => {
+      if (checked) {
+        const currentFiltered = get(filteredAtom);
+        set(
+          selectionEntriesAtom,
+          currentFiltered.map((o) => o.id),
+        );
+      } else {
+        set(selectionEntriesAtom, []);
+      }
+    }, []),
   );
 
   const removeSelected = useAtomCallback(
@@ -104,7 +101,7 @@ export default function Filters() {
             }
           });
       },
-      [selectionEntriesAtom, removeContents],
+      [removeContents],
     ),
   );
 

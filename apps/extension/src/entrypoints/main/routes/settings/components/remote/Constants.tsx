@@ -71,7 +71,7 @@ export default function RemoteConstants() {
 
   useEffect(() => {
     setConstantsBuffer(objectToCustomFormat(constants));
-  }, [constants]);
+  }, [constants, setConstantsBuffer]);
 
   const setSettingsMutation = useMutation(
     orpc.main.setSettings.mutationOptions({

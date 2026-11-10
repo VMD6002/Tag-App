@@ -14,7 +14,6 @@ import {
   updateTitleAtom,
 } from "@/components/craft/UpdateModal/atom";
 import {
-  contentDataAtom,
   useBulkUpdateContentTags,
   useGetContent,
   useGetFilteredData,
@@ -44,7 +43,6 @@ import {
 export const filteredAtom = atom<ContentWebType[]>([]);
 
 function useLibraryContextCore() {
-  const contentData = useAtomValue(contentDataAtom);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const initializeFilterDataFromURL = useInitializeFilterDataFromURL();
@@ -65,7 +63,7 @@ function useLibraryContextCore() {
 
   const afterAddRemoveScript = useAtomValue(enableAfterAddRemoveScriptsAtom);
   const runScript = useCallback(
-    (script: string, data: any) => {
+    (script: string, data: unknown) => {
       if (!afterAddRemoveScript) return;
       iframeRef.current?.contentWindow?.postMessage(
         {
@@ -84,7 +82,8 @@ function useLibraryContextCore() {
     mutationFn: async (vars: { id: string }) => await getContentAction(vars),
   });
   const getFilteredDataMutation = useMutation({
-    mutationFn: async (vars: any) => await getFilteredDataAction(vars),
+    mutationFn: async (vars: Parameters<typeof getFilteredDataAction>[0]) =>
+      await getFilteredDataAction(vars),
     onSuccess: (res) => setFiltered(res),
   });
 
@@ -100,11 +99,12 @@ function useLibraryContextCore() {
         }
         getFilteredDataMutation.mutate(get(FilterQueryAtom));
       },
-      [contentData],
+      [getFilteredDataMutation.mutate],
     ),
   );
 
   const setContentMutation = useMutation({
+    // biome-ignore lint/suspicious/noExplicitAny: typing this exposes a flags (exactOptionalPropertyTypes) mismatch in setContentFunc; unrelated to lint
     mutationFn: async (vars: any) => await setContentAction(vars),
     onSuccess: (res) => {
       log(`${res.id} Updated`);
@@ -117,7 +117,7 @@ function useLibraryContextCore() {
   const setContentFunc = useAtomCallback(
     useCallback(
       async (get) => {
-        const updateId = get(updateIdAtom)!;
+        const updateId = get(updateIdAtom);
         const updateData = get(updateDataAtom);
         const preset = get(updatePresetAtom);
 
@@ -129,19 +129,13 @@ function useLibraryContextCore() {
           ...contentDetails,
           ...updateData,
           download: contentDetails?.download?.type
-            ? { type: contentDetails!.download?.type, flags: preset }
+            ? { type: contentDetails.download?.type, flags: preset }
             : undefined,
         };
 
         setContentMutation.mutate(newContent);
       },
-      [
-        updateIdAtom,
-        updateDataAtom,
-        updatePresetAtom,
-        getContentDetailsMutation,
-        setContentMutation,
-      ],
+      [getContentDetailsMutation, setContentMutation],
     ),
   );
 
@@ -201,12 +195,7 @@ function useLibraryContextCore() {
 
         bulkUpdateTagsMuation.mutate({ ids: selectionEntries, added, removed });
       },
-      [
-        selectionEntriesAtom,
-        selectionTagsAtom,
-        selectionTagsInitialAtom,
-        bulkUpdateTagsMuation,
-      ],
+      [bulkUpdateTagsMuation],
     ),
   );
 
@@ -214,7 +203,7 @@ function useLibraryContextCore() {
   useEffect(() => {
     const initialFilterQuery = initializeFilterDataFromURL();
     getFilteredDataMutation.mutate(initialFilterQuery);
-  }, []);
+  }, [initializeFilterDataFromURL, getFilteredDataMutation.mutate]);
 
   return {
     loadState: {

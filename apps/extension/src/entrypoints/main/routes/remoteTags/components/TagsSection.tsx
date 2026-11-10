@@ -42,7 +42,7 @@ export default function TagsSection() {
       .map((a) => `${selectedParent}:${a}`);
     addTags(newTags);
     setTagString("");
-  }, [tagString, selectedParent]);
+  }, [tagString, selectedParent, setTagString, addTags]);
 
   const removeTagFunc = useCallback(
     (tag: string) =>
