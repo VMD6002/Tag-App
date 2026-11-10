@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { ArrayHasAnyModified } from "./ArrayHelperFunctions";
 import { computeTagCounts } from "./computeTagCounts";
 import { filterData } from "./filterData";
+import { pickOwner } from "./pickOwner";
 import {
   applyConstants,
   replaceWithConstantKey,
@@ -70,5 +71,13 @@ describe("computeTagCounts", () => {
       "Z:old": { count: 0 },
     });
     expect(r.parentTags).toEqual({ A: {}, B: {}, Z: { cover: "pc" } });
+  });
+});
+
+describe("pickOwner", () => {
+  test("prefers current, else first candidate, else undefined", () => {
+    expect(pickOwner(["A", "B"], "B")).toBe("B");
+    expect(pickOwner(["A", "B"], "C")).toBe("A");
+    expect(pickOwner([], "A")).toBeUndefined();
   });
 });
