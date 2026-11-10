@@ -29,7 +29,7 @@ export function useRemoteTag() {
   const openCoverModal = useCallback(
     (tag: string) => {
       setCurrentTag(tag);
-      setCover(tags[tag]!.cover ?? "");
+      setCover(tags[tag]?.cover ?? "");
       setOpen(true);
     },
     [tags],
@@ -39,7 +39,8 @@ export function useRemoteTag() {
     orpc.tags.setTagCover.mutationOptions({
       onSuccess: (res) => {
         setTags((old) => {
-          old[res.tag]!.cover = res.cover;
+          const tag = old[res.tag];
+          if (tag) tag.cover = res.cover;
           return { ...old };
         });
         setOpen(false);
@@ -56,13 +57,13 @@ export function useRemoteTag() {
       tag: currentTag,
       cover,
     });
-  }, [currentTag, cover]);
+  }, [currentTag, cover, setTagCoverMutation.mutate]);
 
   const removeCover = useCallback(() => {
     setTagCoverMutation.mutate({
       tag: currentTag,
     });
-  }, [currentTag]);
+  }, [currentTag, setTagCoverMutation.mutate]);
 
   const addTagsMutation = useMutation(
     orpc.tags.addTags.mutationOptions({
@@ -80,7 +81,7 @@ export function useRemoteTag() {
   );
   const addTags = useCallback(
     (tags: string[]) => addTagsMutation.mutate({ tags }),
-    [],
+    [addTagsMutation.mutate],
   );
 
   const removeTagsMutation = useMutation(
@@ -98,7 +99,7 @@ export function useRemoteTag() {
   );
   const removeTags = useCallback(
     (tags: string[]) => removeTagsMutation.mutate({ tags }),
-    [],
+    [removeTagsMutation.mutate],
   );
 
   const addParentTagsMutation = useMutation(
@@ -116,7 +117,7 @@ export function useRemoteTag() {
   );
   const addParentTags = useCallback(
     (parentTags: string[]) => addParentTagsMutation.mutate({ parentTags }),
-    [],
+    [addParentTagsMutation.mutate],
   );
 
   const removeParentTagsMutation = useMutation(
@@ -130,7 +131,7 @@ export function useRemoteTag() {
   );
   const removeParentTags = useCallback(
     (parentTags: string[]) => removeParentTagsMutation.mutate({ parentTags }),
-    [],
+    [removeParentTagsMutation.mutate],
   );
 
   const fixTagsMutation = useMutation(
@@ -142,7 +143,10 @@ export function useRemoteTag() {
       },
     }),
   );
-  const fixTags = useCallback(() => fixTagsMutation.mutate({}), []);
+  const fixTags = useCallback(
+    () => fixTagsMutation.mutate({}),
+    [fixTagsMutation.mutate],
+  );
 
   const getTagDataMutation = useMutation(
     orpc.tags.getTagData.mutationOptions({
@@ -152,6 +156,7 @@ export function useRemoteTag() {
       },
     }),
   );
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reload tag data when the server changes
   useEffect(() => {
     getTagDataMutation.mutate({});
   }, [orpc]);

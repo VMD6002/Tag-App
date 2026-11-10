@@ -140,6 +140,7 @@ export default function ScriptEditor() {
         ] as const)
       : []),
   ];
+  // biome-ignore lint/style/noNonNullAssertion: tabs always contains the script and metadata tabs
   const current = tabs.find((t) => t.id === activeTab) ?? tabs[0]!;
 
   return (

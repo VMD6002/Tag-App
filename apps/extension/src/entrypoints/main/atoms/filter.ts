@@ -27,7 +27,7 @@ export const filterActiveAtom = atom(
     get(noneAtom).length > 0,
 );
 
-export const injectFilterDataIntoURLCallback = (get: Getter, set: Setter) => {
+export const injectFilterDataIntoURLCallback = (get: Getter) => {
   const fd = get(FilterQueryAtom);
   const url = new URL(location.href);
   const params = url.searchParams;
@@ -61,32 +61,32 @@ const initializeFilterDataFromURLCallback = (get: Getter, set: Setter) => {
   if (any)
     set(
       anyAtom,
-      any!.split(",").map((tag) => ({ value: tag, label: tag })),
+      any.split(",").map((tag) => ({ value: tag, label: tag })),
     );
 
   const none = params.get("none");
   if (none)
     set(
       noneAtom,
-      none!.split(",").map((tag) => ({ value: tag, label: tag })),
+      none.split(",").map((tag) => ({ value: tag, label: tag })),
     );
 
   const all = params.get("all");
   if (all)
     set(
       allAtom,
-      all!.split(",").map((tag) => ({ value: tag, label: tag })),
+      all.split(",").map((tag) => ({ value: tag, label: tag })),
     );
 
   const types = params.get("types");
   if (types)
     set(
       typesAtom,
-      types!.split(",").map((tag) => ({ value: tag, label: tag })),
+      types.split(",").map((tag) => ({ value: tag, label: tag })),
     );
 
   const search = params.get("search");
-  if (search) set(searchAtom, search!);
+  if (search) set(searchAtom, search);
 
   const orderByLatest = params.get("orderByLatest");
   if (orderByLatest) set(orderByLatestAtom, orderByLatest === "true");
@@ -104,7 +104,7 @@ const initializeFilterDataFromURLCallback = (get: Getter, set: Setter) => {
 export const useInitializeFilterDataFromURL = () =>
   useAtomCallback(useCallback(initializeFilterDataFromURLCallback, []));
 
-export const resetFilterCallback = (get: Getter, set: Setter) => {
+export const resetFilterCallback = (_get: Getter, set: Setter) => {
   set(searchAtom, "");
   set(allAtom, []);
   set(anyAtom, []);

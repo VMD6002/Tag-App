@@ -4,17 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
+  type SiteData,
   useEditorState,
   useSiteActions,
   useSupportedSites,
 } from "../SupportedSite.Context";
 
-function SiteCard({ siteName }: { siteName: string }) {
+function SiteCard({ siteName, site }: { siteName: string; site: SiteData }) {
   const { editingSiteName } = useEditorState();
   const { selectSite, removeSite } = useSiteActions();
-  const supportedSites = useSupportedSites();
   const isActive = editingSiteName === siteName;
-  const site = supportedSites[siteName]!;
   const firstHost = site.hosts[0] || "";
 
   const [showHosts, setShowHosts] = useState(false);
@@ -110,12 +109,11 @@ export default function SitesSidebar() {
 
   const { addSite } = useSiteActions();
 
-  const filteredSites = Object.keys(supportedSites)
-    .sort()
-    .filter((name) => {
+  const filteredSites = Object.entries(supportedSites)
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .filter(([name, site]) => {
       if (!searchQuery) return true;
       const query = searchQuery.toLowerCase();
-      const site = supportedSites[name]!;
       return (
         name.toLowerCase().includes(query) ||
         site.hosts.some((host) => host.toLowerCase().includes(query))
@@ -157,8 +155,8 @@ export default function SitesSidebar() {
 
       <ul className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1">
         {filteredSites.length > 0 ? (
-          filteredSites.map((site) => (
-            <SiteCard siteName={site} key={`site-${site}`} />
+          filteredSites.map(([name, site]) => (
+            <SiteCard siteName={name} site={site} key={`site-${name}`} />
           ))
         ) : (
           <li className="py-8 text-center text-xs text-muted-foreground">

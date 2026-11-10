@@ -15,7 +15,7 @@ export function useTag() {
   const openCoverModal = useCallback(
     (tag: string) => {
       setCurrentTag(tag);
-      setCover(tags[tag]!.cover ?? "");
+      setCover(tags[tag]?.cover ?? "");
       setOpen(true);
     },
     [tags],
@@ -29,20 +29,21 @@ export function useTag() {
     }
     setTags(async (old) => {
       const temp = await old;
-      temp[currentTag]!.cover = cover;
+      const tag = temp[currentTag];
+      if (tag) tag.cover = cover;
       return temp;
     });
     setOpen(false);
-  }, [currentTag, cover]);
+  }, [currentTag, cover, setTags]);
 
   const removeCover = useCallback(() => {
     setTags(async (old) => {
       const temp = await old;
-      delete temp[currentTag]!.cover;
+      delete temp[currentTag]?.cover;
       return temp;
     });
     setOpen(false);
-  }, [currentTag]);
+  }, [currentTag, setTags]);
 
   return {
     currentTag,

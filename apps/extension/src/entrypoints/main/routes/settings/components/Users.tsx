@@ -45,7 +45,8 @@ export default function Users() {
 
   const handleRemoveUser = useCallback(
     async (userToRemove: string) => {
-      if (userList.length <= 1) {
+      const fallback = userList.find((u) => u !== userToRemove);
+      if (!fallback) {
         toast.warning("You can't remove the only profile");
         return;
       }
@@ -74,8 +75,8 @@ export default function Users() {
       await rebuildCrossUserHostsIndex(nextList);
 
       // Removing the stored or the shown profile: fall back to another remaining one
-      if (currentUser === userToRemove) setCurrentUser(nextList[0]!);
-      if (activeUser === userToRemove) setUrlUser(nextList[0]!);
+      if (currentUser === userToRemove) setCurrentUser(fallback);
+      if (activeUser === userToRemove) setUrlUser(fallback);
     },
     [
       userList,

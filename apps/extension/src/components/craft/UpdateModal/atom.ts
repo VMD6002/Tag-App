@@ -37,9 +37,9 @@ export const updateExistsAtom = atom(true);
 
 export const updateResetOptionsAtom = atom<{
   title?: () => string;
-  cover?: () => string;
+  cover?: () => string | undefined;
   tags?: () => MultiSelectOption[];
-  contentUrl?: () => string;
+  contentUrl?: () => string | undefined;
   preset?: () => { label: string; value: string } | undefined;
   extraData?: () => string;
 } | null>(null);

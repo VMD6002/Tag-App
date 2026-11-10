@@ -12,10 +12,10 @@ const store = getDefaultStore();
 
 store.set(updateResetOptionsAtom, {
   title: () => GetDetailsFromPage().title,
-  cover: () => GetDetailsFromPage().cover!,
+  cover: () => GetDetailsFromPage().cover,
   tags: () =>
     GetDetailsFromPage().defaultTags.map((o) => ({ label: o, value: o })),
-  contentUrl: () => GetDetailsFromPage().contentUrl!,
+  contentUrl: () => GetDetailsFromPage().contentUrl,
   preset: () => GetTagAppSiteData().download?.defaultPreset,
   extraData: () =>
     `Web: [${GetDetailsFromPage().url}](${GetDetailsFromPage().url})${GetDetailsFromPage().extraData ? `\n${GetDetailsFromPage().extraData}` : ""}`,

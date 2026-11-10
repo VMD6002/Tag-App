@@ -64,25 +64,25 @@ export const initializeFilterDataFromURLAtom = atom(null, (get, set) => {
   if (any)
     set(
       anyAtom,
-      any!.split(",").map((tag) => ({ value: tag, label: tag })),
+      any.split(",").map((tag) => ({ value: tag, label: tag })),
     );
 
   const none = params.get("none");
   if (none)
     set(
       noneAtom,
-      none!.split(",").map((tag) => ({ value: tag, label: tag })),
+      none.split(",").map((tag) => ({ value: tag, label: tag })),
     );
 
   const all = params.get("all");
   if (all)
     set(
       allAtom,
-      all!.split(",").map((tag) => ({ value: tag, label: tag })),
+      all.split(",").map((tag) => ({ value: tag, label: tag })),
     );
 
   const search = params.get("search");
-  if (search) set(searchAtom, search!);
+  if (search) set(searchAtom, search);
 
   const orderByLatest = params.get("orderByLatest");
   if (orderByLatest) set(orderByLatestAtom, orderByLatest === "true");

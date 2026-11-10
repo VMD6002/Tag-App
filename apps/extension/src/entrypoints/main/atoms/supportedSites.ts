@@ -59,14 +59,12 @@ const refreshSupportedHostsIndexCallback = async (
 ) => {
   const index: Record<string, string> = {};
   if (supportSSites) {
-    for (const Site in supportSSites) {
-      for (const host of supportSSites[Site]!.hosts) index[host] = Site;
-    }
+    for (const [Site, { hosts }] of Object.entries(supportSSites))
+      for (const host of hosts) index[host] = Site;
   } else {
     const supportedSites = await get(supportedSitesAtom);
-    for (const Site in supportedSites) {
-      for (const host of supportedSites[Site]!.hosts) index[host] = Site;
-    }
+    for (const [Site, { hosts }] of Object.entries(supportedSites))
+      for (const host of hosts) index[host] = Site;
   }
   const user = await get(effectiveUserAtom);
   set(supportedHostsIndexAtom, index);
