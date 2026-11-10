@@ -1,5 +1,6 @@
 import {
   filterData,
+  parentOf,
   replaceWithConstantKey,
   sanitizeStringForFileName,
 } from "@tagapp/utils";
@@ -21,8 +22,6 @@ export const contentDataAtom = atomWithUserStorage<ContentWebDataType>(
   "contentData",
   {},
 );
-
-const parentOf = (tag: string) => tag.split(":")[0]!;
 
 const setContentCallback = async (
   get: Getter,
@@ -121,13 +120,14 @@ const bulkUpdateContentTagsCallback = async (
   const parentsData = structuredClone(await get(parentTagsAtom));
 
   // Validate first so a bad id can't leave counts half-updated.
-  for (const id of input.ids)
-    if (!contentData[id])
-      throw new Error(`Content with id ${id} doesn't exist`);
+  const targets = [...new Set(input.ids)].map((id) => {
+    const content = contentData[id];
+    if (!content) throw new Error(`Content with id ${id} doesn't exist`);
+    return content;
+  });
 
   const now = Math.floor(Date.now() / 1000);
-  for (const id of new Set(input.ids)) {
-    const content = contentData[id]!;
+  for (const content of targets) {
     const removed = input.removed.filter((t) => content.tags.includes(t));
     content.tags = content.tags.filter((t) => !removed.includes(t));
     const added = [...new Set(input.added)].filter(
@@ -159,7 +159,7 @@ export const useBulkUpdateContentTags = () =>
 
 const getContentCallback = async (
   get: Getter,
-  set: Setter,
+  _set: Setter,
   input: { id: string },
 ) => {
   const contentData = await get(contentDataAtom);
@@ -171,7 +171,7 @@ export const useGetContent = () =>
 
 const getFilteredDataCallback = async (
   get: Getter,
-  set: Setter,
+  _set: Setter,
   input: FilterDataType,
 ) => {
   const contentData = await get(contentDataAtom);

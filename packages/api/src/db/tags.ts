@@ -1,4 +1,4 @@
-import { computeTagCounts } from "@tagapp/utils";
+import { computeTagCounts, parentOf } from "@tagapp/utils";
 import type { ParentTagsType, TagsType } from "@tagapp/utils/types";
 import { JSONFilePreset } from "lowdb/node";
 import { contentDataDB } from "./contentData";
@@ -8,8 +8,6 @@ const tagDB_DefaultData = {
   tags: {} as TagsType,
 };
 const tagDB = await JSONFilePreset("./DB/tags.json", tagDB_DefaultData);
-
-const parentOf = (tag: string) => tag.split(":")[0]!;
 
 const DecrementTagCount = (tags: Iterable<string>) => {
   for (const tag of tags) {

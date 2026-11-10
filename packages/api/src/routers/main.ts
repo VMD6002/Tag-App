@@ -108,15 +108,17 @@ export const bulkUpdateContentTags = os
   )
   .handler(async ({ input }) => {
     // Validate first so a bad id can't leave counts half-updated.
-    for (const id of input.ids)
-      if (!contentDataDB.data[id])
+    const targets = [...new Set(input.ids)].map((id) => {
+      const content = contentDataDB.data[id];
+      if (!content)
         throw new ORPCError("BAD_REQUEST", {
           message: `Content with id ${id} doesn't exist`,
         });
+      return content;
+    });
 
     const now = Math.floor(Date.now() / 1000);
-    for (const id of new Set(input.ids)) {
-      const content = contentDataDB.data[id]!;
+    for (const content of targets) {
       const removed = input.removed.filter((t) => content.tags.includes(t));
       content.tags = content.tags.filter((t) => !removed.includes(t));
       const added = [...new Set(input.added)].filter(

@@ -1,4 +1,5 @@
-import { os } from "@orpc/server";
+import { ORPCError, os } from "@orpc/server";
+import { parentOf } from "@tagapp/utils";
 import z from "zod";
 import { contentDataDB } from "../db/contentData";
 import { recountTags, tagDB } from "../db/tags";
@@ -25,7 +26,12 @@ export const setTagCover = os
     }),
   )
   .handler(async ({ input }) => {
-    tagDB.data.tags[input.tag]!.cover = input.cover;
+    const tag = tagDB.data.tags[input.tag];
+    if (!tag)
+      throw new ORPCError("NOT_FOUND", {
+        message: `Tag ${input.tag} doesn't exist`,
+      });
+    tag.cover = input.cover;
     await tagDB.write();
     return input;
   });
@@ -62,9 +68,9 @@ export const removeParentTags = os
   .input(z.object({ parentTags: z.array(z.string()) }))
   .handler(async ({ input: { parentTags } }) => {
     for (const tag in tagDB.data.tags)
-      if (parentTags.includes(tag.split(":")[0]!)) delete tagDB.data.tags[tag];
+      if (parentTags.includes(parentOf(tag))) delete tagDB.data.tags[tag];
     for (const parentTag of parentTags) delete tagDB.data.parentTags[parentTag];
-    stripTagsFromContent((tag) => parentTags.includes(tag.split(":")[0]!));
+    stripTagsFromContent((tag) => parentTags.includes(parentOf(tag)));
     await Promise.all([tagDB.write(), contentDataDB.write()]);
     return tagDB.data;
   });

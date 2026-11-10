@@ -1,6 +1,7 @@
 import type { ParentTagsType, TagsType } from "./types";
 
-const parentOf = (tag: string) => tag.split(":")[0]!;
+// split() always yields at least one element, so the fallback is never used.
+export const parentOf = (tag: string) => tag.split(":")[0] ?? tag;
 
 // Rebuild every tag count and parentTags from content; keeps covers and zero-count tags.
 // A tag duplicated within one item counts once. Does not mutate its inputs.
