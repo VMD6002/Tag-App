@@ -64,6 +64,10 @@ const SiteDataScaffold: Omit<SiteData, "script"> = {
         label: "360p",
         value: "-f b[height<=360]",
       },
+      {
+        label: "None",
+        value: "",
+      },
     ],
     defaultPreset: {
       label: "480p",
